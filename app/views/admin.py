@@ -117,8 +117,9 @@ def new_post():
 def edit_post(post_title, post_type):
     p = Post.query.filter_by(title=post_title).first()
     form = PostForm()
+    form.post_id.data = p.id
 
-    if p.main_id is not None:
+    if p.main_id:
         abort(404)
 
     if post_type == "draft":

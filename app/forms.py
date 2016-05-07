@@ -46,11 +46,12 @@ class PostForm(Form):
     publicity = SelectField("对外公开", choices=[(1, "所有人可见"), (0, "仅自己可见")], coerce=int)
     commendable = SelectField("允许评论", choices=[(1, "允许评论"), (0, "禁止评论")], coerce=int)
     publish = SubmitField('发布')
+    post_id = IntegerField('id')
     save = SubmitField('保存')
 
     def validate_title(self, field):
         post = Post.query.filter_by(title=field.data).first()
-        if post and post.type == 'article':
+        if post and post.id != self.post_id.data:
             raise ValidationError('文章标题重复')
 
 
