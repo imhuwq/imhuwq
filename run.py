@@ -7,7 +7,10 @@ from app import create_app
 
 app = create_app('production')
 
-log_path = os.path.abspath('./log/app.log')
+log_dir = os.path.abspath('./log')
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
+log_path = os.path.abspath(log_dir + '/app.log')
 
 tornado.options.options.log_file_prefix = log_path
 tornado.options.parse_command_line()

@@ -103,9 +103,9 @@ def new_post():
         db.session.commit()
 
         if form.save.data:
-            return redirect(url_for('admin.edit_post', post_id=p.id, post_type="main"))
+            return redirect(url_for('admin.edit_post', post_title=p.title, post_type="main"))
         elif form.publish.data:
-            return redirect(url_for('blog.post', post_id=p.id))
+            return redirect(url_for('blog.post', post_title=p.title, post_category_link=p.category_link))
     cates = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
     return render_template("admin/new_post.html",
                            form=form,
@@ -176,7 +176,7 @@ def edit_post(post_title, post_type):
             p.tags = form.tags.data
             p.type = 'article'
             db.session.add(p)
-            return redirect(url_for('blog.post', post_id=p.id))
+            return redirect(url_for('blog.post', post_title=p.title, post_category_link=p.category_link))
 
     form.title.data = p.title
     form.content.data = p.body
