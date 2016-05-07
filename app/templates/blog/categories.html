@@ -1,0 +1,38 @@
+{% extends "_base.html" %}
+
+{% block page_main %}
+
+    <h2>全部分类</h2>
+
+    <div class="page-main">
+        <ol class="child-category-list">
+            <div class="row">
+                {% for category in categories %}
+                    <div class="col-md-4 col-sm-6">
+                        <li class="child-category">
+                            <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
+                            {% if category.children %}
+                                <ol class="grandchild-category-list">
+                                    {% for child in category.children %}
+                                        {% if child.posts_count > 0 %}
+                                            <li class="grandchild-category">
+                                                <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ol>
+                            {% endif %}
+                        </li>
+                    </div>
+                {% endfor %}
+            </div>
+        </ol>
+    </div>
+
+{% endblock %}
+
+{% block page_sidebar %}
+    <div class="page-sidebar">
+        {% include "blog/_sider_bar.html" %}
+    </div>
+{% endblock %}

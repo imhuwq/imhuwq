@@ -190,7 +190,6 @@ $(document).ready(function () {
                 selectedItem = [];
             }
         });
-
         // get selected item id
         $("#manage-table").on('change', '.item-selector', function () {
             var itemId = $(this).closest('tr').prop('id').trim();
@@ -564,6 +563,29 @@ $(document).ready(function () {
                     }
                 }
 
+            });
+            
+            // move all selected category
+            $('#move-all-selected').on('click', function () {
+                var newCate = prompt('要把所选分类移入哪个分类中？');
+                if (newCate.indexOf('/') > -1) {
+                    alert('分类名中不能包含“/”')
+                }
+                else if (
+                    confirm('您确定移动这些分类吗？\n它们将成为被移入分类的子分类')
+                    && selectedItem.length > 0) {
+                    $.post($SCRIPT_ROOT + '/ajax-admin/move-all-selected-cates',
+                        {
+                            selected_cates: selectedItem.join(),
+                            target_cate_name: newCate
+                        },
+                        function (data) {
+                            if (data['warning']) {
+                                alert(data['warning'])
+                            }
+                        })
+                }
+                window.location.reload()
             });
 
         }

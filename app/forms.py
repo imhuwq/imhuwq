@@ -50,7 +50,7 @@ class PostForm(Form):
 
     def validate_title(self, field):
         post = Post.query.filter_by(title=field.data).first()
-        if post:
+        if post and post.type == 'article':
             raise ValidationError('文章标题重复')
 
 

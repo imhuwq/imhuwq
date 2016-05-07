@@ -229,3 +229,12 @@ def merge_all_selected_tags():
     Tag.merge(new_tag_name, selected_tags)
     return ''
 
+
+@ajax_admin.route('/move-all-selected-cates', methods=['GET', 'POST'])
+@admin_required
+def move_all_selected_tags():
+    selected_cates = request.form.get('selected_cates').split(',')
+    target_cate_name = request.form.get('target_cate_name')
+    data = Category.move(target_cate_name, selected_cates)
+    print(data)
+    return jsonify(data)

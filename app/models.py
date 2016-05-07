@@ -105,17 +105,23 @@ class Post(db.Model):
         if self.type == 'article':
             old_ancestors = old_link.split('/') if old_link else ''
             new_ancestors = new_link.split('/')
-            add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
-            del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
-            for name in del_ancestors:
-                ancestor = Category.query.filter_by(_name=name).first()
-                if ancestor:
-                    ancestor.refresh_posts_count()
+            if old_ancestors == new_ancestors:
+                for name in old_ancestors:
+                    ancestor = Category.query.filter_by(_name=name).first()
+                    if ancestor:
+                        ancestor.refresh_posts_count()
+            else:
+                add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
+                del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
+                for name in del_ancestors:
+                    ancestor = Category.query.filter_by(_name=name).first()
+                    if ancestor:
+                        ancestor.refresh_posts_count()
 
-            for name in add_ancestors:
-                ancestor = Category.query.filter_by(_name=name).first()
-                if ancestor:
-                    ancestor.refresh_posts_count()
+                for name in add_ancestors:
+                    ancestor = Category.query.filter_by(_name=name).first()
+                    if ancestor:
+                        ancestor.refresh_posts_count()
 
     @property
     def tags(self):
@@ -133,15 +139,19 @@ class Post(db.Model):
         db.session.flush()
 
         if self.type == 'article':
-            add_tags = [x for x in new_tags if x not in old_tags]
-            del_tags = [x for x in old_tags if x not in new_tags]
-            print(del_tags)
-            for tag in del_tags:
-                t = Tag.query.filter_by(name=tag).first()
-                t.refresh_posts_count()
-            for tag in add_tags:
-                t = Tag.query.filter_by(name=tag).first()
-                t.refresh_posts_count()
+            if old_tags == new_tags:
+                for tag in old_tags:
+                    t = Tag.query.filter_by(name=tag).first()
+                    t.refresh_posts_count()
+            else:
+                add_tags = [x for x in new_tags if x not in old_tags]
+                del_tags = [x for x in old_tags if x not in new_tags]
+                for tag in del_tags:
+                    t = Tag.query.filter_by(name=tag).first()
+                    t.refresh_posts_count()
+                for tag in add_tags:
+                    t = Tag.query.filter_by(name=tag).first()
+                    t.refresh_posts_count()
 
     def add_tag(self, tag):
         self.tags_name = self.tags_name + '、' + tag.name if self.tags_name else tag.name
@@ -288,6 +298,24 @@ class Category(db.Model):
             for child in c.children:
                 child.be_child_of(new_cate)
             db.session.delete(c)
+
+    @staticmethod
+    def move(target_name, moved_id_list):
+        if '1' in moved_id_list:
+            name = Category.query.get(1).name
+            return {'warning': '<%s>是默认分类, 不能成为任何分类的子分类' % name}
+        else:
+            target_cate = Category.query.filter_by(_name=target_name).first()
+            if target_cate is None:
+                target_cate = Category(name=target_name)
+                db.session.add(target_cate)
+                db.session.flush()
+            if str(target_cate.id) in moved_id_list:
+                return {'warning': '<%s>不能成为自己的子分类' % target_name}
+        moved_cate_list = [Category.query.get(cate_id) for cate_id in moved_id_list]
+        for c in moved_cate_list:
+            c.be_child_of(target_cate)
+        return {'success': 'done'}
 
 
 class Tag(db.Model):

@@ -9,7 +9,7 @@ admin = Blueprint('admin', __name__, )
 
 
 # below is about site setting
-@admin.route('/manage-site.html', methods=['GET', 'POST'])
+@admin.route('/manage-site', methods=['GET', 'POST'])
 @admin_required
 def manage_site():
     form = SiteSettingForm()
@@ -26,7 +26,7 @@ def manage_site():
 
 
 # below is about user account
-@admin.route('/manage-profile.html', methods=['GET', 'POST'])
+@admin.route('/manage-profile', methods=['GET', 'POST'])
 @admin_required
 def manage_profile():
     form = ProfileForm()
@@ -44,7 +44,7 @@ def manage_profile():
                            title='个人资料')
 
 
-@admin.route('/manage-password.html', methods=['GET', 'POST'])
+@admin.route('/manage-password', methods=['GET', 'POST'])
 @admin_required
 def manage_password():
     form = PasswordSetForm()
@@ -75,7 +75,7 @@ def index():
                            cates_count=cates_count, sets=sets, user=user)
 
 
-@admin.route('/new-post.html', methods=['GET', 'POST'])
+@admin.route('/new-post', methods=['GET', 'POST'])
 @admin_required
 def new_post():
     form = PostForm()
@@ -100,7 +100,6 @@ def new_post():
             db.session.add(cate)
         p.category = cate
         p.tags = form.tags.data
-        db.session.commit()
 
         if form.save.data:
             return redirect(url_for('admin.edit_post', post_title=p.title, post_type="main"))
@@ -113,10 +112,10 @@ def new_post():
                            categories=cates)
 
 
-@admin.route('/edit-post/post_title>/<post_type>.html', methods=['GET', 'POST'])
+@admin.route('/edit-post/<post_title>/<post_type>', methods=['GET', 'POST'])
 @admin_required
 def edit_post(post_title, post_type):
-    p = Post.query.filter_by(post_title).first()
+    p = Post.query.filter_by(title=post_title).first()
     form = PostForm()
 
     if p.main_id is not None:
@@ -150,10 +149,7 @@ def edit_post(post_title, post_type):
                 post_type = 'draft'
             else:
                 draft = p
-
-            if new_cate.name != draft.category:
-                draft.category = new_cate
-
+            draft.category = new_cate
             draft.tags = form.tags.data
 
             draft.title = form.title.data
@@ -171,11 +167,9 @@ def edit_post(post_title, post_type):
             p.body = form.content.data
             p.publicity = form.publicity.data
             p.commendable = form.commendable.data
-            if new_cate.name != p.category_name:
-                p.category = new_cate
-            p.tags = form.tags.data
             p.type = 'article'
-            db.session.add(p)
+            p.category = new_cate
+            p.tags = form.tags.data
             return redirect(url_for('blog.post', post_title=p.title, post_category_link=p.category_link))
 
     form.title.data = p.title
@@ -190,7 +184,7 @@ def edit_post(post_title, post_type):
                            title="编辑文章")
 
 
-@admin.route('/manage-post.html', methods=['GET', 'POST'])
+@admin.route('/manage-post', methods=['GET', 'POST'])
 @admin_required
 def manage_post():
     category = request.args.get('category')
@@ -252,7 +246,7 @@ def manage_post():
 
 
 # below is about comment
-@admin.route('/manage-comment.html', methods=['GET', 'POST'])
+@admin.route('/manage-comment', methods=['GET', 'POST'])
 @admin_required
 def manage_comment():
     sets = Settings.query.get(1)
@@ -261,7 +255,7 @@ def manage_comment():
 
 
 # below is about category
-@admin.route('/new-category.html', methods=['GET', 'POST'])
+@admin.route('/new-category', methods=['GET', 'POST'])
 @admin_required
 def new_category():
     form = CategoryForm()
@@ -287,7 +281,7 @@ def new_category():
                            categories=categories)
 
 
-@admin.route('/edit-category/<path:category_link>.html', methods=['GET', 'POST'])
+@admin.route('/edit-category/<path:category_link>', methods=['GET', 'POST'])
 @admin_required
 def edit_category(category_link):
     form = CategoryForm()
@@ -317,7 +311,7 @@ def edit_category(category_link):
                            categories=categories)
 
 
-@admin.route('/manage-category.html', methods=['GET', 'POST'])
+@admin.route('/manage-category', methods=['GET', 'POST'])
 @admin_required
 def manage_categories():
     categories = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
@@ -326,7 +320,7 @@ def manage_categories():
                            categories=categories)
 
 
-@admin.route('/manage-category/<path:category_link>.html', methods=['GET', 'POST'])
+@admin.route('/manage-category/<path:category_link>', methods=['GET', 'POST'])
 @admin_required
 def manage_category(category_link):
     category = Category.query.filter_by(_link=category_link).first()
@@ -338,7 +332,7 @@ def manage_category(category_link):
 
 
 # below is about tag
-@admin.route('/manage-tag.html', methods=['GET', 'POST'])
+@admin.route('/manage-tag', methods=['GET', 'POST'])
 @admin_required
 def manage_tags():
     query = Tag.query
@@ -355,7 +349,7 @@ def manage_tags():
                            tags=tags)
 
 
-@admin.route('/edit-tag/<tag_name>.html')
+@admin.route('/edit-tag/<tag_name>')
 @admin_required
 def edit_tag(tag_name):
     tag = Tag.query.filter_by(name=tag_name).first()

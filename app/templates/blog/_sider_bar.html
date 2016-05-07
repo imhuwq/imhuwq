@@ -8,7 +8,9 @@
         <span class="glyphicon glyphicon-calendar"></span>&nbsp;&nbsp;存档
     </a></li>
 
-    <li><span class="glyphicon glyphicon-tasks"></span>&nbsp;&nbsp;分类
+    <li>
+        <a href="{{ url_for('blog.categories') }}">
+            <span class="glyphicon glyphicon-tasks"></span>&nbsp;&nbsp;分类</a>
         <ul id="cate-list" style="list-style-type:none">
             {% for cate in cates %}
                 <li>

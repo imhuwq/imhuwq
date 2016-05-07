@@ -6,7 +6,7 @@ from sqlalchemy import or_
 blog = Blueprint('blog', __name__)
 
 
-@blog.route('/index.html')
+@blog.route('/index')
 def index():
     title = '博客'
     query = Post.query.filter_by(type="article").order_by(Post.date.desc())
@@ -30,8 +30,8 @@ def index():
                            pagination=pagination)
 
 
-@blog.route('/category/<path:post_category_link>/><post_title>.html')
-@blog.route('/post/<post_title>.html', defaults={'post_category_link': None})
+@blog.route('/category/<path:post_category_link>/><post_title>')
+@blog.route('/post/<post_title>', defaults={'post_category_link': None})
 def post(post_title, post_category_link):
     p = Post.query.filter_by(title=post_title).first()
     if post_category_link != p.category_link:
@@ -51,22 +51,21 @@ def post(post_title, post_category_link):
         abort(404)
 
 
-@blog.route('/category.html')
+@blog.route('/category')
 def categories():
     display = request.args.get('display')
     if display == 'detail':
         return redirect(url_for('blog.index'))
     cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
     tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
-    return render_template('blog/category.html',
-                           display='cover',
-                           categories=categories,
+    return render_template('blog/categories.html',
+                           categories=cates,
                            title='分类',
                            cates=cates,
                            tags=tags)
 
 
-@blog.route('/category/<path:category_link>.html')
+@blog.route('/category/<path:category_link>')
 def category(category_link):
     cate = Category.query.filter_by(_link=category_link).first()
     if not cate:
@@ -95,7 +94,7 @@ def category(category_link):
                            tags=tags)
 
 
-@blog.route('/tag/<tag_name>.html')
+@blog.route('/tag/<tag_name>')
 def tag(tag_name):
     tags = Tag.query
     t = tags.filter_by(name=tag_name).first()
@@ -127,7 +126,7 @@ def tag(tag_name):
                            tags=tags)
 
 
-@blog.route('/archive.html')
+@blog.route('/archive')
 def archive():
     title = '博客存档'
     ps = Post.query.filter_by(type='article').order_by(Post.date.desc()).all()

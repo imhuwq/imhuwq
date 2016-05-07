@@ -32,7 +32,7 @@ def before_app_request():
         return redirect(url_for('main.setup'))
 
 
-@main.route('/setup.html', methods=['GET', 'POST'])
+@main.route('/setup', methods=['GET', 'POST'])
 def setup():
     if current_app.config['SITE_INITIATED']:
         return redirect('main.index')
@@ -70,7 +70,7 @@ def setup():
                            title=title)
 
 
-@main.route('/login.html', methods=['GET', 'POST'])
+@main.route('/login', methods=['GET', 'POST'])
 def login():
     if not current_user.is_authenticated:
         form = LoginForm()
@@ -88,13 +88,13 @@ def login():
         return redirect(url_for('main.index'))
 
 
-@main.route('/logout.html')
+@main.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
 
-@main.route('/index.html')
+@main.route('/index')
 @main.route('/')
 def index():
     title = '博客'
