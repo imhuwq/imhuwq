@@ -1,0 +1,90 @@
+{% extends "_base.html" %}
+
+{% block page_container %}
+    <div class="col-md-8">
+        <div id="batch-action">
+            <div class="dropdown">
+                <span class="btn btn-default" id="select-all">全选</span>
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    被选中项
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a id="delete-all-selected">删除分类</a></li>
+                    <li><a id="merge-all-selected">合并分类</a></li>
+                </ul>
+                <a class="btn btn-default" id="add-new" href="{{ url_for('admin.new_category') }}">新增</a>
+
+                {% if category %}
+                    <a class="btn btn-default" id="go-back" href="
+                    {% if request.path.split('/')[-2] != 'manage-category' %}
+                       {{ url_for('admin.manage_category', category_link=category.parent.link) }}
+                    {% else %}
+                        {{ url_for('admin.manage_categories') }}
+                    {% endif %}">
+                    返回上一级
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <table class="table table-bordered table-responsive" id="manage-table">
+            <tr>
+                <th id="cate-name">名称</th>
+                <th id="cate-order" style="text-align: center">排序</th>
+                <th id="cate-parent" style="text-align: center">父分类</th>
+                <th id="cate-children" style="text-align: center">子分类个数</th>
+                <th id="cate-posts-count" style="text-align: center">文章篇数</th>
+                <th id="cate-action" style="text-align: center">操作</th>
+            </tr>
+
+            {% for cate in categories %}
+                <tr class="cate-row" id="{{ cate.id }}">
+                    <td>
+                        <input type="checkbox" class="item-selector" name="">
+                        {{ cate.name }}
+                    </td>
+                    <td>{{ cate.order }}</td>
+                    <td>
+                        {% if cate.parent_id %}
+                            {{ cate.parent.name }}
+                        {% else %}
+                            没有父分类
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cate.children %}
+                            {{ cate.children|length }}
+                        {% else %}
+                            没有子分类
+                        {% endif %}
+                    </td>
+                    <td>{{ cate.posts_count }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_category', category_link=cate.link) }}" title="编辑">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a> &nbsp;&nbsp;
+
+                        {% if cate.children %}
+                            <a href="{{ url_for('admin.manage_category', category_link=cate.link) }}" title="管理">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </a> &nbsp;&nbsp;
+                        {% else %}
+                            <a style="color: dimgray;" title="没有子分类，无需管理">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </a> &nbsp;&nbsp;
+                        {% endif %}
+
+                        <a title="删除" class="delete-cate-icon">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

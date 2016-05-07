@@ -1,0 +1,8 @@
+__pycache__
+env
+config.py
+migrations
+*.sqlite
+*.log
+*.pyc
+.idea

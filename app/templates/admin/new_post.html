@@ -1,0 +1,106 @@
+{% extends "_base.html" %}
+
+{% block page_container %}
+    {% if post %}
+        {% if post.draft %}
+            <div class="flashed-message">
+                <div class="alert alert-warning fade in" id="flash">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    该文章正在修改中，继续编辑将会覆盖已有的修改稿件。
+                    <a href="{{ url_for('admin.edit_post', post_id=post.id, post_type='draft') }}">继续上回的编辑</a>
+                </div>
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+    <form action="" method="post" class="form" role="form" id="post-editor-form">
+        {{ form.hidden_tag() }}
+
+        <div class="col-md-9" id="post-editor-main">
+            <div class="form-group required {% if form.title.errors %} has-error {% endif %}" id="post-editor-title">
+                <label class="control-label" for="title">标题</label>
+                {{ form.title(class="form-control", required="", autocomplete="off") }}
+                {% for error in form.title.errors %}
+                    <p class="help-block">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div class="form-group required {% if form.title.errors %} has-error {% endif %}" id="post-editor-content">
+                <label class="control-label" for="content">正文</label>
+                {{ form.content(class="form-control", required="") }}
+                {% for error in form.content.errors %}
+                    <p class="help-block">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div id="post-editor-action">
+                {{ form.publish(class="btn btn-default") }}
+                {{ form.save(class="btn btn-default") }}
+            </div>
+        </div>
+
+        <div class="col-md-3" id="post-editor-side">
+            <label>公开程度</label>
+            <div id="post-editor-publicity">
+                {{ form.publicity(class="form-control", style="border-bottom:none") }}
+                {{ form.commendable(class="form-control") }}
+            </div>
+
+            <hr>
+
+            <div id="post-editor-category">
+                <label>选择分类</label>
+                <ul class="list-group" id="post-editor-cate-selector">
+                    {% for category in categories %}
+                        {{ macros.render_category_list(category, post) }}
+                    {% endfor %}
+                </ul>
+
+                <label>新建分类</label>
+                <div id="post-editor-cate-editor" class="">
+                    <select name="new-category-parent"
+                            id="post-editor-cate-parent"
+                            class="form-control">
+                        <option value="-1" selected id="no-parent">父分类...</option>
+                        {% for category in categories %}
+                            {{ macros.render_category_select(category) }}
+                        {% endfor %}
+                    </select>
+
+                    <input type="text"
+                           id="post-editor-cate-input"
+                           class="form-control"
+                           name="new-category"
+                           autocomplete="off"
+                           placeholder="分类名称，按回车提交，可选父分类"
+                    >
+                </div>
+            </div>
+
+            <hr>
+
+            <div id="post-editor-tag">
+                <label class="control-label" for="post-editor-tag-input">添加标签</label>
+                <input type="text"
+                       id="post-editor-tag-input"
+                       name="tmp-tags"
+                       class="form-control"
+                       placeholder="使用中英文逗号(,)隔离，按回车提交"
+                       autocomplete="off"
+                >
+                {{ form.tags(style="display:none") }}
+                <div id="post-editor-tag-preview">
+                    {% if post and post.tags_name != "" %}
+                        {% for tag in post.tags_name.split('、') %}
+                            <span class="tag-preview">
+                                {{ tag }}
+                                <a title="删除" class="delete-tag-icon btn">&times;</a>
+                            </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+{% endblock %}

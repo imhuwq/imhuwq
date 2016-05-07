@@ -1,0 +1,76 @@
+{% extends "_base.html" %}
+
+{% block page_main %}
+    {% if category %}
+        {% set tree = request.path.split('/')[3:] %}
+        <h2>分类:
+            {% set link = request.path.split('/blog/category/',1)[1] %}
+            {% set len = tree|length %}
+            {% for i in range(len) %}
+                {% set cate_link = '/'.join(tree[:i+1]) %}
+                <a href="{{ url_for('blog.category', category_link=cate_link) }}">{{ tree[i] }}
+                </a>
+                {% if i != len-1 %}&raquo;{% endif %}
+            {% endfor %}
+        </h2>
+    {% else %}
+        <h2>分类</h2>
+    {% endif %}
+
+
+    <div class="page-main">
+        <div id="children-list">
+            <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseChild"
+               aria-expanded="false"
+               aria-controls="collapseExample">
+                子分类
+            </a>
+
+            <div class="collapse" id="collapseChild">
+                <ol class="child-category-list">
+                    <div class="row">
+                        {% for category in categories %}
+                            <div class="col-md-4 col-sm-6">
+                                <li class="child-category">
+                                    <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
+                                    {% if category.children %}
+                                        <ol class="grandchild-category-list">
+                                            {% for child in category.children %}
+                                                {% if child.posts_count > 0 %}
+                                                    <li class="grandchild-category">
+                                                        <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ol>
+                                    {% endif %}
+                                </li>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </ol>
+            </div>
+        </div>
+
+
+        <div id="post-container">
+            {% if posts|length == 0 %}
+                <h3>暂无文章</h3>
+            {% else %}
+                {% include "blog/_post_list.html" %}
+            {% endif %}
+        </div>
+
+        {% if pagination %}
+            <div class="post-pagination">
+                {{ macros.simple_pagination_widget(pagination=pagination, endpoint="main.index") }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block page_sidebar %}
+    <div class="page-sidebar">
+        {% include "blog/_sider_bar.html" %}
+    </div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends "_base.html" %}
+
+{% block page_container %}
+
+    <div class="col-md-12">
+
+        <div id="batch-action">
+            <div class="dropdown">
+                <span class="btn btn-default" id="select-all">全选</span>
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    被选中项
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a id="delete-all-selected">删除文章</a></li>
+
+                    <li role="separator" class="divider"></li>
+                    <li><a class="update-posts-tag" operation="reset">重置标签</a></li>
+                    <li><a class="update-posts-tag" operation="add">添加标签</a></li>
+                    <li><a class="update-posts-tag" operation="delete">删除标签</a></li>
+
+
+                    <li role="separator" class="divider"></li>
+                    <li><a class="update-post-cate" operation="default">删除分类</a></li>
+                    <li><a class="update-post-cate" operation="new">新选分类</a></li>
+
+                    <li role="separator" class="divider"></li>
+                    <li><a class="set-post" property="comment" operation="0">关闭评论</a></li>
+                    <li><a class="set-post" property="comment" operation="1">开放评论</a></li>
+
+                    <li role="separator" class="divider"></li>
+                    <li><a class="set-post" property="publicity" operation="0">转为私密</a></li>
+                    <li><a class="set-post" property="publicity" operation="1">转为公开</a></li>
+                </ul>
+                <a class="btn btn-default" id="add-new" href="{{ url_for('admin.new_post') }}">新增</a>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-responsive" id="manage-table">
+            <tr>
+                <th id="post-title">标题</th>
+
+                <th id="post-status" style="text-align: center">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                              aria-expanded="false">状态:全部 <span class="caret"></span></span>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                            <li><a class="apply-filter" filter="status" by="">全部</a></li>
+                            <li role="separator" class="divider"></li>
+
+                            <li><a class="apply-filter" filter="status" by="Article">已发布</a></li>
+                            <li><a class="apply-filter" filter="status" by="Saved">修改中</a></li>
+                            <li><a class="apply-filter" filter="status" by="Draft">起草中</a></li>
+
+                        </ul>
+                    </div>
+                </th>
+
+
+                <th id="post-cate" style="text-align: center">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                              aria-expanded="false">分类:全部 <span class="caret"></span></span>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                            <li><a class="apply-filter" filter="category" by="">全部</a></li>
+                            <li role="separator" class="divider"></li>
+
+
+                            {% for category in categories %}
+                                {{ macros.render_category_filter(category) }}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </th>
+
+                <th id="post-tag" style="text-align: center">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                              aria-expanded="false">标签:全部 <span class="caret"></span></span>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                            <li><a class="apply-filter" filter="tag" by="">全部</a></li>
+                            <li><a class="apply-filter" filter="tag" by=",">无标签</a></li>
+                            <li role="separator" class="divider"></li>
+
+                            {% for tag in tags %}
+                                <li {% if tag.posts_count == 0 %} class="disabled" {% endif %}>
+                                    <a class="apply-filter" filter="tag" by="{{ tag.name }}">{{ tag.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </th>
+
+                <th id="post-publicity" style="text-align: center">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                              aria-expanded="false">公开:全部 <span class="caret"></span></span>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                            <li><a class="apply-filter" filter="publicity" by="">全部</a></li>
+                            <li role="separator" class="divider"></li>
+
+                            <li><a class="apply-filter" filter="publicity" by="True">已公开</a></li>
+                            <li><a class="apply-filter" filter="publicity" by="False">非公开</a></li>
+
+                        </ul>
+                    </div>
+                </th>
+
+                <th id="post-commendable" style="text-align: center">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                              aria-expanded="false">评论:全部 <span class="caret"></span></span>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a class="apply-filter" filter="commendable" by="">全部</a></li>
+                            <li role="separator" class="divider"></li>
+
+                            <li><a class="apply-filter" filter="commendable" by="On">已开启</a></li>
+                            <li><a class="apply-filter" filter="commendable" by="Off">已关闭</a></li>
+
+
+                        </ul>
+                    </div>
+                </th>
+                <th id="post-action" style="text-align: center">操作</th>
+            </tr>
+
+            {% for post in posts %}
+                <tr class="post-row" id="{{ post.id }}">
+
+                    <td class="post-title">
+                        <input type="checkbox" class="item-selector" name="">
+                        <a href="{{ url_for('blog.post', post_title=post.title) }}" target="_blank">{{ post.title }}</a>
+                    </td>
+
+                    <td style="text-align: center" class="post-type">
+                        {% if post.type == 'article' and not post.draft %}
+                            <span class="glyphicon glyphicon-list-alt" title="已发布"></span>
+                        {% elif post.draft %}
+                            <a href="{{ url_for('admin.edit_post', post_type='main', post_title=post.title) }}"
+                               title="修改中">
+                                <span class="glyphicon glyphicon-list-alt"></span></a>
+                        {% else %}
+                            <a href="{{ url_for('admin.edit_post', post_type='main', post_title=post.title) }}"
+                               title="起草中">
+                                <span class="glyphicon glyphicon-edit"></span></a>
+                        {% endif %} </td>
+
+                    <td class="post-cate"><a href="{{ url_for('blog.category', category_link=post.category_link) }}">
+                        {{ post.category_link }}</a></td>
+
+                    <td class="post-tag">
+                        {% set tags = post.tags_name.split('、') %}
+                        {% for tag in tags %}
+                            <a href="{{ url_for('blog.tag', tag_name=tag) }}">{{ tag }}</a>
+                            {% if tag != tags[-1] %}、{% endif %}
+                        {% endfor %}
+                    </td>
+
+                    <td style="text-align: center" class="post-publicity">
+
+                        <a class="public-post-icon"
+                                {% if  post.publicity %}
+                           title="所有人可见" style="color:green">
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                {% else %}
+                                    title="仅自己可见" style="color:orange">
+                                    <span class="glyphicon glyphicon-eye-close"></span>
+                                {% endif %}
+                        </a>
+
+                    </td>
+
+                    <td style="text-align: center" class="post-comments-count">
+
+                        <a class="commendable-post-icon"
+                                {% if  post.commendable %}
+                           title="开放评论" style="color:green">
+                                    <span class="glyphicon glyphicon-ok-circle"></span>
+                                {% else %}
+                                    title="禁止评论" style="color:orange">
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                {% endif %}
+                        </a>
+                        &nbsp;&nbsp;
+                        <a href="">{{ post.comments_count }}</a>
+                    </td>
+
+                    <td style="text-align: center" class="post-action">
+                        <a href="{{ url_for('admin.edit_post', post_title=post.title, post_type='main') }}" title="修改">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a> &nbsp;&nbsp;
+                        <a title="删除" class="delete-post-icon">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+
+        {% if pagination %}
+            {{ macros.pagination_widget(
+                                        pagination=pagination,
+                                        endpoint='admin.manage_post',
+                                        status=request.args.get('status'),
+                                        publicity=request.args.get('publicity'),
+                                        commendable=request.args.get('commendable'),
+                                        tag = request.args.get('tag'),
+                                        category = request.args.get('category')
+            ) }}
+        {% endif %}
+    </div>
+
+
+{% endblock %}

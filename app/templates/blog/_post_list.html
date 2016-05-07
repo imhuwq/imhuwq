@@ -1,0 +1,58 @@
+<ul class="post-list">
+    {% for post in posts %}
+        {% if post.publicity or current_user.is_administrator %}
+            <li class="post">
+                <a href="{{ url_for('blog.post', post_title=post.title) }}">
+                    <h2 class="post-title">{{ post.title }}</h2>
+                </a>
+
+                <div class="post-meta">
+                    <span class="post-date">
+                        <span class=" glyphicon glyphicon-calendar" title="日期"></span>&nbsp;
+                        {{ moment(post.date).format('LL') }}
+                    </span>&nbsp;
+                    <span class="post-category">
+                        <span class=" glyphicon glyphicon-book" title="分类"></span>&nbsp;
+                        <a href="{{ url_for('blog.category', category_link=post.category_link) }}">
+                            {{ post.category_name }}
+                        </a>
+                    </span>&nbsp;
+                    {% if post.tags_name %}
+                        <span class="post-tag">
+                        <span class="glyphicon glyphicon-tags" title="标签"></span>&nbsp;
+                            {% for tag in post.tags_name.split('、') %}
+                                <a href="{{ url_for('blog.tag', tag_name=tag) }}">
+                        {{ tag }}</a>
+                            {% endfor %}</span>&nbsp;
+                    {% endif %}
+                    <span class="post-comment">
+                        <span class="glyphicon glyphicon-comment" title="评论"></span>&nbsp;
+                        <a href="{{ url_for('blog.post', post_title=post.title, _external=True) }}#disqus_thread"
+                           data-disqus-identifier="post-{{ post.title }}">
+
+                        </a>
+                    </span>&nbsp;
+
+                    {% if current_user.is_administrator %}
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span class="post-edit">
+                        <a href="{{ url_for("admin.edit_post", post_title=post.title, post_type='main') }}">编辑</a></span>
+                    {% endif %}
+                </div>
+
+                <div class="post-content">
+                    {% if detailed %}
+                        <div class="body">
+                            {{ post.body | markdown | safe }}
+                        </div>
+                    {% else %}
+                        <div class="abstract">
+                            {{ post.abstract | markdown | safe }}
+                        </div>
+                        <span class="read-more"><a href="{{ url_for('blog.post', post_title=post.title) }}">阅读全文</a></span>
+                    {% endif %}
+                </div>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

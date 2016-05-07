@@ -1,0 +1,65 @@
+{% extends "_base.html" %}
+
+{% block page_container %}
+    <div class="col-md-8">
+        <div id="batch-action">
+            <div class="dropdown">
+                <span class="btn btn-default" id="select-all">全选</span>
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    被选中项
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a id="delete-all-selected">删除标签</a></li>
+                    <li><a id="merge-all-selected">合并标签</a></li>
+                </ul>
+                <a class="btn btn-default" id="add-new" >新增</a>
+
+            </div>
+        </div>
+
+        <table class="table table-bordered table-responsive" id="manage-table">
+            <tr>
+                <th id="tag-name">名称</th>
+                <th id="tag-posts-count" style="text-align: center">文章篇数</th>
+                <th id="tag-action" style="text-align: center">操作</th>
+            </tr>
+
+            {% for tag in tags %}
+                <tr class="tag-row" id="{{ tag.id }}">
+                    <td>
+                        <input type="checkbox" class="item-selector" name="">
+                        {{ tag.name }}
+                    </td>
+                    <td>{{ tag.posts_count }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_tag', tag_name=tag.name) }}" title="编辑">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a> &nbsp;&nbsp;
+
+                        <a title="删除" class="delete-cate-icon">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+        </table>
+
+
+    </div>
+    <div class="col-md-4">
+        &nbsp;
+    </div>
+    <div class="col-md-8">
+        {% if pagination %}
+            {{ macros.pagination_widget(
+                                        pagination=pagination,
+                                        endpoint='admin.manage_tags'
+            ) }}
+        {% endif %}
+    </div>
+
+{% endblock %}

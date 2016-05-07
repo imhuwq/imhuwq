@@ -1,0 +1,31 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+        .row {
+            margin-top: 8em;
+        }
+
+        #submit {
+            position: absolute;
+            right: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="setup-form col-md-4 col-lg-4 col-sm-2 col-xs-2"></div>
+
+            <div class="setup-form col-md-4 col-lg-4 col-sm-8 col-xs-8">
+                {{ wtf.quick_form(form) }}
+            </div>
+            <div class="setup-form col-md-4 col-lg-4 col-sm-2 col-xs-2"></div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,331 @@
+/* 1
+*****************************************************************
+*                   Index 1: global sets                        *
+*****************************************************************/
+body {
+    padding-top: 70px;
+}
+
+body * {
+    border-radius: 0 !important;
+}
+
+a:hover, a:active, a:visited {
+    outline: none !important;
+}
+
+.dropdown-menu {
+    max-height: 30em;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+form #submit {
+    float: right;
+}
+
+/* 2
+*****************************************************************
+*                   Index 2: post editor sets                   *
+*****************************************************************/
+
+/* 2.1 main body sets*/
+#post-editor-main {
+    margin-bottom: 4em;
+}
+
+#post-editor-content textarea {
+    height: 40em;
+}
+
+#post-editor-action .btn {
+    float: right;
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+/* 2.2 category sets*/
+#post-editor-cate-selector {
+    max-height: 20em;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+#post-editor-cate-selector > li:first-child {
+    border-top: 0;
+}
+
+#post-editor-cate-selector > li:last-child {
+    border-bottom: 0;
+}
+
+#post-editor-cate-selector .list-group-item {
+    padding: 0.5em;
+}
+
+#post-editor-cate-selector .list-group {
+    margin-bottom: 0;
+}
+
+#post-editor-cate-parent {
+    border-bottom: 0;
+}
+
+#post-editor-cate-parent option {
+    color: black;
+}
+
+.option-placeholder {
+    color: lightgray;
+}
+
+/* Index 2.3: tag sets */
+#post-editor-tag .tag-preview {
+    background-color: rgb(245, 245, 245);
+    padding: 0.3em 1em 0.3em 0.3em;
+    border-radius: 0.6em !important;
+    margin: 0.3em 0.5em 0 0;
+    position: relative;
+    display: inline-block;
+}
+
+#post-editor-tag .tag-preview a {
+    position: absolute;
+    right: -0.6em;
+    top: -0.6em;
+    font-size: 1.2em;
+    color: pink;
+}
+
+/* Index 2.4: draft reminder sets */
+#post-draft-reminder {
+    clear: both;
+    padding: 0.6em 1em;
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+/* 3
+*****************************************************************
+*                   Index 3: post index sets                    *
+*****************************************************************/
+
+#post-container .post-list {
+    padding: 0;
+    list-style-type: none;
+}
+
+#post-container .post-list .post {
+    margin-bottom: 3em;
+    border-bottom: 1px solid rgb(248, 248, 248)
+}
+
+#post-container .post a:hover {
+    text-decoration: none;
+}
+
+#post-container .post-title {
+    font-size: 2em;
+    margin-bottom: 0.2em;
+    color: rgb(85, 85, 85)
+}
+
+#post-container .post-meta {
+    margin-bottom: 0.5em;
+}
+
+#post-container .post-content {
+    margin-bottom: 1em;
+    font-size: 1.4em;
+    color: rgb(105, 105, 105);
+    position: relative;
+}
+
+#post-container .read-more {
+    font-size: 0.8em;
+    position: absolute;
+    bottom: -1.5em;
+    right: 1em;
+    margin-bottom: 0.1em;
+}
+
+/* 4
+*****************************************************************
+*                   Index 4: manage table sets            *
+*****************************************************************/
+#select-all, #batch-action button, #add-new, #go-back {
+    margin-bottom: 1em;
+    margin-right: 7px;
+}
+
+#manage-table {
+    table-layout: fixed;
+    width: 100%;
+    white-space: nowrap;
+}
+
+#manage-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#manage-table a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#post-title {
+    width: 30%;
+}
+
+#post-status, #post-commendable, #post-publicity {
+    width: 9%;
+}
+
+#post-action {
+    width: 7%;
+}
+
+#post-cate {
+    width: 12%;
+}
+
+#cate-order, #cate-posts-count, #cate-children {
+    width: 12%;
+}
+
+#cate-parent, #cate-action {
+    width: 15%;
+}
+
+#tag-name, #tag-posts-count, #tag-action {
+    width: 33%;
+}
+
+/* 5
+*****************************************************************
+*                   Index 5: sider sets                   *
+*****************************************************************/
+#sider-nav {
+    list-style-type: none;
+    padding: 20px 25px;
+    background: rgb(250, 250, 250);
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 4px !important;
+    color: dimgray;
+    position: fixed;
+}
+
+#sider-nav > li {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+}
+
+#sider-nav a {
+    text-decoration: none;
+    color: dimgray;
+}
+
+#tag-list, #cate-list {
+    padding-left: 20px;
+}
+
+#tag-list > li, #cate-list > li {
+    padding-top: 10px;
+}
+
+#tag-list .badge, #cate-list .badge {
+    border-radius: 5px !important;
+    background-color: rgb(205, 205, 205);
+}
+
+/* 6
+*****************************************************************
+*                   Index 6: post archive sets                  *
+*****************************************************************/
+.archive-container ul {
+    padding-left: 0;
+}
+
+#post-archive-list {
+    list-style-type: none;
+    font-size: 1.5em;
+    color: rgb(105, 105, 105);
+}
+
+#post-archive-list h3 {
+    color: dimgray;
+    font-size: 1.6em;
+}
+
+#post-archive-list a {
+    text-decoration: none;
+    color: rgb(105, 105, 105);
+}
+
+/* 7
+*****************************************************************
+*                   Index 7: category sets                  *
+*****************************************************************/
+#children-list > a {
+    color: rgb(125, 125, 125);
+    background-color: transparent;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 1px solid dimgray;
+}
+
+.child-category-list, .grandchild-category-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.child-category {
+    cursor: pointer;
+    height: 10em;
+    border: 1px solid rgb(235, 235, 235);
+    margin: 1em 2em;
+    padding: 2em 1em 1em 2em;
+    font-size: 1.5em;
+}
+
+.child-category > a {
+    text-decoration: none;
+    color: dimgray;
+}
+
+.grandchild-category a {
+    font-size: 0.7em;
+    color: lightgray;
+}
+
+/* 8
+*****************************************************************
+*                   Index 8: admin index sets                  *
+*****************************************************************/
+
+.admin-card {
+    border: 1px solid rgb(245, 245, 245);
+    padding: 1em;
+    height: 15em;
+    margin-bottom: 2em;
+    font-size: 1.1em;
+}
+
+.admin-top-card {
+    max-height: 11em;
+}
+
+.admin-table {
+
+}
+
+.edit-sets {
+    float: right;
+}

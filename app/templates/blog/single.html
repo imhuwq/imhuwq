@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+
+{% block page_main %}
+    <div class="page-main">
+        <div id="post-container">
+            {% include "blog/_post_list.html" %}
+        </div>
+
+        {% if config['ENABLE_COMMENT'] and posts[0].commendable %}
+            <div id="post-comment">
+                {% include "blog/_comments.html" %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block page_sidebar %}
+    <div class="page-sidebar">
+        {% include "blog/_sider_bar.html" %}
+    </div>
+{% endblock %}
