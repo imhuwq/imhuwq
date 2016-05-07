@@ -19,21 +19,21 @@
 
 
     <div class="page-main">
-        <div id="children-list">
-            <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseChild"
-               aria-expanded="false"
-               aria-controls="collapseExample">
-                子分类
-            </a>
+        {% if category.children %}
+            <div id="children-list">
+                <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseChild"
+                   aria-expanded="false"
+                   aria-controls="collapseExample">
+                    子分类
+                </a>
 
-            <div class="collapse" id="collapseChild">
-                <ol class="child-category-list">
-                    <div class="row">
-                        {% for category in categories %}
-                            <div class="col-md-4 col-sm-6">
-                                <li class="child-category">
-                                    <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
-                                    {% if category.children %}
+                <div class="collapse" id="collapseChild">
+                    <ol class="child-category-list">
+                        <div class="row">
+                            {% for category in categories %}
+                                <div class="col-md-4 col-sm-6">
+                                    <li class="child-category">
+                                        <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
                                         <ol class="grandchild-category-list">
                                             {% for child in category.children %}
                                                 {% if child.posts_count > 0 %}
@@ -43,14 +43,14 @@
                                                 {% endif %}
                                             {% endfor %}
                                         </ol>
-                                    {% endif %}
-                                </li>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </ol>
+                                    </li>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </ol>
+                </div>
             </div>
-        </div>
+        {% endif %}
 
 
         <div id="post-container">
