@@ -326,9 +326,9 @@ class Tag(db.Model):
     @property
     def posts(self):
         query = Post.query.filter(or_(Post.tags_name.like(self.name),
-                                      Post.tags_name.like(self.name + '、%'),
-                                      Post.tags_name.like('%、' + self.name),
-                                      Post.tags_name.like('%、' + self.name + '、%')))
+                                      Post.tags_name.like(self.name + ',%'),
+                                      Post.tags_name.like('%,' + self.name),
+                                      Post.tags_name.like('%,' + self.name + ',%')))
         return query
 
     def refresh_posts_count(self):
