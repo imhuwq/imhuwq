@@ -1,7 +1,7 @@
 from flask import Blueprint, request, flash, jsonify
 from ..helpers import admin_required
 from .. import db
-from ..models import Post, Tag, Category
+from ..models import Post, Tag, Category, Settings
 
 ajax_admin = Blueprint('ajax_admin', __name__, )
 
@@ -257,3 +257,12 @@ def rename_tag():
         t.name = new_name
         data = {'reneme': 'done'}
         return jsonify(data)
+
+
+@ajax_admin.route('/reset-posts-per-page', methods=['GET', 'POST'])
+@admin_required
+def reset_posts_per_page():
+    per_page = int(request.form.get('per_page'))
+    sets = Settings.query.get(1)
+    sets.posts_per_page = per_page
+    return ''

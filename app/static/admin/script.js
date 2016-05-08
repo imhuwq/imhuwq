@@ -683,6 +683,23 @@ $(document).ready(function () {
 
         }
     }
+
+    // Js works in admin blog page
+    if (window.location.pathname == $ADMIN_BLOG_PATH) {
+        $('#edit-posts-per_page').on('click', function () {
+            var per_page = parseInt(prompt('设置每页显示文章数量为：'));
+            if (isNaN(per_page)) {
+                alert('请输入数字')
+            }
+            else {
+                $.post($SCRIPT_ROOT + '/ajax-admin/reset-posts-per-page',
+                    {'per_page': per_page},
+                    function () {
+                        location.reload()
+                    })
+            }
+        })
+    }
 });
 
 

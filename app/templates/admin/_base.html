@@ -116,8 +116,9 @@
 
     <script>
         var $ADMIN_EDIT_POST_PATH = '';
-        var $ADMIN_INDEX_PATH = {{ url_for('admin.index')|tojson|safe }};
         var $ADMIN_NEW_POST_PATH = {{ url_for('admin.new_post')|tojson|safe }};
+        var $ADMIN_INDEX_PATH = {{ url_for('admin.index')|tojson|safe }};
+        var $ADMIN_BLOG_PATH = {{ url_for('admin.blog')|tojson|safe }};
         var $ADMIN_MANAGE_POST_PATH = {{ url_for('admin.manage_posts')|tojson|safe }};
         var $ADMIN_MANAGE_CATE_PATH = {{ url_for('admin.manage_categories')|tojson|safe }};
         var $ADMIN_MANAGE_TAG_PATH = {{ url_for('admin.manage_tags')|tojson|safe }};
