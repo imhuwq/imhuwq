@@ -1,0 +1,121 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='blog/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+{% endblock %}
+
+{% block title %}
+    {% if title %}
+        {{ title }} -
+    {% endif %}
+    {{ config['SITE_TITLE'] }}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#site-navbar" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ config['SITE_TITLE'] }}</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="site-navbar">
+
+                <ul class="nav navbar-nav">
+                    {% if request.endpoint %}
+                        <li {% if request.endpoint.startswith('blog.') %} class="active" {% endif %}>
+                            <a href={{ url_for('blog.index') }}>博客</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% if current_user.is_authenticated %}
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                管理
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('admin.new_post') }}">发文</a></li>
+                                <li><a href="{{ url_for('admin.index') }}">后台</a></li>
+                                <li><a href="{{ url_for('main.logout') }}">注销</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="flashed-message" id="flashed-message">
+            {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning fade in" id="flash">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            {% block page_container %}
+
+                <div class="col-md-9">
+                    {% block page_main %}
+
+                    {% endblock %}
+                </div>
+
+                <div class="col-md-3">
+                    {% block page_sidebar %}
+
+                    {% endblock %}
+                </div>
+
+                <div class="col-md-12">
+                    <div class="page-footer">
+                        <p><i>ImHuWQ</i> - a blog based on <i>Flask</i> & <i>Bootstrap</i></p>
+                    </div>
+                </div>
+
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment(local_js="/static/moment-with-locales.min.js") }}
+
+    <script>
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        var $BLOG_CATEGORY_PATH = {{ url_for('blog.categories')|tojson|safe }};
+    </script>
+
+    {% if request.endpoint %}
+        {% if request.endpoint.startswith('blog.')  or request.endpoint.startswith('main.index') %}
+            <script id="dsq-count-scr" src="//imhuwq.disqus.com/count.js" async></script>
+        {% endif %}
+    {% endif %}
+    <script src="{{ url_for('static', filename='blog/script.js') }}"></script>
+
+{% endblock %}

@@ -25,7 +25,7 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'main.login'
 
 
-def create_app(config_name='default'):
+def create_app(config_name='production'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)

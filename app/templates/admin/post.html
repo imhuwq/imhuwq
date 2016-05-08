@@ -1,11 +1,11 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
 
     <div class="col-md-12">
-
+        <h2>管理文章</h2>
         <div id="batch-action">
-            <div class="dropdown">
+            <div class="dropdown manage-table-actions">
                 <span class="btn btn-default" id="select-all">全选</span>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -35,6 +35,19 @@
                     <li><a class="set-post" property="publicity" operation="1">转为公开</a></li>
                 </ul>
                 <a class="btn btn-default" id="add-new" href="{{ url_for('admin.new_post') }}">新增</a>
+            </div>
+            <div class="dropdown manage-table-actions">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    前往
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a href="{{ url_for('admin.manage_posts') }}">管理文章</a></li>
+                    <li><a href="{{ url_for('admin.manage_categories') }}">管理分类</a></li>
+                    <li><a href="{{ url_for('admin.manage_tags') }}">管理标签</a></li>
+                </ul>
             </div>
         </div>
 
@@ -207,7 +220,7 @@
         {% if pagination %}
             {{ macros.pagination_widget(
                                         pagination=pagination,
-                                        endpoint='admin.manage_post',
+                                        endpoint='admin.manage_posts',
                                         status=request.args.get('status'),
                                         publicity=request.args.get('publicity'),
                                         commendable=request.args.get('commendable'),

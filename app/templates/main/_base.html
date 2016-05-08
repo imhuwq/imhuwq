@@ -1,10 +1,13 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% import "_macros.html" as macros %}
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
 {% endblock %}
 
 {% block title %}
@@ -86,14 +89,6 @@
 
                     {% endblock %}
                 </div>
-
-                <div class="col-md-12">
-                    <div class="page-footer">
-                        <p>A blog based on <i>Flask</i> & <i>Bootstrap</i></p>
-                        <p><i>ImHuWQ</i></p>
-                    </div>
-                </div>
-
             {% endblock %}
         </div>
     </div>
@@ -102,42 +97,5 @@
 {% block scripts %}
     {{ super() }}
     {{ moment.include_moment(local_js="/static/moment-with-locales.min.js") }}
-
-    <script>
-        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-        var $BLOG_CATEGORY_PATH = {{ url_for('blog.categories')|tojson|safe }};
-    </script>
-
-    {% if current_user.is_administrator %}
-        <script>
-            var $ADMIN_EDIT_POST_PATH = '';
-            var $ADMIN_INDEX_PATH = {{ url_for('admin.index') }};
-            var $ADMIN_NEW_POST_PATH = {{ url_for('admin.new_post')|tojson|safe }};
-            var $ADMIN_MANAGE_POST_PATH = {{ url_for('admin.manage_post')|tojson|safe }};
-            var $ADMIN_MANAGE_CATE_PATH = {{ url_for('admin.manage_categories')|tojson|safe }};
-            var $ADMIN_MANAGE_TAG_PATH = {{ url_for('admin.manage_tags')|tojson|safe }};
-
-            {% if request.endpoint == ('admin.edit_post') %}
-                $ADMIN_EDIT_POST_PATH = {{ request.path|tojson|safe }};
-            {% endif %}
-
-        </script>
-    {% else %}
-        <script>
-            var $ADMIN_EDIT_POST_PATH = '';
-            var $ADMIN_INDEX_PATH = '';
-            var $ADMIN_NEW_POST_PATH = '';
-            var $ADMIN_MANAGE_POST_PATH = '';
-            var $ADMIN_MANAGE_CATE_PATH = '';
-            var $ADMIN_MANAGE_TAG_PATH = '';
-        </script>
-    {% endif %}
-
-    {% if request.endpoint %}
-        {% if request.endpoint.startswith('blog.')  or request.endpoint.startswith('main.index') %}
-            <script id="dsq-count-scr" src="//imhuwq.disqus.com/count.js" async></script>
-        {% endif %}
-    {% endif %}
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    <script src="{{ url_for('static', filename='main/script.js') }}"></script>
 {% endblock %}

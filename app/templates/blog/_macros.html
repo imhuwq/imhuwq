@@ -1,0 +1,135 @@
+{% macro pagination_widget(pagination, endpoint) %}
+    <ul class="pagination">
+
+        <li {% if not pagination.has_prev %} class="disabled" {% endif %}>
+            <a href="
+        {% if pagination.has_prev %} {{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}
+        {% else %}#
+        {% endif %}">
+                &laquo;
+            </a>
+        </li>
+
+        {% for p in pagination.iter_pages(3,1,2,3) %}
+            {% if p %}
+                <li {% if p == pagination.page %} class="active" {% endif %}>
+                    <a href="{{ url_for(endpoint, page=p, **kwargs) }}">{{ p }}</a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="#">&hellip;</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <li {% if not pagination.has_next %} class="disabled" {% endif %}>
+            <a href="
+        {% if pagination.has_next %} {{ url_for(endpoint, page=pagination.page + 1, **kwargs) }}
+        {% else %}#
+        {% endif %}">
+                &raquo;
+            </a>
+        </li>
+    </ul>
+{% endmacro %}
+
+{% macro simple_pagination_widget(pagination, endpoint) %}
+    <nv>
+        <ul class="pager">
+            {% if pagination.has_prev %}
+                <li class="previous"><a href="{{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}">
+                    <span aria-hidden="true">&larr;</span>上一页
+                </a></li>
+            {% endif %}
+            {% if pagination.has_next %}
+                <li class="next"><a href="{{ url_for(endpoint, page=pagination.page + 1, **kwargs) }}">
+                    下一页<span>&rarr;</span>
+                </a></li>
+            {% endif %}
+        </ul>
+    </nv>
+{% endmacro %}
+
+{% macro render_category_list(category, post=None) %}
+    <li class="list-group-item">
+
+        <span id="category-{{ category.name }}">
+            <input type="checkbox"
+                   name="category"
+                   value="{{ category.id }}"
+                   id="category{{ category.id }}"
+                   class="category-checkboxes"
+
+                    {% if post and post.category_name == category.name %}
+                   checked="checked"
+                    {% endif %}
+            >
+            {{ category.name }}
+        </span>
+
+        <ul class="list-group">
+            {% if category.children %}
+
+                {% for child in category.children %}
+                    {{ render_category_list(child, post) }}
+                {% endfor %}
+
+            {% endif %}
+        </ul>
+
+    </li>
+{% endmacro %}
+
+
+{% macro render_category_select(category, cate=None, parent=None) %}
+    {% if cate %}
+        {% if not category.is_descendant_of(cate) %}
+            <option value="{{ category.id }}"
+                    class="category-selectors"
+                    {% if category.id == parent %} selected {% endif %}
+            >
+                {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
+                {{ category.name }}
+            </option>
+
+            {% if category.children %}
+                {% for child in category.children %}
+                    {{ render_category_select(child, cate=cate, parent=parent) }}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
+    {% else %}
+        <option value="{{ category.id }}"
+                class="category-selectors"
+                {% if category.id == parent %} selected {% endif %}
+        >
+            {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
+            {{ category.name }}
+        </option>
+
+        {% if category.children %}
+            {% for child in category.children %}
+                {{ render_category_select(child) }}
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_category_filter(category) %}
+    <li {% if category.posts_count == 0 %} class="disabled" {% endif %}>
+        <a class="apply-filter"
+           filter="category"
+           by="{{ category.name }}">
+            {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
+            {{ category.name }}
+        </a>
+    </li>
+
+    {% if category.children %}
+        {% for child in category.children %}
+            {{ render_category_filter(child) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}

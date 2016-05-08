@@ -1,9 +1,10 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
     <div class="col-md-8">
+        <h2>管理分类</h2>
         <div id="batch-action">
-            <div class="dropdown">
+            <div class="dropdown manage-table-actions">
                 <span class="btn btn-default" id="select-all">全选</span>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -17,10 +18,9 @@
                     <li><a id="move-all-selected">移入分类</a></li>
                 </ul>
                 <a class="btn btn-default" id="add-new" href="{{ url_for('admin.new_category') }}">新增</a>
-
                 {% if category %}
                     <a class="btn btn-default" id="go-back" href="
-                    {% if request.path.split('/')[-2] != 'manage-category' %}
+                    {% if request.path.split('/')[-2] != 'category' %}
                        {{ url_for('admin.manage_category', category_link=category.parent.link) }}
                     {% else %}
                         {{ url_for('admin.manage_categories') }}
@@ -28,6 +28,19 @@
                         返回上一级
                     </a>
                 {% endif %}
+            </div>
+            <div class="dropdown manage-table-actions">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    前往
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a href="{{ url_for('admin.manage_posts') }}">管理文章</a></li>
+                    <li><a href="{{ url_for('admin.manage_categories') }}">管理分类</a></li>
+                    <li><a href="{{ url_for('admin.manage_tags') }}">管理标签</a></li>
+                </ul>
             </div>
         </div>
 

@@ -1,9 +1,10 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
     <div class="col-md-8">
+        <h2>管理标签</h2>
         <div id="batch-action">
-            <div class="dropdown">
+            <div class="dropdown manage-table-actions">
                 <span class="btn btn-default" id="select-all">全选</span>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -15,8 +16,21 @@
                     <li><a id="delete-all-selected">删除标签</a></li>
                     <li><a id="merge-all-selected">合并标签</a></li>
                 </ul>
-                <a class="btn btn-default" id="add-new" >新增</a>
+                <a class="btn btn-default" id="add-new">新增</a>
 
+            </div>
+            <div class="dropdown manage-table-actions">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    前往
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+                    <li><a href="{{ url_for('admin.manage_posts') }}">管理文章</a></li>
+                    <li><a href="{{ url_for('admin.manage_categories') }}">管理分类</a></li>
+                    <li><a href="{{ url_for('admin.manage_tags') }}">管理标签</a></li>
+                </ul>
             </div>
         </div>
 
@@ -35,7 +49,7 @@
                     </td>
                     <td>{{ tag.posts_count }}</td>
                     <td>
-                        <a href="{{ url_for('admin.edit_tag', tag_name=tag.name) }}" title="编辑">
+                        <a title="改名" class="rename">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a> &nbsp;&nbsp;
 
@@ -48,12 +62,6 @@
             {% endfor %}
         </table>
 
-
-    </div>
-    <div class="col-md-4">
-        &nbsp;
-    </div>
-    <div class="col-md-8">
         {% if pagination %}
             {{ macros.pagination_widget(
                                         pagination=pagination,

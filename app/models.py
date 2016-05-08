@@ -32,7 +32,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
     name = db.Column(db.String(12), unique=True, index=True)
-    about = db.Column(db.String(128))
     is_administrator = db.Column(db.Boolean)
     password_hash = db.Column(db.String(128))
     password_period = db.Column(db.DateTime, default=datetime.utcnow())
@@ -129,13 +128,13 @@ class Post(db.Model):
 
     @tags.setter
     def tags(self, tags):
-        old_tags = self.tags_name.split('、') if self.tags_name else []
-        new_tags = [tag for tag in tags.split('、') if tag != '']
+        old_tags = self.tags_name.split(',') if self.tags_name else []
+        new_tags = [tag for tag in tags.split(',') if tag != '']
         for tag in new_tags:
             if Tag.query.filter_by(name=tag).first() is None:
                 t = Tag(name=tag)
                 db.session.add(t)
-        self.tags_name = '、'.join(new_tags)
+        self.tags_name = ','.join(new_tags)
         db.session.flush()
 
         if self.type == 'article':
@@ -344,12 +343,12 @@ class Tag(db.Model):
     @staticmethod
     def merge(new_name, merged_id_list):
         new_tag = Tag.query.filter_by(name=new_name).first()
+        merged_id_list = [int(id) for id in merged_id_list]
         if new_tag is None:
             new_tag = Tag(name=new_name)
             db.session.add(new_tag)
             db.session.flush()
-        new_id = str(new_tag.id)
-        merged_id_list = [x for x in merged_id_list if x != new_id]
+        merged_id_list = [x for x in merged_id_list if x != new_tag.id]
         merged_tag_list = [Tag.query.get(id) for id in merged_id_list]
         for t in merged_tag_list:
             posts = t.posts

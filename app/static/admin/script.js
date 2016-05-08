@@ -127,15 +127,8 @@ $(document).ready(function () {
         });
         tagInput.on('keypress', function (e) {
             if ((e.which == 13) && (tagInput.val() != '')) {
-                var newTags = '';
-                tagInput.val().split(/,+|，+|、+/).forEach(function (item) {
+                tagInput.val().split(/,+/).forEach(function (item) {
                     if ((item.trim() != '') && (fnlTags.indexOf(item.trim()) < 0)) {
-                        if (newTags == '') {
-                            newTags = item.trim();
-                        }
-                        else {
-                            newTags = newTags + '、' + item.trim();
-                        }
                         fnlTags.push(item.trim());
                         var tag = $('<span/>', {
                             html: item.trim(),
@@ -149,9 +142,6 @@ $(document).ready(function () {
                     }
                 });
                 tagInput.prop('value', '');
-                if (newTags != '') {
-                    $.post($SCRIPT_ROOT + '/ajax-admin/new-tag', {new_tags: newTags});
-                }
                 tagSubmit.prop('value', fnlTags);
                 return false
             }
@@ -564,7 +554,7 @@ $(document).ready(function () {
                 }
 
             });
-            
+
             // move all selected category
             $('#move-all-selected').on('click', function () {
                 var newCate = prompt('要把所选分类移入哪个分类中？');
@@ -611,8 +601,8 @@ $(document).ready(function () {
             // merge all selected tag
             $('#merge-all-selected').on('click', function () {
                 var newTag = prompt('请输入合并后的标签名称');
-                if (newTag.indexOf('、') > -1) {
-                    alert('分类名中不能包含“、”')
+                if (newTag.indexOf(',') > -1) {
+                    alert('分类名中不能包含“,”')
                 }
                 else if (
                     confirm('您确定合并这些标签吗？')
@@ -656,8 +646,8 @@ $(document).ready(function () {
 
             // add tag
             $('#add-new').on('click', function () {
-                var newTags = prompt('请输入要添加的标签，用(,)或者(、)隔离');
-                newTags = newTags.split(/,+|、+|，+/);
+                var newTags = prompt('请输入要添加的标签，用(,)隔离');
+                newTags = newTags.split(/,+/);
                 newTags = removeItem(newTags, '');
                 if (newTags.length > 0) {
                     $.post($SCRIPT_ROOT + '/ajax-admin/add-tag', {
@@ -669,29 +659,30 @@ $(document).ready(function () {
                 else {
                     alert('请输入标签名')
                 }
-            })
+            });
+
+            // rename tag
+            $('.rename').on('click', function () {
+                var newName = prompt('请输入新标签名称，不能包含(,)');
+                newName = newName.trim();
+                if (newName.indexOf(',') < 0 && newName != '') {
+                    $.post($SCRIPT_ROOT + '/ajax-admin/rename-tag', {
+                        tag_id: $(this).closest('tr').attr('id'),
+                        new_name: newName
+                    }, function (data) {
+                        if (data['merge']) {
+                            alert(data['merge'])
+                        }
+                        window.location.reload()
+                    })
+                }
+                else {
+                    alert('标签名不能为空且不能包含(,)')
+                }
+            });
+
         }
     }
-
-    // Js works in blog categories page
-    if (window.location.pathname.indexOf($BLOG_CATEGORY_PATH) > -1) {
-        var childCategory = $('.child-category');
-        childCategory.on('click', function () {
-            window.location.replace($SCRIPT_ROOT + $(this).children('a').attr('href'))
-        });
-
-        childCategory.on('mouseover', function () {
-            // $(this).prop('style', 'box-shadow: rgb(245, 245, 245) -1px -1px 5px;');
-            $(this).children('a').prop('style', 'color:rgb(55,55,55);')
-        });
-
-        childCategory.on('mouseout', function () {
-            // $(this).prop('style', 'box-shadow: none;');
-            $(this).children('a').prop('style', 'color:dimgray')
-
-        });
-    }
-    
 });
 
 

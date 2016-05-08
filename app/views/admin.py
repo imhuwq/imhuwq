@@ -8,61 +8,7 @@ from sqlalchemy import or_
 admin = Blueprint('admin', __name__, )
 
 
-# below is about site setting
-@admin.route('/manage-site', methods=['GET', 'POST'])
-@admin_required
-def manage_site():
-    form = SiteSettingForm()
-    sets = Settings.query.get(1)
-    if form.validate_on_submit():
-        sets.site_title = form.title.data
-        sets.site_description = form.descp.data
-        return redirect(url_for('admin.index'))
-    form.title.data = sets.site_title
-    form.descp.data = sets.site_description
-    return render_template('admin/site.html',
-                           form=form,
-                           title='网站设置')
-
-
-# below is about user account
-@admin.route('/manage-profile', methods=['GET', 'POST'])
-@admin_required
-def manage_profile():
-    form = ProfileForm()
-    user = User.query.get(1)
-    if form.validate_on_submit():
-        user.name = form.name.data
-        user.email = form.email.data
-        user.about = form.about.data
-        return redirect(url_for('admin.index'))
-    form.name.data = user.name
-    form.email.data = user.email
-    form.about.data = user.about
-    return render_template('admin/profile.html',
-                           form=form,
-                           title='个人资料')
-
-
-@admin.route('/manage-password', methods=['GET', 'POST'])
-@admin_required
-def manage_password():
-    form = PasswordSetForm()
-    if form.validate_on_submit():
-        user = User.query.get(1)
-        if user.verify_password(form.old.data):
-            user.password = form.new.data
-            return redirect(url_for('admin.index'))
-        else:
-            flash('旧密码不正确')
-            return redirect(url_for('admin.manage_password'))
-    return render_template('admin/password.html',
-                           title='更改密码',
-                           form=form)
-
-
-# below is about post
-@admin.route('/')
+@admin.route('/index')
 @admin_required
 def index():
     posts_count = Post.query.filter_by(type='article').count()
@@ -75,7 +21,74 @@ def index():
                            cates_count=cates_count, sets=sets, user=user)
 
 
-@admin.route('/new-post', methods=['GET', 'POST'])
+@admin.route('/site')
+@admin_required
+def site():
+    form = SiteSettingForm()
+    sets = Settings.query.get(1)
+    if form.validate_on_submit():
+        sets.site_title = form.title.data
+        sets.site_description = form.descp.data
+        return redirect(url_for('admin.site'))
+    form.title.data = sets.site_title
+    form.descp.data = sets.site_description
+    return render_template('admin/site.html',
+                           form=form,
+                           sets=sets,
+                           title='站点设置')
+
+
+@admin.route('/blog')
+@admin_required
+def blog():
+    posts_count = Post.query.filter_by(type='article').count()
+    cates_count = Category.query.count()
+    tags_count = Tag.query.count()
+    sets = Settings.query.get(1)
+    return render_template('admin/blog.html',
+                           title='博客管理',
+                           sets=sets,
+                           posts_count=posts_count,
+                           cates_count=cates_count,
+                           tags_count=tags_count)
+
+
+# below is about user account
+@admin.route('/profile')
+@admin_required
+def profile():
+    form = ProfileForm()
+    user = User.query.get(1)
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.email = form.email.data
+        return redirect(url_for('admin.index'))
+    form.name.data = user.name
+    form.email.data = user.email
+    return render_template('admin/profile.html',
+                           form=form,
+                           title='个人资料')
+
+
+@admin.route('/profile/password', methods=['GET', 'POST'])
+@admin_required
+def password():
+    form = PasswordSetForm()
+    if form.validate_on_submit():
+        user = User.query.get(1)
+        if user.verify_password(form.old.data):
+            user.password = form.new.data
+            return redirect(url_for('admin.index'))
+        else:
+            flash('旧密码不正确')
+            return redirect(url_for('admin.change_password'))
+    return render_template('admin/password.html',
+                           title='更改密码',
+                           form=form)
+
+
+# below is about post
+@admin.route('/blog/post', methods=['GET', 'POST'])
 @admin_required
 def new_post():
     form = PostForm()
@@ -112,7 +125,7 @@ def new_post():
                            categories=cates)
 
 
-@admin.route('/edit-post/<post_title>/<post_type>', methods=['GET', 'POST'])
+@admin.route('/blog/post/<post_title>/<post_type>', methods=['GET', 'POST'])
 @admin_required
 def edit_post(post_title, post_type):
     p = Post.query.filter_by(title=post_title).first()
@@ -175,7 +188,7 @@ def edit_post(post_title, post_type):
 
     form.title.data = p.title
     form.content.data = p.body
-    form.tags.data = ','.join(p.tags.split('、'))
+    form.tags.data = p.tags
     form.commendable.data = p.commendable
     form.publicity.data = p.publicity
     cates = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
@@ -185,9 +198,9 @@ def edit_post(post_title, post_type):
                            title="编辑文章")
 
 
-@admin.route('/manage-post', methods=['GET', 'POST'])
+@admin.route('/blog/posts', methods=['GET', 'POST'])
 @admin_required
-def manage_post():
+def manage_posts():
     category = request.args.get('category')
     status = request.args.get('status')
     publicity = request.args.get('publicity')
@@ -247,16 +260,16 @@ def manage_post():
 
 
 # below is about comment
-@admin.route('/manage-comment', methods=['GET', 'POST'])
+@admin.route('/blog/comment', methods=['GET', 'POST'])
 @admin_required
 def manage_comment():
     sets = Settings.query.get(1)
     sets.enable_post_comment = not sets.enable_post_comment
-    return redirect(url_for('admin.index'))
+    return redirect(url_for('admin.blog'))
 
 
 # below is about category
-@admin.route('/new-category', methods=['GET', 'POST'])
+@admin.route('/blog/new-category', methods=['GET', 'POST'])
 @admin_required
 def new_category():
     form = CategoryForm()
@@ -282,7 +295,7 @@ def new_category():
                            categories=categories)
 
 
-@admin.route('/edit-category/<path:category_link>', methods=['GET', 'POST'])
+@admin.route('/blog/edit-category/<path:category_link>', methods=['GET', 'POST'])
 @admin_required
 def edit_category(category_link):
     form = CategoryForm()
@@ -312,7 +325,7 @@ def edit_category(category_link):
                            categories=categories)
 
 
-@admin.route('/manage-category', methods=['GET', 'POST'])
+@admin.route('/blog/category', methods=['GET', 'POST'])
 @admin_required
 def manage_categories():
     categories = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
@@ -321,7 +334,7 @@ def manage_categories():
                            categories=categories)
 
 
-@admin.route('/manage-category/<path:category_link>', methods=['GET', 'POST'])
+@admin.route('/blog/category/<path:category_link>', methods=['GET', 'POST'])
 @admin_required
 def manage_category(category_link):
     category = Category.query.filter_by(_link=category_link).first()
@@ -333,7 +346,7 @@ def manage_category(category_link):
 
 
 # below is about tag
-@admin.route('/manage-tag', methods=['GET', 'POST'])
+@admin.route('/blog/tag', methods=['GET', 'POST'])
 @admin_required
 def manage_tags():
     query = Tag.query
@@ -350,7 +363,7 @@ def manage_tags():
                            tags=tags)
 
 
-@admin.route('/edit-tag/<tag_name>')
+@admin.route('/blog/tag/<tag_name>')
 @admin_required
 def edit_tag(tag_name):
     tag = Tag.query.filter_by(name=tag_name).first()

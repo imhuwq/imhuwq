@@ -24,91 +24,6 @@ form #submit {
     float: right;
 }
 
-/* 2
-*****************************************************************
-*                   Index 2: post editor sets                   *
-*****************************************************************/
-
-/* 2.1 main body sets*/
-#post-editor-main {
-    margin-bottom: 4em;
-}
-
-#post-editor-content textarea {
-    height: 40em;
-}
-
-#post-editor-action .btn {
-    float: right;
-    margin-left: 1em;
-    margin-bottom: 1em;
-}
-
-/* 2.2 category sets*/
-#post-editor-cate-selector {
-    max-height: 20em;
-    overflow: auto;
-    overflow-x: hidden;
-    padding: 0;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-}
-
-#post-editor-cate-selector > li:first-child {
-    border-top: 0;
-}
-
-#post-editor-cate-selector > li:last-child {
-    border-bottom: 0;
-}
-
-#post-editor-cate-selector .list-group-item {
-    padding: 0.5em;
-}
-
-#post-editor-cate-selector .list-group {
-    margin-bottom: 0;
-}
-
-#post-editor-cate-parent {
-    border-bottom: 0;
-}
-
-#post-editor-cate-parent option {
-    color: black;
-}
-
-.option-placeholder {
-    color: lightgray;
-}
-
-/* Index 2.3: tag sets */
-#post-editor-tag .tag-preview {
-    background-color: rgb(245, 245, 245);
-    padding: 0.3em 1em 0.3em 0.3em;
-    border-radius: 0.6em !important;
-    margin: 0.3em 0.5em 0 0;
-    position: relative;
-    display: inline-block;
-}
-
-#post-editor-tag .tag-preview a {
-    position: absolute;
-    right: -0.6em;
-    top: -0.6em;
-    font-size: 1.2em;
-    color: pink;
-}
-
-/* Index 2.4: draft reminder sets */
-#post-draft-reminder {
-    clear: both;
-    padding: 0.6em 1em;
-    color: #8a6d3b;
-    background-color: #fcf8e3;
-    border-color: #faebcc;
-}
-
 /* 3
 *****************************************************************
 *                   Index 3: post index sets                    *
@@ -151,60 +66,6 @@ form #submit {
     bottom: -1.5em;
     right: 1em;
     margin-bottom: 0.1em;
-}
-
-/* 4
-*****************************************************************
-*                   Index 4: manage table sets            *
-*****************************************************************/
-#select-all, #batch-action button, #add-new, #go-back {
-    margin-bottom: 1em;
-    margin-right: 7px;
-}
-
-#manage-table {
-    table-layout: fixed;
-    width: 100%;
-    white-space: nowrap;
-}
-
-#manage-table td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#manage-table a {
-    cursor: pointer;
-    text-decoration: none;
-}
-
-#post-title {
-    width: 30%;
-}
-
-#post-status, #post-commendable, #post-publicity {
-    width: 9%;
-}
-
-#post-action {
-    width: 7%;
-}
-
-#post-cate {
-    width: 12%;
-}
-
-#cate-order, #cate-posts-count, #cate-children {
-    width: 12%;
-}
-
-#cate-parent, #cate-action {
-    width: 15%;
-}
-
-#tag-name, #tag-posts-count, #tag-action {
-    width: 33%;
 }
 
 /* 5
@@ -308,30 +169,6 @@ form #submit {
     color: lightgray;
 }
 
-/* 8
-*****************************************************************
-*                   Index 8: admin index sets                  *
-*****************************************************************/
-
-.admin-card {
-    border: 1px solid rgb(245, 245, 245);
-    padding: 1em;
-    height: 15em;
-    margin-bottom: 2em;
-    font-size: 1.1em;
-}
-
-.admin-top-card {
-    max-height: 11em;
-}
-
-.admin-table {
-
-}
-
-.edit-sets {
-    float: right;
-}
 
 /* 9
 *****************************************************************
@@ -339,4 +176,7 @@ form #submit {
 *****************************************************************/
 .page-footer {
     text-align: center;
+}
+.page-footer p {
+    margin: 0;
 }

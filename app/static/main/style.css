@@ -1,0 +1,25 @@
+/* 1
+*****************************************************************
+*                   Index 1: global sets                        *
+*****************************************************************/
+body {
+    padding-top: 70px;
+}
+
+body * {
+    border-radius: 0 !important;
+}
+
+a:hover, a:active, a:visited {
+    outline: none !important;
+}
+
+.dropdown-menu {
+    max-height: 30em;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+form #submit {
+    float: right;
+}

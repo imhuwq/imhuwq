@@ -57,8 +57,8 @@ class PostForm(Form):
 
 class SiteSettingForm(Form):
     title = StringField('网站标题', validators=[DataRequired()])
-    descp = StringField('网站描述', validators=[DataRequired(), Length(4, 30, message='网站描述长度在4-30个字符')])
-    submit = SubmitField('提交')
+    descp = TextAreaField('网站描述', validators=[DataRequired(), Length(4, 30, message='网站描述长度在4-30个字符')])
+    submit = SubmitField('修改')
 
 
 class ProfileForm(Form):
@@ -67,7 +67,6 @@ class ProfileForm(Form):
                                            Regexp('^[\u2E80-\u9FFFa-zA-Z][\u2E80-\u9FFF0-9a-zA-Z]*$', 0,
                                                   '用户名包括汉字、 字母、数字和下划线, '
                                                   '不能以数字开头')])
-    about = StringField('一点简介')
     submit = SubmitField('提交')
 
 
@@ -80,7 +79,7 @@ class PasswordSetForm(Form):
 
 class CategoryForm(Form):
     name = StringField('分类名称', validators=[DataRequired(), Length(2, 12, message='分类名称长度在2-12之间')])
-    order = IntegerField('排序',  default=99)
+    order = IntegerField('排序',  default=0)
     submit = SubmitField('提交')
 
     def validate_name(self, field):

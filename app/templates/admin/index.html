@@ -1,87 +1,32 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
     <div class="col-md-12">
-        <div class="admin-card admin-top-card">
-            <table class="table site-info admin-table">
-                <caption>站点信息
-                    <a href="{{ url_for('admin.manage_site') }}" class="edit-sets">修改</a>
-                </caption>
-                <tr>
-                    <th>标题</th>
-                    <td>{{ sets.site_title }}</td>
-                </tr>
-                <tr>
-                    <th>简介</th>
-                    <td>{{ sets.site_description }}</td>
-                </tr>
-            </table>
-        </div>
+
+        <h2>站点概览</h2>
+        <table class="table">
+            <tr>
+                <th>标题</th>
+                <td>{{ sets.site_title }}</td>
+            </tr>
+            <tr>
+                <th>简介</th>
+                <td>{{ sets.site_description }}</td>
+            </tr>
+
+            <tr>
+                <th>作者</th>
+                <td>{{ user.name }}</td>
+
+            </tr>
+
+            <tr>
+                <th>文章</th>
+                <td>{{ posts_count }}篇</td>
+            </tr>
+
+        </table>
     </div>
 
-    <div>
-        <div class="col-md-6 admin-profile">
-            <div class="admin-card">
-                <table class="table profile admin-table">
-                    <caption>个人信息</caption>
-                    <tr>
-                        <th>邮箱</th>
-                        <td>{{ user.email }}</td>
-                        <td><a href="{{ url_for('admin.manage_profile') }}" class="edit-sets">修改</a></td>
-                    </tr>
-                    <tr>
-                        <th>名称</th>
-                        <td>{{ user.name }}</td>
-                        <td><a href="{{ url_for('admin.manage_profile') }}" class="edit-sets">修改</a></td>
-
-                    </tr>
-                    <tr>
-                        <th>简介</th>
-                        <td>{{ user.about }}</td>
-                        <td><a href="{{ url_for('admin.manage_profile') }}" class="edit-sets">修改</a></td>
-
-                    </tr>
-                    <tr>
-                        <th>密码</th>
-                        <td>{{ moment(user.password_period).fromNow() }}</td>
-                        <td><a href="{{ url_for('admin.manage_password') }}" class="edit-sets">修改</a></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-6 admin-post">
-            <div class="admin-card">
-                <table class="table site-info admin-table">
-                    <caption>博客信息
-                    </caption>
-                    <tr>
-                        <th>评论</th>
-                        {% if sets.enable_post_comment %}
-                            <td>已开启</td>
-                            <td><a class="edit-sets" href="{{ url_for('admin.manage_comment') }}">关闭</a></td>
-                        {% else %}
-                            <td>已关闭</td>
-                            <td><a class="edit-sets" href="{{ url_for('admin.manage_comment') }}">开启</a></td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <th>文章</th>
-                        <td>{{ posts_count }}篇</td>
-                        <td><a class="edit-sets" href="{{ url_for('admin.manage_post') }}">管理</a></td>
-                    </tr>
-                    <tr>
-                        <th>分类</th>
-                        <td>{{ cates_count }}个</td>
-                        <td><a class="edit-sets" href="{{ url_for('admin.manage_categories') }}">管理</a></td>
-                    </tr>
-                    <tr>
-                        <th>标签</th>
-                        <td>{{ tags_count }}个</td>
-                        <td><a class="edit-sets" href="{{ url_for('admin.manage_tags') }}">管理</a></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}

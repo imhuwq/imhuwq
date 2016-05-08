@@ -1,12 +1,10 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
-    <div class="col-md-4"></div>
-
-    <div class="col-md-4">
+    <div class="col-md-12">
+        <h2>站点信息</h2>
         {{ wtf.quick_form(form) }}
-    </div>
 
-    <div class="col-md-4"></div>
+    </div>
 
 {% endblock %}

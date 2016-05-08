@@ -238,3 +238,22 @@ def move_all_selected_tags():
     data = Category.move(target_cate_name, selected_cates)
     print(data)
     return jsonify(data)
+
+
+@ajax_admin.route('/rename-tag', methods=['GET', 'POST'])
+@admin_required
+def rename_tag():
+    tag_id = request.form.get('tag_id')
+    new_name = request.form.get('new_name')
+    t = Tag.query.filter_by(name=new_name).first()
+    if t:
+        if t.id == int(tag_id):
+            return ''
+        Tag.merge(new_name, [tag_id, t.id])
+        data = {'merge': '新标签名已存在，已将二者合并'}
+        return jsonify(data)
+    else:
+        t = Tag.query.get(tag_id)
+        t.name = new_name
+        data = {'reneme': 'done'}
+        return jsonify(data)

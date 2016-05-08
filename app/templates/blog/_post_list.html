@@ -20,9 +20,10 @@
                     {% if post.tags_name %}
                         <span class="post-tag">
                         <span class="glyphicon glyphicon-tags" title="标签"></span>&nbsp;
-                            {% for tag in post.tags_name.split('、') %}
+                        {% set tags = post.tags.split(',') %}
+                            {% for tag in tags %}
                                 <a href="{{ url_for('blog.tag', tag_name=tag) }}">
-                        {{ tag }}</a>
+                                {{ tag }}</a>{% if tag != tags[-1] %},{% endif %}
                             {% endfor %}</span>&nbsp;
                     {% endif %}
                     <span class="post-comment">
@@ -50,7 +51,8 @@
                             {{ post.abstract | markdown | safe }}
                             ......
                         </div>
-                        <span class="read-more"><a href="{{ url_for('blog.post', post_title=post.title) }}">阅读全文</a></span>
+                        <span class="read-more"><a
+                                href="{{ url_for('blog.post', post_title=post.title) }}">阅读全文</a></span>
                     {% endif %}
                 </div>
             </li>

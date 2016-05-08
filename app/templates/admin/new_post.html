@@ -1,4 +1,4 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
     {% if post %}
@@ -89,8 +89,8 @@
                 >
                 {{ form.tags(style="display:none") }}
                 <div id="post-editor-tag-preview">
-                    {% if post and post.tags_name != "" %}
-                        {% for tag in post.tags_name.split('、') %}
+                    {% if post and post.tags != "" %}
+                        {% for tag in post.tags.split(',') %}
                             <span class="tag-preview">
                                 {{ tag }}
                                 <a title="删除" class="delete-tag-icon btn">&times;</a>

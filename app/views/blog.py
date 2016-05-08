@@ -100,10 +100,10 @@ def tag(tag_name):
     t = tags.filter_by(name=tag_name).first()
     if not t:
         abort(404)
-    query = Post.query.filter(or_(Post.tags_name.like(tag_name + '、%'),
-                                  Post.tags_name.like('%、' + tag_name),
+    query = Post.query.filter(or_(Post.tags_name.like(tag_name + ',%'),
+                                  Post.tags_name.like('%,' + tag_name),
                                   Post.tags_name.like(tag_name),
-                                  Post.tags_name.like('%、' + tag_name + '、%'))) \
+                                  Post.tags_name.like('%,' + tag_name + ',%'))) \
         .order_by(Post.date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()

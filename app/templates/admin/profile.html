@@ -1,12 +1,11 @@
-{% extends "_base.html" %}
+{% extends "admin/_base.html" %}
 
 {% block page_container %}
-    <div class="col-md-4"></div>
-
-    <div class="col-md-4">
+    <div class="col-md-12">
+        <h2>个人信息</h2>
         {{ wtf.quick_form(form) }}
-    </div>
+        <span id="ch-passwd"><a href="{{ url_for('admin.password') }}" class="btn btn-default">更改密码</a></span>
 
-    <div class="col-md-4"></div>
+    </div>
 
 {% endblock %}
