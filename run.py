@@ -5,7 +5,7 @@ from tornado.ioloop import IOLoop
 import os
 from app import create_app
 
-app = create_app('production')
+app = create_app()
 
 log_dir = os.path.abspath('./log')
 if not os.path.exists(log_dir):
