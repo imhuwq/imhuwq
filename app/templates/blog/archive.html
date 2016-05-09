@@ -16,11 +16,19 @@
                     <h3>{{ tmp_year }}年</h3>
                     <li>{{ post.date.month }}月
                         {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
-                                href="{{ url_for("blog.post", post_title=post.title) }}">{{ post.title }}</a></li>
+                                href="{{ url_for("blog.post",
+                                                 post_title=post.title,
+                                                 post_date='%s/%s' % (post.date.year, post.date.month)) }}">
+                            {{ post.title }}</a>
+                    </li>
                 {% else %}
                     <li>{{ post.date.month }}月
                         {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
-                                href="{{ url_for("blog.post", post_title=post.title) }}">{{ post.title }}</a></li>
+                                href="{{ url_for("blog.post",
+                                                 post_title=post.title,
+                                                 post_date='%s/%s' % (post.date.year, post.date.month)) }}">
+                            {{ post.title }}</a>
+                    </li>
                 {% endif %}
             {% endfor %}
         </div>

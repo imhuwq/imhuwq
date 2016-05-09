@@ -57,7 +57,11 @@
             {% if posts|length == 0 %}
                 <h3>暂无文章</h3>
             {% else %}
-                {% include "blog/_post_list.html" %}
+                {{ macros.render_post_list(posts,
+                                           current_user=current_user,
+                                           moment=moment,
+                                           slug_type='category',
+                                           slug_value=category.link) }}
             {% endif %}
         </div>
 

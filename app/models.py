@@ -380,8 +380,8 @@ def update_category_posts_count(mapper, connection, target):
     if target.type == 'article':
         cate_table = Category.__table__
         category = target.category_link
-        ancestors = category.split('/')
-        for name in set(ancestors):
+        ancestors = category.split('/') if target.category_link else []
+        for name in ancestors:
             ancestor = Category.query.filter_by(_name=name).first()
             if ancestor:
                 count = ancestor.posts_count - 1
@@ -389,7 +389,8 @@ def update_category_posts_count(mapper, connection, target):
                     cate_table.update().where(cate_table.c.id == ancestor.id).values(posts_count=count)
                 )
         tag_table = Tag.__table__
-        tags = target.tags_name.split('、')
+        tags_name = target.tags_name
+        tags = tags_name.split(',') if tags_name else []
         for name in tags:
             tag = Tag.query.filter_by(name=name).first()
             if tag:

@@ -44,7 +44,7 @@ form #submit {
 }
 
 #post-container .post-title {
-    font-size: 2em;
+    /*font-size: 2em;*/
     margin-bottom: 0.2em;
     color: rgb(85, 85, 85)
 }
@@ -55,15 +55,15 @@ form #submit {
 
 #post-container .post-content {
     margin-bottom: 1em;
-    font-size: 1.4em;
+    /*font-size: 1.4em;*/
     color: rgb(105, 105, 105);
     position: relative;
 }
 
 #post-container .read-more {
-    font-size: 0.8em;
+    /*font-size: 0.8em;*/
     position: absolute;
-    bottom: -1.5em;
+    bottom: -1.3em;
     right: 1em;
     margin-bottom: 0.1em;
 }

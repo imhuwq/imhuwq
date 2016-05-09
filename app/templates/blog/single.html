@@ -3,7 +3,7 @@
 {% block page_main %}
     <div class="page-main">
         <div id="post-container">
-            {% include "blog/_post_list.html" %}
+            {{ macros.render_post_list(posts, current_user=current_user, moment=moment, single=True) }}
         </div>
 
         {% if config['ENABLE_COMMENT'] and posts[0].commendable %}

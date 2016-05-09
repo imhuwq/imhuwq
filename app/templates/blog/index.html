@@ -4,7 +4,7 @@
     <div class="page-main">
 
         <div id="post-container">
-            {% include "blog/_post_list.html" %}
+            {{ macros.render_post_list(posts, moment=moment, current_user=current_user) }}
         </div>
 
         {% if pagination %}

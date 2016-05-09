@@ -50,86 +50,78 @@
     </nv>
 {% endmacro %}
 
-{% macro render_category_list(category, post=None) %}
-    <li class="list-group-item">
 
-        <span id="category-{{ category.name }}">
-            <input type="checkbox"
-                   name="category"
-                   value="{{ category.id }}"
-                   id="category{{ category.id }}"
-                   class="category-checkboxes"
+{% macro render_post_list(posts, current_user, moment, slug_type=None, slug_value=None, single=False) %}
+    <ul class="post-list">
+        {% for post in posts %}
+            {% if post.publicity or current_user.is_administrator %}
+                <li class="post">
+                    <a
+                            {% if not single %}
+                                {% if not slug_type %}
+                                    href="{{ url_for('blog.post', post_title=post.title) }}"
+                                {% elif slug_type == 'category' %}
+                                    href="{{ url_for('blog.post', post_title=post.title, post_category_link=post.category_link) }}"
+                                {% elif slug_type == 'tag' %}
+                                    href="{{ url_for('blog.post', post_title=post.title, tag_name=slug_value) }}"
+                                {% endif %}
+                            {% endif %}
+                    >
+                        <h2 class="post-title">{{ post.title }}</h2>
+                    </a>
 
-                    {% if post and post.category_name == category.name %}
-                   checked="checked"
-                    {% endif %}
-            >
-            {{ category.name }}
-        </span>
+                    <div class="post-meta">
+                    <span class="post-date">
+                        <span class=" glyphicon glyphicon-calendar" title="日期"></span>&nbsp;
+                        {{ moment(post.date).format('LL') }}
+                    </span>&nbsp;
+                    <span class="post-category">
+                        <span class=" glyphicon glyphicon-book" title="分类"></span>&nbsp;
+                        <a href="{{ url_for('blog.category', category_link=post.category_link) }}">
+                            {{ post.category_name }}
+                        </a>
+                    </span>&nbsp;
+                        {% if post.tags_name %}
+                            <span class="post-tag">
+                        <span class="glyphicon glyphicon-tags" title="标签"></span>&nbsp;
+                        {% set tags = post.tags.split(',') %}
+                                {% for tag in tags %}
+                                    <a href="{{ url_for('blog.tag', tag_name=tag) }}">
+                                {{ tag }}</a>{% if tag != tags[-1] %},{% endif %}
+                                {% endfor %}</span>&nbsp;
+                        {% endif %}
+                        <span class="post-comment">
+                        <span class="glyphicon glyphicon-comment" title="评论"></span>&nbsp;
+                        <a href="{{ url_for('blog.post', post_title=post.title, _external=True) }}#disqus_thread"
+                           data-disqus-identifier="post-{{ post.title }}">
 
-        <ul class="list-group">
-            {% if category.children %}
+                        </a>
+                    </span>&nbsp;
 
-                {% for child in category.children %}
-                    {{ render_category_list(child, post) }}
-                {% endfor %}
+                        {% if current_user.is_administrator %}
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            <span class="post-edit">
+                        <a href="{{ url_for("admin.edit_post", post_title=post.title, post_type='main') }}">编辑</a></span>
+                        {% endif %}
+                    </div>
 
+                    <div class="post-content">
+                        {% if detailed %}
+                            <div class="body">
+                                {{ post.body | markdown | safe }}
+                            </div>
+                        {% else %}
+                            <div class="abstract">
+                                {{ post.abstract | markdown | safe }}
+                                ......
+                            </div>
+                            <span class="read-more"><a
+                                    href="{{ url_for('blog.post', post_title=post.title) }}">阅读全文</a></span>
+                        {% endif %}
+                    </div>
+                </li>
             {% endif %}
-        </ul>
-
-    </li>
-{% endmacro %}
-
-
-{% macro render_category_select(category, cate=None, parent=None) %}
-    {% if cate %}
-        {% if not category.is_descendant_of(cate) %}
-            <option value="{{ category.id }}"
-                    class="category-selectors"
-                    {% if category.id == parent %} selected {% endif %}
-            >
-                {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
-                {{ category.name }}
-            </option>
-
-            {% if category.children %}
-                {% for child in category.children %}
-                    {{ render_category_select(child, cate=cate, parent=parent) }}
-                {% endfor %}
-            {% endif %}
-        {% endif %}
-
-    {% else %}
-        <option value="{{ category.id }}"
-                class="category-selectors"
-                {% if category.id == parent %} selected {% endif %}
-        >
-            {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
-            {{ category.name }}
-        </option>
-
-        {% if category.children %}
-            {% for child in category.children %}
-                {{ render_category_select(child) }}
-            {% endfor %}
-        {% endif %}
-    {% endif %}
-{% endmacro %}
-
-
-{% macro render_category_filter(category) %}
-    <li {% if category.posts_count == 0 %} class="disabled" {% endif %}>
-        <a class="apply-filter"
-           filter="category"
-           by="{{ category.name }}">
-            {{ '&nbsp;&nbsp;&nbsp;'|safe * category.level }}
-            {{ category.name }}
-        </a>
-    </li>
-
-    {% if category.children %}
-        {% for child in category.children %}
-            {{ render_category_filter(child) }}
         {% endfor %}
-    {% endif %}
+    </ul>
+
 {% endmacro %}

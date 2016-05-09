@@ -5,7 +5,6 @@
 
 import os
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -30,19 +29,13 @@ class Config:
     # 数据库用户密码
     DATABASE_PASSWORD = ''
 
-    # 站点邮件前缀
-    MAIL_SUBJECT_PREFIX = ''
+    # app默认的运行模式, 一般为 'production’ 生产模式
+    # 如果需要测试环境，设置为'test'
+    # 绝对不要在生产环境中使用'debug'
+    DEFAULT_APP_MODE = 'production'
 
-    # 站点邮件服务用户名
-    EMAIL_USERNAME = ''
-
-    # 站点邮件用户名密码
-    EMAIL_PASSWORD = ''
-
-    # 站点邮件服务器设置
-    MAIL_SERVER = ''
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
+    # 使用disqus评论系统
+    DISQUS_IDENTIFIER = ''
 
     # 下列使用随机生产的数据
     SECRET_KEY = 'NEVERTELLANYBODYEXCEPTIT'
@@ -57,7 +50,7 @@ class Config:
     SQLALCHEMY_RECORD_QUERIES = True
     SITE_INITIATED = False
 
-    def __init__(self, mode):
+    def __init__(self, mode=DEFAULT_APP_MODE):
         # default develop mode
         # 默认开发模式
         if mode == 'default' or mode == 'deve':
@@ -84,10 +77,5 @@ class Config:
     def init_app(app):
         pass
 
-config = {
-    'development': Config('deve'),
-    'testing': Config('test'),
-    'production': Config('prod'),
 
-    'default': Config('default')
-}
+config = Config()

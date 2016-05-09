@@ -30,25 +30,33 @@ def index():
                            pagination=pagination)
 
 
-@blog.route('/category/<path:post_category_link>/><post_title>')
-@blog.route('/post/<post_title>', defaults={'post_category_link': None})
-def post(post_title, post_category_link):
+@blog.route('/category/<path:post_category_link>/<post_title>')
+@blog.route('/tag/<path:tag_name>/<post_title>')
+@blog.route('/archive/<path:post_date>/<post_title>')
+@blog.route('/post/<path:post_title>')
+def post(post_title, post_category_link=None, tag_name=None, post_date=None):
     p = Post.query.filter_by(title=post_title).first()
-    if post_category_link != p.category_link:
-        return redirect(url_for('blog.post', post_title=p.title, post_category_link=p.category_link))
-    if p.publicity or current_user.is_administrator:
-        cates = Category.query.filter_by(parent_id=None). \
-            filter(Category.posts_count != 0). \
-            order_by(Category.order).all()
-        tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
-        return render_template('blog/single.html',
-                               title=p.title,
-                               posts=[p],
-                               cates=cates,
-                               tags=tags,
-                               detailed=True)
-    else:
+    if not p:
         abort(404)
+    if not p.publicity or not current_user.is_administrator:
+        abort(404)
+    if post_category_link and post_category_link != p.category_link:
+        abort(404)
+    if tag_name and tag_name not in p.tags:
+        abort(404)
+    if post_date and post_date != '%s/%s' % (p.date.year, p.date.month):
+        abort(404)
+
+    cates = Category.query.filter_by(parent_id=None). \
+        filter(Category.posts_count != 0). \
+        order_by(Category.order).all()
+    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    return render_template('blog/single.html',
+                           title=p.title,
+                           posts=[p],
+                           cates=cates,
+                           tags=tags,
+                           detailed=True)
 
 
 @blog.route('/category')

@@ -1,6 +1,6 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% import "_macros.html" as macros %}
+{% import "blog/_macros.html" as macros %}
 
 {% block head %}
     {{ super() }}
@@ -93,7 +93,7 @@
 
                 <div class="col-md-12">
                     <div class="page-footer">
-                        <p><i>ImHuWQ</i> - a blog based on <i>Flask</i> & <i>Bootstrap</i></p>
+                        <p><i>{{ config['SITE_TITLE'] }}</i> - a blog based on <i>Flask</i> & <i>Bootstrap</i></p>
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@
 
     {% if request.endpoint %}
         {% if request.endpoint.startswith('blog.')  or request.endpoint.startswith('main.index') %}
-            <script id="dsq-count-scr" src="//imhuwq.disqus.com/count.js" async></script>
+            <script id="dsq-count-scr" src="//{{ config['DISQUS_IDENTIFIER'] }}.disqus.com/count.js"async></script>
         {% endif %}
     {% endif %}
     <script src="{{ url_for('static', filename='blog/script.js') }}"></script>
