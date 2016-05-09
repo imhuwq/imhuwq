@@ -55,8 +55,7 @@ def post(post_title, post_category_link=None, tag_name=None, post_date=None):
                            title=p.title,
                            posts=[p],
                            cates=cates,
-                           tags=tags,
-                           detailed=True)
+                           tags=tags)
 
 
 @blog.route('/category')
@@ -108,11 +107,7 @@ def tag(tag_name):
     t = tags.filter_by(name=tag_name).first()
     if not t:
         abort(404)
-    query = Post.query.filter(or_(Post.tags_name.like(tag_name + ',%'),
-                                  Post.tags_name.like('%,' + tag_name),
-                                  Post.tags_name.like(tag_name),
-                                  Post.tags_name.like('%,' + tag_name + ',%'))) \
-        .order_by(Post.date.desc())
+    query = t.posts.order_by(Post.date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()
         pagination = None
