@@ -38,7 +38,7 @@ def post(post_title, post_category_link=None, tag_name=None, post_date=None):
     p = Post.query.filter_by(title=post_title).first()
     if not p:
         abort(404)
-    if not p.publicity or not current_user.is_administrator:
+    if not p.publicity and not current_user.is_administrator:
         abort(404)
     if post_category_link and post_category_link != p.category_link:
         abort(404)
