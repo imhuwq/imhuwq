@@ -111,7 +111,7 @@
         var $BLOG_CATEGORY_PATH = {{ url_for('blog.categories')|tojson|safe }};
     </script>
 
-    {% if request.endpoint %}
+    {% if request.endpoint and config['DISQUS_IDENTIFIER'] %}
         {% if request.endpoint.startswith('blog.')  or request.endpoint.startswith('main.index') %}
             <script id="dsq-count-scr" src="//{{ config['DISQUS_IDENTIFIER'] }}.disqus.com/count.js" async></script>
         {% endif %}

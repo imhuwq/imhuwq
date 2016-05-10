@@ -16,6 +16,7 @@ class Settings(db.Model):
     comments_per_page = db.Column(db.Integer, default=20)
     site_title = db.Column(db.String(64), default="一个崭新的网站")
     site_description = db.Column(db.String(128), default="请到管理面板更改设置")
+    disqus_identifier = db.Column(db.String(32))
     google_analytics_code = db.Column(db.String(32))
 
     def update_site_settings(self):
@@ -27,6 +28,7 @@ class Settings(db.Model):
         current_app.config['SITE_TITLE'] = self.site_title
         current_app.config['SITE_DESCRIPTION'] = self.site_description
         current_app.config['GOOGLE_ANALYTICS_CODE'] = self.google_analytics_code
+        current_app.config['DISQUS_IDENTIFIER'] = self.disqus_identifier
 
 
 class User(db.Model, UserMixin):

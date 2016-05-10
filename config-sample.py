@@ -34,9 +34,6 @@ class Config:
     # 绝对不要在生产环境中使用'debug'
     DEFAULT_APP_MODE = 'production'
 
-    # 使用disqus评论系统
-    DISQUS_IDENTIFIER = ''
-
     # 下列使用随机生产的数据
     SECRET_KEY = 'NEVERTELLANYBODYEXCEPTIT'
 

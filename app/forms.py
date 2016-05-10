@@ -58,6 +58,7 @@ class PostForm(Form):
 class SiteSettingForm(Form):
     title = StringField('网站标题', validators=[DataRequired()])
     descp = TextAreaField('网站描述', validators=[DataRequired(), Length(4, 30, message='网站描述长度在4-30个字符')])
+    dq_id = StringField('Disqus Identifier')
     ga_id = StringField('Google Analytics Track ID')
     submit = SubmitField('修改')
 

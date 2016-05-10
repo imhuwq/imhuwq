@@ -6,7 +6,7 @@
             {{ macros.render_post_list(posts, current_user=current_user, moment=moment, single=True) }}
         </div>
 
-        {% if config['ENABLE_COMMENT'] and posts[0].commendable %}
+        {% if config['ENABLE_COMMENT'] and posts[0].commendable and config['DISQUS_IDENTIFIER']%}
             <div id="post-comment">
                 {% include "blog/_comments.html" %}
             </div>

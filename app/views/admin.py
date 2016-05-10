@@ -30,9 +30,11 @@ def site():
         sets.site_title = form.title.data
         sets.site_description = form.descp.data
         sets.google_analytics_code = form.ga_id.data
+        sets.disqus_identifier = form.dq_id.data
         return redirect(url_for('admin.site'))
     form.title.data = sets.site_title
     form.descp.data = sets.site_description
+    form.dq_id.data = sets.disqus_identifier
     form.ga_id.data = sets.google_analytics_code
     return render_template('admin/site.html',
                            form=form,
