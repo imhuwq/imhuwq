@@ -21,7 +21,7 @@ def index():
                            cates_count=cates_count, sets=sets, user=user)
 
 
-@admin.route('/site')
+@admin.route('/site', methods=['GET', 'POST'])
 @admin_required
 def site():
     form = SiteSettingForm()
@@ -29,9 +29,11 @@ def site():
     if form.validate_on_submit():
         sets.site_title = form.title.data
         sets.site_description = form.descp.data
+        sets.google_analytics_code = form.ga_id.data
         return redirect(url_for('admin.site'))
     form.title.data = sets.site_title
     form.descp.data = sets.site_description
+    form.ga_id.data = sets.google_analytics_code
     return render_template('admin/site.html',
                            form=form,
                            sets=sets,

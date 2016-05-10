@@ -16,6 +16,7 @@ class Settings(db.Model):
     comments_per_page = db.Column(db.Integer, default=20)
     site_title = db.Column(db.String(64), default="一个崭新的网站")
     site_description = db.Column(db.String(128), default="请到管理面板更改设置")
+    google_analytics_code = db.Column(db.String(32))
 
     def update_site_settings(self):
         current_app.config['SITE_INITIATED'] = self.site_initiated
@@ -25,6 +26,7 @@ class Settings(db.Model):
         current_app.config['COMMENTS_PER_PAGE'] = self.comments_per_page
         current_app.config['SITE_TITLE'] = self.site_title
         current_app.config['SITE_DESCRIPTION'] = self.site_description
+        current_app.config['GOOGLE_ANALYTICS_CODE'] = self.google_analytics_code
 
 
 class User(db.Model, UserMixin):
