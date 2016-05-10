@@ -128,6 +128,12 @@ class Post(db.Model):
     def tags(self):
         return self.tags_name
 
+    @property
+    def tags_object(self):
+        names = self.tags_name.split(',') if self.tags_name else []
+        tags = [Tag.query.filter_by(name=name).first() for name in names]
+        return tags
+
     @tags.setter
     def tags(self, tags):
         old_tags = self.tags_name.split(',') if self.tags_name else []

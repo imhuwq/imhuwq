@@ -32,9 +32,9 @@ def index():
 
 @blog.route('/post><path:post_link>')
 @blog.route('/category/<path:post_category_link>><path:post_link>')
-@blog.route('/tag/<path:tag_name>><path:post_link>')
+@blog.route('/tag/<path:tag_link>><path:post_link>')
 @blog.route('/archive/<path:post_date>><path:post_link>')
-def post(post_link, post_category_link=None, tag_name=None, post_date=None):
+def post(post_link, post_category_link=None, tag_link=None, post_date=None):
     p = Post.query.filter_by(link=post_link).first()
     if not p:
         abort(404)
@@ -42,8 +42,10 @@ def post(post_link, post_category_link=None, tag_name=None, post_date=None):
         abort(404)
     if post_category_link and post_category_link != p.category_link:
         abort(404)
-    if tag_name and tag_name not in p.tags:
-        abort(404)
+    if tag_link:
+        t = Tag.query.filter_by(link=tag_link).first()
+        if t.name not in p.tags:
+            abort(404)
     if post_date and post_date != '%s/%s' % (p.date.year, p.date.month):
         abort(404)
 
@@ -101,10 +103,10 @@ def category(category_link):
                            tags=tags)
 
 
-@blog.route('/tag/<path:tag_name>')
-def tag(tag_name):
+@blog.route('/tag/<path:tag_link>')
+def tag(tag_link):
     tags = Tag.query
-    t = tags.filter_by(name=tag_name).first()
+    t = tags.filter_by(link=tag_link).first()
     if not t:
         abort(404)
     query = t.posts.order_by(Post.date.desc())
@@ -121,7 +123,7 @@ def tag(tag_name):
     cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
     tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
     return render_template('blog/tag.html',
-                           title='标签:' + tag_name,
+                           title='标签:' + tag_link,
                            pagination=pagination,
                            posts=ps,
                            tag=t,

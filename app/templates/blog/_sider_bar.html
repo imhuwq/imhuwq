@@ -25,7 +25,7 @@
         <ul id="tag-list" style="list-style-type:none">
             {% for tag in tags %}
                 <li>
-                    <a href="{{ url_for('blog.tag', tag_name=tag.name) }}">{{ tag.name }}</a>
+                    <a href="{{ url_for('blog.tag', tag_link=tag.link) }}">{{ tag.name }}</a>
                     <span class="badge">{{ tag.posts_count }}</span>
                 </li>
             {% endfor %}

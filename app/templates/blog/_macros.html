@@ -63,7 +63,7 @@
                                 {% elif slug_type == 'category' %}
                                     href="{{ url_for('blog.post', post_link=post.link, post_category_link=post.category_link) }}"
                                 {% elif slug_type == 'tag' %}
-                                    href="{{ url_for('blog.post', post_link=post.link, tag_name=slug_value) }}"
+                                    href="{{ url_for('blog.post', post_link=post.link, tag_link=slug_value) }}"
                                 {% endif %}
                             {% endif %}
                     >
@@ -84,10 +84,10 @@
                         {% if post.tags_name %}
                             <span class="post-tag">
                         <span class="glyphicon glyphicon-tags" title="标签"></span>&nbsp;
-                        {% set tags = post.tags.split(',') %}
+                        {% set tags = post.tags_object %}
                                 {% for tag in tags %}
-                                    <a href="{{ url_for('blog.tag', tag_name=tag) }}">
-                                {{ tag }}</a>{% if tag != tags[-1] %},{% endif %}
+                                    <a href="{{ url_for('blog.tag', tag_link=tag.link) }}">
+                                {{ tag.name }}</a>{% if tag != tags[-1] %},{% endif %}
                                 {% endfor %}</span>&nbsp;
                         {% endif %}
                         <span class="post-comment">

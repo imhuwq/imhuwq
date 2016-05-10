@@ -366,8 +366,8 @@ def manage_tags():
                            tags=tags)
 
 
-@admin.route('/blog/tag/<path:tag_name>')
+@admin.route('/blog/tag/<path:tag_link>')
 @admin_required
-def edit_tag(tag_name):
-    tag = Tag.query.filter_by(name=tag_name).first()
+def edit_tag(tag_link):
+    tag = Tag.query.filter_by(link=tag_link).first()
     return ''
