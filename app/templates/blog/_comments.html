@@ -6,7 +6,7 @@
 <script>
 
     var disqus_config = function () {
-        this.page.url = '{{ url_for('blog.post', post_title=posts[0].title, _external=True) }}'; // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = '{{ url_for('blog.post', post_link=posts[0].link, _external=True) }}'; // Replace PAGE_URL with your page's canonical URL variable
         this.page.identifier = 'post-{{ posts[0].title }}'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 

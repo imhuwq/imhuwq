@@ -13,7 +13,7 @@ def new_category():
     parent_id = request.form.get('parent_id')
     if name and parent_id:
         parent = Category.query.get(parent_id)
-        cate = Category.query.filter_by(_name=name).first()
+        cate = Category.query.filter_by(name=name).first()
         if cate is None:
             cate = Category(
                 name=name
@@ -142,10 +142,10 @@ def update_posts_category():
         if category == '默认分类':
             cate = Category.query.get(1)
             if not cate:
-                cate = Category(_name='默认分类')
+                cate = Category(name='默认分类')
                 db.session.add(cate)
         else:
-            cate = Category.query.filter_by(_name=category).first()
+            cate = Category.query.filter_by(name=category).first()
             if not cate:
                 cate = Category(name=category)
                 db.session.add(cate)

@@ -43,6 +43,7 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+        self.password_period = datetime.utcnow()
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -78,13 +79,14 @@ class Post(db.Model):
     main_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     draft = db.relationship('Post', uselist=False, backref=db.backref('main', remote_side=[id]))
     title = db.Column(db.String(32))
+    link = db.Column(db.String(32))
     date = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text)
     abstract = db.Column(db.Text)
     commendable = db.Column(db.Boolean, default=True)
     publicity = db.Column(db.Boolean, default=True)
     tags_name = db.Column(db.String(128))
-    category_name = db.Column(db.String(8), index=True)
+    category_name = db.Column(db.String(32), index=True)
     category_link = db.Column(db.String(128), index=True)
 
     @property
@@ -106,19 +108,19 @@ class Post(db.Model):
             new_ancestors = new_link.split('/')
             if old_ancestors == new_ancestors:
                 for name in old_ancestors:
-                    ancestor = Category.query.filter_by(_name=name).first()
+                    ancestor = Category.query.filter_by(name=name).first()
                     if ancestor:
                         ancestor.refresh_posts_count()
             else:
                 add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
                 del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
                 for name in del_ancestors:
-                    ancestor = Category.query.filter_by(_name=name).first()
+                    ancestor = Category.query.filter_by(name=name).first()
                     if ancestor:
                         ancestor.refresh_posts_count()
 
                 for name in add_ancestors:
-                    ancestor = Category.query.filter_by(_name=name).first()
+                    ancestor = Category.query.filter_by(name=name).first()
                     if ancestor:
                         ancestor.refresh_posts_count()
 
@@ -187,8 +189,8 @@ class Post(db.Model):
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
-    _name = db.Column('name', db.String(32), unique=True, index=True)
-    _link = db.Column('link', db.String(190), unique=True, index=True)
+    name = db.Column('name', db.String(32), unique=True, index=True)
+    link = db.Column('link', db.String(128), unique=True, index=True)
     level = db.Column(db.Integer, default=0)
     parent_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     children = db.relationship('Category', backref=db.backref('parent', remote_side=[id]))
@@ -215,38 +217,6 @@ class Category(db.Model):
 
     def is_descendant_of(self, cate):
         return self.link.startswith(cate.link)
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, new_name):
-        if '/' in new_name:
-            raise ValueError('“/” is not allowed in Category Name \n 分类名中不能包含“/”')
-        self._name = new_name
-        if not self.link or len(self.link.split('/')) == 1:
-            self.link = new_name
-        else:
-            ancestors = self.link.split('/')
-            self.link = '/'.join(ancestors[:-1]) + '/' + new_name
-
-    @property
-    def link(self):
-        return self._link
-
-    @link.setter
-    def link(self, new_link):
-        old_link = self._link
-        self._link = new_link
-
-        if old_link:
-            posts = Post.query.filter_by(category_link=old_link).all()
-            for post in posts:
-                post.category = self
-            children = self.children
-            for child in children:
-                child.link = new_link + '/' + child.name
 
     @staticmethod
     def generate_fake(count=20):
@@ -282,7 +252,7 @@ class Category(db.Model):
             new_cate = Category.query.get(1)
             new_cate.name = new_name
         else:
-            new_cate = Category.query.filter_by(_name=new_name).first()
+            new_cate = Category.query.filter_by(name=new_name).first()
             if new_cate is None:
                 new_cate = Category(name=new_name)
                 db.session.add(new_cate)
@@ -304,7 +274,7 @@ class Category(db.Model):
             name = Category.query.get(1).name
             return {'warning': '<%s>是默认分类, 不能成为任何分类的子分类' % name}
         else:
-            target_cate = Category.query.filter_by(_name=target_name).first()
+            target_cate = Category.query.filter_by(name=target_name).first()
             if target_cate is None:
                 target_cate = Category(name=target_name)
                 db.session.add(target_cate)
@@ -321,6 +291,7 @@ class Tag(db.Model):
     __tablename__ = 'tags'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), unique=True, index=True)
+    link = db.Column(db.String(32), unique=True, index=True)
     posts_count = db.Column(db.Integer, default=0)
 
     @property
@@ -375,6 +346,12 @@ def generate_abstract(target, value, oldvalue, initiator):
     target.abstract = re.split(r'\r?\n?\r?\n?<!\s*--more--\s*>', value, 1)[0]
 
 
+@event.listens_for(Post.title, 'set')
+def generate_post_link(target, value, oldvalue, initiator):
+    target.link = value.replace(' ', '_')
+
+
+# recount tag and category posts count after deleting the post
 @event.listens_for(Post, 'after_delete')
 def update_category_posts_count(mapper, connection, target):
     if target.type == 'article':
@@ -382,7 +359,7 @@ def update_category_posts_count(mapper, connection, target):
         category = target.category_link
         ancestors = category.split('/') if target.category_link else []
         for name in ancestors:
-            ancestor = Category.query.filter_by(_name=name).first()
+            ancestor = Category.query.filter_by(name=name).first()
             if ancestor:
                 count = ancestor.posts_count - 1
                 connection.execute(
@@ -413,6 +390,47 @@ def update_admin_email(target, value, oldvalue, initiator):
         sets.update_site_settings()
 
 
-@event.listens_for(User.password_hash, 'set')
-def update_password_period(target, value, oldvalue, initiator):
-    target.password_period = datetime.utcnow()
+@event.listens_for(Tag.name, 'set')
+def generate_tag_link(target, value, oldvalue, initiator):
+    target.link = value.replace(' ', '_')
+
+
+@event.listens_for(Category.name, 'set')
+def generate_category_link(target, value, oldvalue, initiator):
+    if '/' in value:
+        raise ValueError('“/” is not allowed in Category Name \n 分类名中不能包含“/”')
+    new_link = value.replace(' ', '_')
+    if not target.link or len(target.link.split('/')) == 1:
+        target.link = new_link
+    else:
+        ancestors = target.link.split('/')
+        target.link = '/'.join(ancestors[:-1]) + '/' + new_link
+
+
+@event.listens_for(Category.link, 'set')
+def generate_family_tree(target, value, oldvalue, initiator):
+    old_link = oldvalue if oldvalue.__repr__() != "symbol('NO_VALUE')" else ''
+
+    if old_link:
+        posts = Post.query.filter_by(category_link=old_link).all()
+        for post in posts:
+            post.category = target
+        children = target.children
+        for child in children:
+            child.link = value + '/' + child.name
+
+
+def update_links():
+    ps = Post.query.all()
+    for p in ps:
+        p.link = p.name.replace(' ', '_')
+
+    ts = Tag.query.all()
+    for t in ts:
+        t.link = t.name.replace(' ', '_')
+
+    cs = Category.query.all()
+    for c in cs:
+        c.link = c.link.replace(' ', '_')
+
+    db.session.commit()

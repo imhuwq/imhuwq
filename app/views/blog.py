@@ -30,12 +30,12 @@ def index():
                            pagination=pagination)
 
 
-@blog.route('/category/<path:post_category_link>/<post_title>')
-@blog.route('/tag/<path:tag_name>/<post_title>')
-@blog.route('/archive/<path:post_date>/<post_title>')
-@blog.route('/post/<path:post_title>')
-def post(post_title, post_category_link=None, tag_name=None, post_date=None):
-    p = Post.query.filter_by(title=post_title).first()
+@blog.route('/post><path:post_link>')
+@blog.route('/category/<path:post_category_link>><path:post_link>')
+@blog.route('/tag/<path:tag_name>><path:post_link>')
+@blog.route('/archive/<path:post_date>><path:post_link>')
+def post(post_link, post_category_link=None, tag_name=None, post_date=None):
+    p = Post.query.filter_by(link=post_link).first()
     if not p:
         abort(404)
     if not p.publicity and not current_user.is_administrator:
@@ -74,7 +74,7 @@ def categories():
 
 @blog.route('/category/<path:category_link>')
 def category(category_link):
-    cate = Category.query.filter_by(_link=category_link).first()
+    cate = Category.query.filter_by(link=category_link).first()
     if not cate:
         abort(404)
     children = Category.query.filter_by(parent_id=cate.id).order_by(Category.order).all()
@@ -101,7 +101,7 @@ def category(category_link):
                            tags=tags)
 
 
-@blog.route('/tag/<tag_name>')
+@blog.route('/tag/<path:tag_name>')
 def tag(tag_name):
     tags = Tag.query
     t = tags.filter_by(name=tag_name).first()

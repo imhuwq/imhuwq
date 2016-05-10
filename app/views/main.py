@@ -97,7 +97,7 @@ def logout():
 @main.route('/index')
 @main.route('/')
 def index():
-    title = '博客'
+    title = 'ImHuWQ'
     query = Post.query.filter_by(type="article").order_by(Post.date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()

@@ -59,11 +59,11 @@
                     <a
                             {% if not single %}
                                 {% if not slug_type %}
-                                    href="{{ url_for('blog.post', post_title=post.title) }}"
+                                    href="{{ url_for('blog.post', post_link=post.link) }}"
                                 {% elif slug_type == 'category' %}
-                                    href="{{ url_for('blog.post', post_title=post.title, post_category_link=post.category_link) }}"
+                                    href="{{ url_for('blog.post', post_link=post.link, post_category_link=post.category_link) }}"
                                 {% elif slug_type == 'tag' %}
-                                    href="{{ url_for('blog.post', post_title=post.title, tag_name=slug_value) }}"
+                                    href="{{ url_for('blog.post', post_link=post.link, tag_name=slug_value) }}"
                                 {% endif %}
                             {% endif %}
                     >
@@ -92,7 +92,7 @@
                         {% endif %}
                         <span class="post-comment">
                         <span class="glyphicon glyphicon-comment" title="评论"></span>&nbsp;
-                        <a href="{{ url_for('blog.post', post_title=post.title, _external=True) }}#disqus_thread"
+                        <a href="{{ url_for('blog.post', post_link=post.link, _external=True) }}#disqus_thread"
                            data-disqus-identifier="post-{{ post.title }}">
 
                         </a>
@@ -101,7 +101,7 @@
                         {% if current_user.is_administrator %}
                             <span class="glyphicon glyphicon-pencil"></span>
                             <span class="post-edit">
-                        <a href="{{ url_for("admin.edit_post", post_title=post.title, post_type='main') }}">编辑</a></span>
+                        <a href="{{ url_for("admin.edit_post", post_link=post.link, post_type='main') }}">编辑</a></span>
                         {% endif %}
                     </div>
 
@@ -116,7 +116,7 @@
                                 ......
                             </div>
                             <span class="read-more"><a
-                                    href="{{ url_for('blog.post', post_title=post.title) }}">阅读全文</a></span>
+                                    href="{{ url_for('blog.post', post_link=post.link) }}">阅读全文</a></span>
                         {% endif %}
                     </div>
                 </li>
