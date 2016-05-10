@@ -423,7 +423,7 @@ def generate_family_tree(target, value, oldvalue, initiator):
 def update_links():
     ps = Post.query.all()
     for p in ps:
-        p.link = p.name.replace(' ', '_')
+        p.link = p.title.replace(' ', '_')
 
     ts = Tag.query.all()
     for t in ts:

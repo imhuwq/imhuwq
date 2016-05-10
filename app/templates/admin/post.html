@@ -148,18 +148,18 @@
 
                     <td class="post-title">
                         <input type="checkbox" class="item-selector" name="">
-                        <a href="{{ url_for('blog.post', post_title=post.title) }}" target="_blank">{{ post.title }}</a>
+                        <a href="{{ url_for('blog.post', post_link=post.link) }}" target="_blank">{{ post.title }}</a>
                     </td>
 
                     <td style="text-align: center" class="post-type">
                         {% if post.type == 'article' and not post.draft %}
                             <span class="glyphicon glyphicon-list-alt" title="已发布"></span>
                         {% elif post.draft %}
-                            <a href="{{ url_for('admin.edit_post', post_type='main', post_title=post.title) }}"
+                            <a href="{{ url_for('admin.edit_post', post_type='main', post_link=post.link) }}"
                                title="修改中">
                                 <span class="glyphicon glyphicon-list-alt"></span></a>
                         {% else %}
-                            <a href="{{ url_for('admin.edit_post', post_type='main', post_title=post.title) }}"
+                            <a href="{{ url_for('admin.edit_post', post_type='main', post_link=post.link) }}"
                                title="起草中">
                                 <span class="glyphicon glyphicon-edit"></span></a>
                         {% endif %} </td>
@@ -205,7 +205,7 @@
                     </td>
 
                     <td style="text-align: center" class="post-action">
-                        <a href="{{ url_for('admin.edit_post', post_title=post.title, post_type='main') }}" title="修改">
+                        <a href="{{ url_for('admin.edit_post', post_link=post.link, post_type='main') }}" title="修改">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a> &nbsp;&nbsp;
                         <a title="删除" class="delete-post-icon">
