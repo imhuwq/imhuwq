@@ -1,6 +1,8 @@
 # 一.简介
 基于Flask的个人博客，完全出于学习练手的目的。  
 所以折腾第一， 开发效率第二。  
+app基于Flask， 数据库为mysql，也支持sqlite；  
+服务器为tornado， middleware为nginx。
 
 ## 1.整体方向
 1.1 把自己接触到的东西尽量在这个项目里面尝试  
@@ -52,11 +54,54 @@
 ## 1. 获取程序
 直接 `git clone` 获取程序代码  
 ## 2. 安装依赖
-2.1 首先安装虚拟环境`virtualenv`  
+2.1 python包依赖  
+  - 首先安装虚拟环境`virtualenv`  
 
-2.2 `sudo apt install libffi-dev`，主要是用来支持misaka渲染markdown  
+  - `sudo apt install libffi-dev`，主要是用来支持misaka渲染markdown  
 
-2.2 在激活虚拟环境的状态下 `pip install -r requirements.txt`  
+  - 在激活虚拟环境的状态下 `pip install -r requirements.txt`
+
+2.2 系统依赖  
+  - 安装mysql-server
+  - 安装和配置nginx  
+  以下是参考nginx配置  
+  */etc/nginx/sites-available/default*
+  ```nginx
+  server {
+      listen 80 default_server;
+      listen [::]:80 default_server;
+      server_name localhost;
+
+      # 此处替换下行中的your_domain.access为你的网站域名
+      access_log  /var/log/nginx/your_domain.com.access.log;
+
+      # 此处替换下行中的路径为您的应用文件夹路径(manage.py等文件所在目录)
+      root /home/john/Desktop/imhuwq;
+
+      location /static/ {
+      		 expires max;
+      		 add_header Last-Modified $sent_http_Expires;
+           # 此处替换下行中的路径为您的应用静态文件夹路径
+      		 alias /home/john/Desktop/imhuwq/app/static/;
+      }
+
+      location / {
+      			try_files $uri @tornado;
+      }
+
+      location @tornado {
+      			proxy_set_header Host $host;
+      			proxy_set_header X-Real-IP $remote_addr;
+      			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      			proxy_pass       http://127.0.0.1:5000;
+      }
+  }
+  ```
+2.3 创建数据库  
+  创建数据库的时候需要指定数据库的字符集为utf8
+  ```mysql
+  CREATE DATABASE your_db_name CHARACTER SET 'utf8';
+  ```
 
 ## 3. 编辑配置文件
 复制`config-sample.py`为`config.py`, 根据里面的文字提示来进行修改。  
@@ -65,4 +110,4 @@
 ## 4. 运行程序
 4.1 激活虚拟环境  
 
-4.2 `sudo -H /env/bin/python run.py`  
+4.2 `python run.py`
