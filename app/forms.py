@@ -82,6 +82,7 @@ class PasswordSetForm(Form):
 class CategoryForm(Form):
     name = StringField('分类名称', validators=[DataRequired(), Length(2, 12, message='分类名称长度在2-12之间')])
     order = IntegerField('排序',  default=0)
+    cate_id = IntegerField('id')
     submit = SubmitField('提交')
 
     def validate_name(self, field):
@@ -90,5 +91,5 @@ class CategoryForm(Form):
             raise ValidationError('分类名中不能包含“/”')
         else:
             cate = Category.query.filter_by(name=name).first()
-            if cate is not None:
+            if cate and cate.id != self.cate_id.data:
                 raise ValidationError('分类已经存在')

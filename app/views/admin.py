@@ -304,6 +304,7 @@ def new_category():
 def edit_category(category_link):
     form = CategoryForm()
     cate = Category.query.filter_by(link=category_link).first()
+    form.cate_id.data = cate.id
     if form.validate_on_submit():
         if '/' in form.name.data:
             flash('分类名中不能包含"/"')

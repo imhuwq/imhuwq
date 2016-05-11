@@ -25,22 +25,25 @@
                     <p class="help-block">{{ error }}</p>
                 {% endfor %}
             </div>
-            <div class="form-group required {% if form.title.errors %} has-error {% endif %}" id="post-editor-content">
+
+            <div class="form-group required {% if form.content.errors %} has-error {% endif %}" id="post-editor-content">
                 <label class="control-label" for="content">正文</label>
                 {{ form.content(class="form-control", required="") }}
                 {% for error in form.content.errors %}
                     <p class="help-block">{{ error }}</p>
                 {% endfor %}
             </div>
+
             <div id="post-editor-action">
                 {{ form.publish(class="btn btn-default") }}
                 {{ form.save(class="btn btn-default") }}
             </div>
+
         </div>
 
         <div class="col-md-3" id="post-editor-side">
-            <label>公开程度</label>
             <div id="post-editor-publicity">
+                <label>公开程度</label>
                 {{ form.publicity(class="form-control", style="border-bottom:none") }}
                 {{ form.commendable(class="form-control") }}
             </div>

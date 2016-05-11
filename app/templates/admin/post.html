@@ -168,9 +168,9 @@
                         {{ post.category_link }}</a></td>
 
                     <td class="post-tag">
-                        {% set tags = post.tags_name.split('、') %}
+                        {% set tags = post.tags_object %}
                         {% for tag in tags %}
-                            <a href="{{ url_for('blog.tag', tag_name=tag) }}">{{ tag }}</a>
+                            <a href="{{ url_for('blog.tag', tag_link=tag.link) }}">{{ tag.name }}</a>
                             {% if tag != tags[-1] %}、{% endif %}
                         {% endfor %}
                     </td>
