@@ -5,7 +5,7 @@ from ..forms import PostForm, ProfileForm, SiteSettingForm, PasswordSetForm, Cat
 from ..models import Post, Tag, Category, Settings, User
 from sqlalchemy import or_
 
-admin = Blueprint('admin', __name__, )
+admin = Blueprint('admin', __name__)
 
 
 @admin.route('/index')
@@ -132,7 +132,7 @@ def new_post():
 @admin.route('/blog/post/<path:post_link>/<post_type>', methods=['GET', 'POST'])
 @admin_required
 def edit_post(post_link, post_type):
-    p = Post.query.filter_by(title=post_link).first()
+    p = Post.query.filter_by(link=post_link).first()
     form = PostForm()
     form.post_id.data = p.id
 
