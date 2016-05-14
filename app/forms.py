@@ -50,8 +50,8 @@ class PostForm(Form):
     save = SubmitField('保存')
 
     def validate_title(self, field):
-        post = Post.query.filter_by(title=field.data).first()
-        if post and post.id != self.post_id.data:
+        post = Post.query.filter_by(_title=field.data).first()
+        if post and post.id != self.post_id.data and post.type == 'article':
             raise ValidationError('文章标题重复')
 
 
@@ -90,6 +90,6 @@ class CategoryForm(Form):
         if '/' in name:
             raise ValidationError('分类名中不能包含“/”')
         else:
-            cate = Category.query.filter_by(name=name).first()
+            cate = Category.query.filter_by(_name=name).first()
             if cate and cate.id != self.cate_id.data:
                 raise ValidationError('分类已经存在')

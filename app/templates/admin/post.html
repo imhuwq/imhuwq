@@ -155,30 +155,30 @@
                         {% if post.type == 'article' and not post.draft %}
                             <span class="glyphicon glyphicon-list-alt" title="已发布"></span>
                         {% elif post.draft %}
-                            <a href="{{ url_for('admin.edit_post', post_type='main', post_link=post.link) }}"
+                            <a href="{{ url_for('admin.edit_post', post_version='draft', post_link=post.link) }}"
                                title="修改中">
                                 <span class="glyphicon glyphicon-list-alt"></span></a>
                         {% else %}
-                            <a href="{{ url_for('admin.edit_post', post_type='main', post_link=post.link) }}"
+                            <a href="{{ url_for('admin.edit_post', post_version='main', post_link=post.link) }}"
                                title="起草中">
                                 <span class="glyphicon glyphicon-edit"></span></a>
                         {% endif %} </td>
 
-                    <td class="post-cate"><a href="{{ url_for('blog.category', category_link=post.category_link) }}">
-                        {{ post.category_link }}</a></td>
+                    <td class="post-cate"><a href="{{ url_for('blog.category', category_link=post.category.link) }}">
+                        {{ post.category.link }}</a></td>
 
                     <td class="post-tag">
-                        {% set tags = post.tags_object %}
+                        {% set tags = post.tags%}
                         {% for tag in tags %}
-                            <a href="{{ url_for('blog.tag', tag_link=tag.link) }}">{{ tag.name }}</a>
-                            {% if tag != tags[-1] %}、{% endif %}
+                            <a href="{{ url_for('blog.tag', tag_link=tag.replace(' ', '_')) }}">{{ tag }}</a>
+                            {% if tag != tags[-1] %},{% endif %}
                         {% endfor %}
                     </td>
 
                     <td style="text-align: center" class="post-publicity">
 
                         <a class="public-post-icon"
-                                {% if  post.publicity %}
+                                {% if  post.public %}
                            title="所有人可见" style="color:green">
                                     <span class="glyphicon glyphicon-eye-open"></span>
                                 {% else %}
@@ -205,7 +205,7 @@
                     </td>
 
                     <td style="text-align: center" class="post-action">
-                        <a href="{{ url_for('admin.edit_post', post_link=post.link, post_type='main') }}" title="修改">
+                        <a href="{{ url_for('admin.edit_post', post_link=post.link, post_version='main') }}" title="修改">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a> &nbsp;&nbsp;
                         <a title="删除" class="delete-post-icon">

@@ -169,7 +169,6 @@ form #submit {
     color: lightgray;
 }
 
-
 /* 9
 *****************************************************************
 *                   Index 9: site footer sets                 *
@@ -177,6 +176,7 @@ form #submit {
 .page-footer {
     text-align: center;
 }
+
 .page-footer p {
     margin: 0;
 }

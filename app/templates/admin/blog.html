@@ -29,6 +29,19 @@
             </tr>
 
             <tr>
+                <th>显示</th>
+                <td>
+                    {% if sets.show_abstract %}摘要
+                    {% else %}全文
+                    {% endif %}</td>
+                <td><a href="{{ url_for('admin.manage_display_style') }}">
+                    {% if sets.show_abstract %}全文
+                    {% else %}摘要
+                    {% endif %}
+                </a></td>
+            </tr>
+
+            <tr>
                 <th>文章</th>
                 <td>{{ posts_count }}篇</td>
                 <td><a href="{{ url_for('admin.manage_posts') }}">管理</a></td>

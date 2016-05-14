@@ -4,6 +4,7 @@ from .. import db
 from ..forms import PostForm, ProfileForm, SiteSettingForm, PasswordSetForm, CategoryForm
 from ..models import Post, Tag, Category, Settings, User
 from sqlalchemy import or_
+from datetime import datetime
 
 admin = Blueprint('admin', __name__)
 
@@ -11,7 +12,7 @@ admin = Blueprint('admin', __name__)
 @admin.route('/index')
 @admin_required
 def index():
-    posts_count = Post.query.filter_by(type='article').count()
+    posts_count = Post.query.filter_by(_type='article').count()
     tags_count = Tag.query.count()
     cates_count = Category.query.count()
     sets = Settings.query.get(1)
@@ -45,7 +46,7 @@ def site():
 @admin.route('/blog')
 @admin_required
 def blog():
-    posts_count = Post.query.filter_by(type='article').count()
+    posts_count = Post.query.filter_by(_type='article').count()
     cates_count = Category.query.count()
     tags_count = Tag.query.count()
     sets = Settings.query.get(1)
@@ -100,9 +101,10 @@ def new_post():
     if form.validate_on_submit():
         p = Post(
             title=form.title.data,
-            body=form.content.data,
-            publicity=form.publicity.data,
-            commendable=form.commendable.data
+            content=form.content.data,
+            public=form.publicity.data,
+            commendable=form.commendable.data,
+            date=datetime.utcnow()
         )
         p.type = 'article' if form.publish.data else 'draft'
         db.session.add(p)
@@ -116,35 +118,34 @@ def new_post():
             cate = Category(id=1, name="默认分类")
             db.session.add(cate)
         p.category = cate
-        p.tags = form.tags.data
+        p.tags = form.tags.data.strip()
 
         if form.save.data:
-            return redirect(url_for('admin.edit_post', post_link=p.link, post_type="main"))
+            return redirect(url_for('admin.edit_post', post_link=p.link, post_version="main"))
         elif form.publish.data:
-            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category_link))
-    cates = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
+            p._publish_date = datetime.utcnow(),
+            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category.link))
+    cates = Category.query.filter_by(_level=0).order_by(Category._order.asc()).all()
     return render_template("admin/new_post.html",
                            form=form,
                            title='书写文章',
                            categories=cates)
 
 
-@admin.route('/blog/post/<path:post_link>/<post_type>', methods=['GET', 'POST'])
+@admin.route('/blog/post/<path:post_link>/<post_version>', methods=['GET', 'POST'])
 @admin_required
-def edit_post(post_link, post_type):
-    p = Post.query.filter_by(link=post_link).first()
+def edit_post(post_link, post_version):
+    p = Post.query.filter_by(_link=post_link).first()
     form = PostForm()
     form.post_id.data = p.id
 
-    if p.main_id:
-        abort(404)
-
-    if post_type == "draft":
+    if post_version == "draft":
+        old_p = p
         p = p.draft
         if p is None:
-            return redirect(url_for('admin.edit_post', post_link=p.link, post_type='main'))
-    elif post_type != "main":
-        return redirect(url_for("admin.edit_post", post_link=p.link, post_type="main"))
+            return redirect(url_for('admin.edit_post', post_link=old_p.link, post_version='main'))
+    elif post_version != "main":
+        return redirect(url_for("admin.edit_post", post_link=p.link, post_version="main"))
 
     if form.validate_on_submit():
         try:
@@ -157,45 +158,49 @@ def edit_post(post_link, post_type):
             db.session.add(new_cate)
 
         if form.save.data:
-            if post_type == 'main' and p.type == 'article':
+            if post_version == 'main' and p.type == 'article':
                 draft = p.draft
                 if draft is None:
                     draft = Post(type='draft',
-                                 main_id=p.id)
+                                 main=p)
                     db.session.add(draft)
                     db.session.flush()
-                post_type = 'draft'
+                post_version = 'draft'
             else:
                 draft = p
             draft.category = new_cate
-            draft.tags = form.tags.data
-
+            draft.tags = form.tags.data.strip()
             draft.title = form.title.data
-            draft.body = form.content.data
+            draft.content = form.content.data
             draft.commendable = form.commendable.data
-            draft.publicity = form.publicity.data
-            return redirect(url_for('admin.edit_post', post_link=draft.link, post_type=post_type))
+            draft.public = form.publicity.data
+            draft.date = datetime.utcnow()
+            return redirect(url_for('admin.edit_post', post_link=p.link, post_version=post_version))
 
         elif form.publish.data:
             if p.type == 'draft' and p.main is not None:
                 p_main = p.main
                 db.session.delete(p)
                 p = p_main
+
             p.title = form.title.data
-            p.body = form.content.data
-            p.publicity = form.publicity.data
+            p.content = form.content.data
+            p.public = form.publicity.data
             p.commendable = form.commendable.data
             p.type = 'article'
             p.category = new_cate
-            p.tags = form.tags.data
-            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category_link))
+            p.tags = form.tags.data.strip()
+            p.date = datetime.utcnow()
+            if not p._publish_date:
+                p._publish_date = p.date
+            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category.link))
 
     form.title.data = p.title
-    form.content.data = p.body
-    form.tags.data = p.tags
+    form.content.data = p.content
+    form.tags.data = p._tags if p._tags else None
     form.commendable.data = p.commendable
-    form.publicity.data = p.publicity
-    cates = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
+    form.publicity.data = p.public
+    cates = Category.query.filter_by(_level=0).order_by(Category._order.asc()).all()
     return render_template("admin/new_post.html",
                            form=form, post=p,
                            categories=cates,
@@ -210,40 +215,40 @@ def manage_posts():
     publicity = request.args.get('publicity')
     commendable = request.args.get('commendable')
     tag = request.args.get('tag')
-    query = Post.query.filter_by(main_id=None)
+    query = Post.query.filter_by(_main_id=None)
     if category:
-        category = Category.query.filter_by(name=category).first()
+        category = Category.query.filter_by(_name=category).first()
         if category:
-            query = query.filter(or_(Post.category_link.like(category.link),
-                                     Post.category_link.like(category.link + '/%')))
+            query = query.filter(or_(Post._category.like(category.link),
+                                     Post._category.like(category.link + '/%')))
     if tag:
         if tag == ',':
-            query = query.filter(or_((Post.tags_name == ''),
-                                     Post.tags_name is None))
+            query = query.filter(or_((Post._tags == ''),
+                                     Post._tags is None))
         else:
-            query = query.filter(or_(Post.tags_name.like(tag + '、%'),
-                                     Post.tags_name.like('%、' + tag),
-                                     Post.tags_name.like(tag),
-                                     Post.tags_name.like('%、' + tag + '、%')))
+            query = query.filter(or_(Post._tags.like(tag + '、%'),
+                                     Post._tags.like('%、' + tag),
+                                     Post._tags.like(tag),
+                                     Post._tags.like('%、' + tag + '、%')))
     if publicity:
         if publicity == 'True':
-            query = query.filter_by(publicity=True)
+            query = query.filter_by(_public=True)
         elif publicity == 'False':
-            query = query.filter_by(publicity=False)
+            query = query.filter_by(_public=False)
     if commendable:
         if commendable == 'On':
-            query = query.filter_by(commendable=True)
+            query = query.filter_by(_commendable=True)
         elif commendable == 'Off':
-            query = query.filter_by(commendable=False)
+            query = query.filter_by(_commendable=False)
     if status:
         if status == 'Article':
-            query = query.filter_by(type='article', draft=None)
+            query = query.filter_by(_type='article', draft=None)
         elif status == 'Draft':
-            query = query.filter_by(type='draft')
+            query = query.filter_by(_type='draft')
         elif status == 'Saved':
             query = query.filter(Post.draft != None)
 
-    query = query.order_by(Post.date.desc())
+    query = query.order_by(Post._publish_date.desc())
     if query.count() <= 10:
         posts = query.all()
         pagination = None
@@ -253,7 +258,7 @@ def manage_posts():
             page=page, error_out=False, per_page=10
         )
         posts = pagination.items
-    categories = Category.query.filter_by(parent_id=None).all()
+    categories = Category.query.filter_by(_level=0).all()
     tags = Tag.query.all()
     return render_template('admin/post.html',
                            title='管理文章',
@@ -262,6 +267,13 @@ def manage_posts():
                            pagination=pagination,
                            )
 
+
+@admin.route('/blog/post_display', methods=['GET', 'POST'])
+@admin_required
+def manage_display_style():
+    sets = Settings.query.get(1)
+    sets.show_abstract = not sets.show_abstract
+    return redirect(url_for('admin.blog'))
 
 # below is about comment
 @admin.route('/blog/comment', methods=['GET', 'POST'])
@@ -289,10 +301,10 @@ def new_category():
         except KeyError:
             parent = None
         cate = Category(name=name, order=order)
+        cate.parent = parent
         db.session.add(cate)
-        cate.be_child_of(parent)
         return redirect(url_for('admin.manage_categories'))
-    categories = Category.query.filter_by(parent_id=None).all()
+    categories = Category.query.filter_by(_level=0).all()
     return render_template('admin/new_category.html',
                            title='新建分类',
                            form=form,
@@ -303,7 +315,7 @@ def new_category():
 @admin_required
 def edit_category(category_link):
     form = CategoryForm()
-    cate = Category.query.filter_by(link=category_link).first()
+    cate = Category.query.filter_by(_link=category_link).first()
     form.cate_id.data = cate.id
     if form.validate_on_submit():
         if '/' in form.name.data:
@@ -318,14 +330,14 @@ def edit_category(category_link):
             parent = None
         cate.name = name
         cate.order = order
-        cate.be_child_of(parent)
+        cate.parent = parent
         if parent:
             return redirect(url_for('admin.manage_category', category_link=cate.parent.link))
         else:
             return redirect(url_for('admin.manage_categories'))
     form.name.data = cate.name
     form.order.data = cate.order
-    categories = Category.query.filter_by(parent_id=None).all()
+    categories = Category.query.filter_by(_level=0).all()
     return render_template('admin/new_category.html',
                            title='编辑分类',
                            form=form,
@@ -336,7 +348,7 @@ def edit_category(category_link):
 @admin.route('/blog/category', methods=['GET', 'POST'])
 @admin_required
 def manage_categories():
-    categories = Category.query.filter_by(parent_id=None).order_by(Category.order.asc()).all()
+    categories = Category.query.filter_by(_level=0).order_by(Category._order.asc()).all()
     return render_template('admin/category.html',
                            title='管理分类',
                            categories=categories)
@@ -345,8 +357,8 @@ def manage_categories():
 @admin.route('/blog/category/<path:category_link>', methods=['GET', 'POST'])
 @admin_required
 def manage_category(category_link):
-    category = Category.query.filter_by(link=category_link).first()
-    categories = Category.query.filter_by(parent_id=category.id).order_by(Category.order.asc()).all()
+    category = Category.query.filter_by(_link=category_link).first()
+    categories = Category.query.filter_by(_parent=category).order_by(Category._order.asc()).all()
     return render_template('admin/category.html',
                            title='管理分类',
                            category=category,
@@ -369,10 +381,3 @@ def manage_tags():
                            title='管理标签',
                            pagination=pagination,
                            tags=tags)
-
-
-@admin.route('/blog/tag/<path:tag_link>')
-@admin_required
-def edit_tag(tag_link):
-    tag = Tag.query.filter_by(link=tag_link).first()
-    return ''

@@ -98,7 +98,7 @@ def logout():
 @main.route('/')
 def index():
     title = 'ImHuWQ'
-    query = Post.query.filter_by(type="article").order_by(Post.date.desc())
+    query = Post.query.filter_by(_type="article").order_by(Post._edit_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()
         pagination = None
@@ -108,8 +108,8 @@ def index():
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False
         )
         posts = pagination.items
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/index.html',
                            title=title,
                            posts=posts,

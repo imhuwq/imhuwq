@@ -62,7 +62,7 @@
                     </td>
                     <td>{{ cate.order }}</td>
                     <td>
-                        {% if cate.parent_id %}
+                        {% if cate.parent %}
                             {{ cate.parent.name }}
                         {% else %}
                             没有父分类

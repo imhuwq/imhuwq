@@ -9,7 +9,7 @@ blog = Blueprint('blog', __name__)
 @blog.route('/index')
 def index():
     title = '博客'
-    query = Post.query.filter_by(type="article").order_by(Post.date.desc())
+    query = Post.query.filter_by(_type="article").order_by(Post._edit_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()
         pagination = None
@@ -19,8 +19,8 @@ def index():
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False
         )
         posts = pagination.items
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/index.html',
                            title=title,
                            posts=posts,
@@ -35,24 +35,24 @@ def index():
 @blog.route('/tag/<path:tag_link>><path:post_link>')
 @blog.route('/archive/<path:post_date>><path:post_link>')
 def post(post_link, post_category_link=None, tag_link=None, post_date=None):
-    p = Post.query.filter_by(link=post_link).first()
+    p = Post.query.filter_by(_link=post_link).first()
     if not p:
         abort(404)
-    if not p.publicity and not current_user.is_administrator:
+    if not p.public and not current_user.is_administrator:
         abort(404)
-    if post_category_link and post_category_link != p.category_link:
+    if post_category_link and post_category_link != p.category.link:
         abort(404)
     if tag_link:
-        t = Tag.query.filter_by(link=tag_link).first()
+        t = Tag.query.filter_by(_link=tag_link).first()
         if t.name not in p.tags:
             abort(404)
     if post_date and post_date != '%s/%s' % (p.date.year, p.date.month):
         abort(404)
 
-    cates = Category.query.filter_by(parent_id=None). \
-        filter(Category.posts_count != 0). \
-        order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0). \
+        filter(Category._posts_count != 0). \
+        order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/single.html',
                            title=p.title,
                            posts=[p],
@@ -65,8 +65,8 @@ def categories():
     display = request.args.get('display')
     if display == 'detail':
         return redirect(url_for('blog.index'))
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/categories.html',
                            categories=cates,
                            title='分类',
@@ -76,13 +76,11 @@ def categories():
 
 @blog.route('/category/<path:category_link>')
 def category(category_link):
-    cate = Category.query.filter_by(link=category_link).first()
+    cate = Category.query.filter_by(_link=category_link).first()
     if not cate:
         abort(404)
-    children = Category.query.filter_by(parent_id=cate.id).order_by(Category.order).all()
-    query = Post.query.filter(or_(Post.category_link.like(category_link),
-                                  Post.category_link.like(category_link + '/%'))) \
-        .order_by(Post.date.desc())
+    children = cate.children
+    query = cate.all_posts.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()
         pagination = None
@@ -91,8 +89,8 @@ def category(category_link):
         pagination = query.paginate(
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
         ps = pagination.items
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/category.html',
                            category=cate,
                            categories=children,
@@ -105,11 +103,10 @@ def category(category_link):
 
 @blog.route('/tag/<path:tag_link>')
 def tag(tag_link):
-    tags = Tag.query
-    t = tags.filter_by(link=tag_link).first()
+    t = Tag.query.filter_by(_link=tag_link).first()
     if not t:
         abort(404)
-    query = t.posts.order_by(Post.date.desc())
+    query = t.posts.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()
         pagination = None
@@ -120,8 +117,8 @@ def tag(tag_link):
         )
         ps = pagination.items
 
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/tag.html',
                            title='标签:' + tag_link,
                            pagination=pagination,
@@ -134,9 +131,9 @@ def tag(tag_link):
 @blog.route('/archive')
 def archive():
     title = '博客存档'
-    ps = Post.query.filter_by(type='article').order_by(Post.date.desc()).all()
-    cates = Category.query.filter_by(parent_id=None).filter(Category.posts_count != 0).order_by(Category.order).all()
-    tags = Tag.query.filter(Tag.posts_count != 0).order_by(Tag.posts_count.desc()).all()
+    ps = Post.query.filter_by(_type='article', public=1).order_by(Post._publish_date.desc()).all()
+    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/archive.html',
                            posts=ps,
                            title=title,
