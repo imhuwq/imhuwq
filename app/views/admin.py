@@ -275,6 +275,7 @@ def manage_display_style():
     sets.show_abstract = not sets.show_abstract
     return redirect(url_for('admin.blog'))
 
+
 # below is about comment
 @admin.route('/blog/comment', methods=['GET', 'POST'])
 @admin_required
@@ -303,7 +304,10 @@ def new_category():
         cate = Category(name=name, order=order)
         cate.parent = parent
         db.session.add(cate)
-        return redirect(url_for('admin.manage_categories'))
+        if parent:
+            return redirect(url_for('admin.manage_category', category_link=cate.parent.link))
+        else:
+            return redirect(url_for('admin.manage_categories'))
     categories = Category.query.filter_by(_level=0).all()
     return render_template('admin/new_category.html',
                            title='新建分类',

@@ -20,12 +20,14 @@ def new_category():
             )
             if parent:
                 cate.parent = parent
+            else:
+                parent_id = None
             db.session.add(cate)
             db.session.commit()
             return jsonify({
                 'action': 'add',
-                'name': cate._name,
-                'id': cate._id,
+                'name': cate.name,
+                'id': cate.id,
                 'parent_id': parent_id
             })
         else:

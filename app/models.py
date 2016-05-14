@@ -141,22 +141,23 @@ class Post(db.Model):
     def category(self, cate):
         old_link = self._category
         new_link = cate.link
-
         self._category = cate.link
 
-        old_ancestors = old_link.split('/') if old_link else ''
-        new_ancestors = new_link.split('/')
-        add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
-        del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
-        for name in del_ancestors:
-            ancestor = Category.query.filter_by(_name=name).first()
-            if ancestor:
-                ancestor.refresh_posts_count()
+        if self._type == 'article':
+            old_ancestors = old_link.split('/') if old_link else ''
+            new_ancestors = new_link.split('/')
+            add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
+            del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
 
-        for name in add_ancestors:
-            ancestor = Category.query.filter_by(_name=name).first()
-            if ancestor:
-                ancestor.refresh_posts_count()
+            for name in del_ancestors:
+                ancestor = Category.query.filter_by(_name=name).first()
+                if ancestor:
+                    ancestor.refresh_posts_count()
+
+            for name in add_ancestors:
+                ancestor = Category.query.filter_by(_name=name).first()
+                if ancestor:
+                    ancestor.refresh_posts_count()
 
     @property
     def tags(self):
@@ -295,16 +296,29 @@ class Category(db.Model):
         self._name = new_name
         if self._link:
             if self._level == 0:
-                self._link = new_name.replace(' ', '_')
+                self.link = new_name.replace(' ', '_')
             else:
                 parent_link = self._link.split('/')[:-1]
-                self._link = '%s/%s' % ('/'.join(parent_link), new_name.replace(' ', '_'))
+                self.link = '%s/%s' % ('/'.join(parent_link), new_name.replace(' ', '_'))
         else:
-            self._link = new_name.replace(' ', '_')
+            self.link = new_name.replace(' ', '_')
 
     @property
     def link(self):
         return self._link
+
+    @link.setter
+    def link(self, new_link):
+        old_link = self._link
+        if old_link:
+            children = self.children.all()
+            posts = self.posts.all()
+            self._link = new_link
+            self._level = len(self._link.split('/')) - 1
+            self.update_family_tree(children, posts)
+        else:
+            self._link = new_link
+            self._level = len(self._link.split('/')) - 1
 
     @property
     def level(self):
@@ -328,25 +342,14 @@ class Category(db.Model):
 
     @parent.setter
     def parent(self, cate):
-        old_parent = self.parent
-
         if cate:
             if cate.is_descendant_of(self):
                 raise AttributeError('%s is descendant of %s, and it can not be its parent directly'
                                      % (cate.name, self._name))
             else:
-                self._link = '%s/%s' % (cate.link, self._name.replace(' ', '_'))
-                self._level = len(self._link.split('/')) - 1
-                cate.refresh_posts_count()
-
+                self.link = '%s/%s' % (cate.link, self._name.replace(' ', '_'))
         else:
-            self._link = self._name.replace(' ', '_')
-            self._level = 0
-
-        self.update_family_tree()
-
-        if old_parent:
-            old_parent.refresh_posts_count()
+            self.link = self._name.replace(' ', '_')
 
     @property
     def children(self):
@@ -355,13 +358,14 @@ class Category(db.Model):
     def is_descendant_of(self, cate):
         return self._link.startswith(cate.link)
 
-    def update_family_tree(self):
-        for post in self.posts:
-            post.category_link = self._link
-        if self.children.all():
-            for child in self.children.all():
-                child._link = self._link + child.name.replace(' ', '_')
-                child.update_family_tree()
+    def update_family_tree(self, children=None, posts=None):
+        posts = posts or self.posts.all()
+        for post in posts:
+            post.category = self
+        children = children or self.children.all()
+        if children:
+            for child in children:
+                child.link = self._link + '/' + child.name.replace(' ', '_')
 
     def refresh_posts_count(self):
         count = self.all_posts.count()
@@ -435,7 +439,7 @@ class Category(db.Model):
                 target_cate = Category(name=target_name)
                 db.session.add(target_cate)
                 db.session.flush()
-            if target_cate._id in moved_id_list:
+            if target_cate.id in moved_id_list:
                 return {'warning': '<%s>不能成为自己的子分类' % target_name}
         moved_cate_list = [Category.query.get(cate_id) for cate_id in moved_id_list]
         for c in moved_cate_list:
