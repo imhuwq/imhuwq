@@ -350,7 +350,7 @@ class Category(db.Model):
 
     @property
     def children(self):
-        return Category.query.filter_by(_level=self._level + 1).filter(Category._link.like(self._link + '/%')).all()
+        return Category.query.filter_by(_level=self._level + 1).filter(Category._link.like(self._link + '/%'))
 
     def is_descendant_of(self, cate):
         return self._link.startswith(cate.link)
@@ -358,8 +358,8 @@ class Category(db.Model):
     def update_family_tree(self):
         for post in self.posts:
             post.category_link = self._link
-        if self.children:
-            for child in self.children:
+        if self.children.all():
+            for child in self.children.all():
                 child._link = self._link + child.name.replace(' ', '_')
                 child.update_family_tree()
 
@@ -397,7 +397,7 @@ class Category(db.Model):
         posts = cate.posts
         for post in posts:
             post.category = parent
-        for child in cate.children:
+        for child in cate.children.all():
             child.parent = parent
         db.session.delete(cate)
 
@@ -419,7 +419,7 @@ class Category(db.Model):
         for c in merged_cate_list:
             for p in c.posts:
                 p.category = new_cate
-            for child in c.children:
+            for child in c.children.all():
                 child.parent = new_cate
             db.session.delete(c)
 

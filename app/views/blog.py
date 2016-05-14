@@ -79,7 +79,7 @@ def category(category_link):
     cate = Category.query.filter_by(_link=category_link).first()
     if not cate:
         abort(404)
-    children = cate.children
+    children = cate.children.all()
     query = cate.all_posts.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()

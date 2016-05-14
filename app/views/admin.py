@@ -358,7 +358,7 @@ def manage_categories():
 @admin_required
 def manage_category(category_link):
     category = Category.query.filter_by(_link=category_link).first()
-    categories = Category.query.filter_by(_parent=category).order_by(Category._order.asc()).all()
+    categories = category.children.order_by(Category._order.asc()).all()
     return render_template('admin/category.html',
                            title='管理分类',
                            category=category,

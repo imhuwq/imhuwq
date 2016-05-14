@@ -11,9 +11,9 @@
                     <div class="col-md-4 col-sm-6">
                         <li class="child-category">
                             <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
-                            {% if category.children %}
+                            {% if category.children.all() %}
                                 <ol class="grandchild-category-list">
-                                    {% for child in category.children %}
+                                    {% for child in category.children.all() %}
                                         {% if child.posts_count > 0 %}
                                             <li class="grandchild-category">
                                                 <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>

@@ -69,8 +69,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if cate.children %}
-                            {{ cate.children|length }}
+                        {% if cate.children.all() %}
+                            {{ cate.children.all()|length }}
                         {% else %}
                             没有子分类
                         {% endif %}
@@ -81,7 +81,7 @@
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a> &nbsp;&nbsp;
 
-                        {% if cate.children %}
+                        {% if cate.children.all() %}
                             <a href="{{ url_for('admin.manage_category', category_link=cate.link) }}" title="管理">
                                 <span class="glyphicon glyphicon-folder-open"></span>
                             </a> &nbsp;&nbsp;

@@ -68,9 +68,9 @@
         </span>
 
         <ul class="list-group">
-            {% if category.children %}
+            {% if category.children.all() %}
 
-                {% for child in category.children %}
+                {% for child in category.children.all() %}
                     {{ render_category_list(child, post) }}
                 {% endfor %}
 
@@ -92,8 +92,8 @@
                 {{ category.name }}
             </option>
 
-            {% if category.children %}
-                {% for child in category.children %}
+            {% if category.children.all() %}
+                {% for child in category.children.all() %}
                     {{ render_category_select(child, cate=cate, parent=parent) }}
                 {% endfor %}
             {% endif %}
@@ -108,8 +108,8 @@
             {{ category.name }}
         </option>
 
-        {% if category.children %}
-            {% for child in category.children %}
+        {% if category.children.all() %}
+            {% for child in category.children.all() %}
                 {{ render_category_select(child) }}
             {% endfor %}
         {% endif %}
@@ -127,8 +127,8 @@
         </a>
     </li>
 
-    {% if category.children %}
-        {% for child in category.children %}
+    {% if category.children.all() %}
+        {% for child in category.children.all() %}
             {{ render_category_filter(child) }}
         {% endfor %}
     {% endif %}
