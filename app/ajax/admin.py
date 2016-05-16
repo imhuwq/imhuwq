@@ -23,7 +23,7 @@ def new_category():
             else:
                 parent_id = None
             db.session.add(cate)
-            db.session.commit()
+
             return jsonify({
                 'action': 'add',
                 'name': cate.name,
@@ -48,7 +48,6 @@ def new_tag():
             if t is None:
                 t = Tag(name=name)
                 db.session.add(t)
-                db.session.commit()
     return ''
 
 
@@ -132,7 +131,6 @@ def update_posts_tag():
                     old_tags.extend(add_tags)
                     new_tags = ','.join(old_tags)
                 post.tags = new_tags
-    db.session.commit()
     return ''
 
 
@@ -156,7 +154,6 @@ def update_posts_category():
             p = Post.query.get(post)
             if p:
                 p.category = cate
-    db.session.commit()
     return ''
 
 
@@ -170,7 +167,7 @@ def delete_all_selected_cates():
         for cate_id in cates_list:
             cate = Category.query.get(cate_id)
             Category.delete(cate)
-            db.session.commit()
+
     return ''
 
 
@@ -181,7 +178,7 @@ def delete_category():
     cate = Category.query.get(cate_id)
     if cate.id != 1:
         Category.delete(cate)
-        db.session.commit()
+
         return jsonify({'success': 'action completed'})
     return jsonify({'warning': 'category not found'})
 
@@ -192,7 +189,6 @@ def merge_all_selected_cates():
     selected_cates = request.form.get('selected_cates').split(',')
     new_cate_name = request.form.get('new_cate_name')
     Category.marge(new_cate_name, selected_cates)
-    db.session.commit()
     return ''
 
 
@@ -205,7 +201,6 @@ def add_tag():
         if tag is None:
             tag = Tag(name=name)
             db.session.add(tag)
-    db.session.commit()
     return ''
 
 
@@ -216,7 +211,6 @@ def delete_tag():
     tag = Tag.query.get(tag_id)
     if tag:
         Tag.delete(tag)
-    db.session.commit()
     return ''
 
 
@@ -227,7 +221,6 @@ def delete_all_selected_tags():
     for tag in tags_list:
         t = Tag.query.get(tag)
         Tag.delete(t)
-    db.session.commit()
     return ''
 
 
@@ -237,7 +230,6 @@ def merge_all_selected_tags():
     selected_tags = request.form.get('selected_tags').split(',')
     new_tag_name = request.form.get('new_tag_name')
     Tag.merge(new_tag_name, selected_tags)
-    db.session.commit()
     return ''
 
 
@@ -247,7 +239,6 @@ def move_all_selected_tags():
     selected_cates = request.form.get('selected_cates').split(',')
     target_cate_name = request.form.get('target_cate_name')
     data = Category.move(target_cate_name, selected_cates)
-    db.session.commit()
     return jsonify(data)
 
 

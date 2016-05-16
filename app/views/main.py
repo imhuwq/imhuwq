@@ -98,7 +98,7 @@ def logout():
 @main.route('/')
 def index():
     title = 'ImHuWQ'
-    query = Post.query.filter_by(_type="article").order_by(Post._edit_date.desc())
+    query = Post.query.filter_by(_type="article").order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()
         pagination = None

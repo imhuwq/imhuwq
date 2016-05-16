@@ -9,7 +9,7 @@ blog = Blueprint('blog', __name__)
 @blog.route('/index')
 def index():
     title = '博客'
-    query = Post.query.filter_by(_type="article").order_by(Post._edit_date.desc())
+    query = Post.query.filter_by(_type="article").order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()
         pagination = None
@@ -131,7 +131,7 @@ def tag(tag_link):
 @blog.route('/archive')
 def archive():
     title = '博客存档'
-    ps = Post.query.filter_by(_type='article', public=1).order_by(Post._publish_date.desc()).all()
+    ps = Post.query.filter_by(_type='article').filter_by(_public=1).order_by(Post._publish_date.desc()).all()
     cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
     tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/archive.html',

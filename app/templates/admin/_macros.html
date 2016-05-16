@@ -60,7 +60,7 @@
                    id="category{{ category.id }}"
                    class="category-checkboxes"
 
-                    {% if post and post.category_name == category.name %}
+                    {% if post and post.category.name == category.name %}
                    checked="checked"
                     {% endif %}
             >
