@@ -183,16 +183,17 @@ def edit_post(post_link, post_version):
                 db.session.delete(p)
                 p = p_main
 
+            p.type = 'article'
             p.title = form.title.data
             p.content = form.content.data
             p.public = form.publicity.data
             p.commendable = form.commendable.data
-            p.type = 'article'
             p.category = new_cate
             p.tags = form.tags.data.strip()
             p.date = datetime.utcnow()
             if not p._publish_date:
                 p._publish_date = p.date
+            new_cate.refresh_posts_count()
             return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category.link))
 
     form.title.data = p.title
