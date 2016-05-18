@@ -24,7 +24,7 @@
                     <option value="-1" id="no-parent">父分类...</option>
                     {% for cate in categories %}
                         {% if category %}
-                            {{ macros.render_category_select(cate, category, category.parent_id) }}
+                            {{ macros.render_category_select(cate, category, category.parent.id) }}
                         {% else %}
                             {{ macros.render_category_select(cate) }}
                         {% endif %}

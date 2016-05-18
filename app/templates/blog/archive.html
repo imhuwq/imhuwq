@@ -17,16 +17,14 @@
                     <li>{{ post.date.month }}月
                         {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
                                 href="{{ url_for("blog.post",
-                                                 post_link=post.link,
-                                                 post_date='%s/%s' % (post.date.year, post.date.month)) }}">
+                                                 post_date_link = '%s/%s/%s' % (post.date.year, post.date.month, post.link)) }}">
                             {{ post.title }}</a>
                     </li>
                 {% else %}
                     <li>{{ post.date.month }}月
                         {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
                                 href="{{ url_for("blog.post",
-                                                 post_link=post.link,
-                                                 post_date='%s/%s' % (post.date.year, post.date.month)) }}">
+                                                 post_date_link = '%s/%s/%s' % (post.date.year, post.date.month, post.link)) }}">
                             {{ post.title }}</a>
                     </li>
                 {% endif %}

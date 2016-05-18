@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy import event, or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin, AnonymousUserMixin
-import re
 
 
 class Settings(db.Model):
@@ -398,6 +397,8 @@ class Category(db.Model):
     @staticmethod
     def delete(cate):
         parent = cate.parent
+        if not parent:
+            parent = Category.query.get(1)
         posts = cate.posts
         for post in posts:
             post.category = parent

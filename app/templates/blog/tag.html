@@ -15,7 +15,7 @@
 
         {% if pagination %}
             <div class="post-pagination">
-                {{ macros.simple_pagination_widget(pagination=pagination, endpoint="main.index") }}
+                {{ macros.simple_pagination_widget(pagination=pagination, tag_link=tag.link, endpoint="blog.tag") }}
             </div>
         {% endif %}
 

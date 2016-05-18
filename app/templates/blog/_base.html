@@ -9,6 +9,12 @@
           type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
           type="image/x-icon">
+    {% if request.endpoint == 'blog.post' %}
+        {% set post = posts[0] %}
+        <link rel="canonical"
+              href="{{ url_for('blog.post', post_category_link='%s/%s' %(post._category, post.link), _external=True) }}"
+        >
+    {% endif %}
 {% endblock %}
 
 {% block title %}
