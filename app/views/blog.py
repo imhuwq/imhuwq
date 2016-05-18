@@ -7,6 +7,7 @@ blog = Blueprint('blog', __name__)
 
 
 @blog.route('/index')
+@blog.route('/')
 def index():
     title = '博客'
     query = Post.query.filter_by(_type="article").order_by(Post._publish_date.desc())
@@ -26,27 +27,38 @@ def index():
                            posts=posts,
                            cates=cates,
                            tags=tags,
-                           detailed=False,
                            pagination=pagination)
 
 
-@blog.route('/post><path:post_link>')
-@blog.route('/category/<path:post_category_link>><path:post_link>')
-@blog.route('/tag/<path:tag_link>><path:post_link>')
-@blog.route('/archive/<path:post_date>><path:post_link>')
-def post(post_link, post_category_link=None, tag_link=None, post_date=None):
-    p = Post.query.filter_by(_link=post_link).first()
-    if not p:
-        abort(404)
-    if not p.public and not current_user.is_administrator:
-        abort(404)
-    if post_category_link and post_category_link != p.category.link:
-        abort(404)
-    if tag_link:
-        t = Tag.query.filter_by(_link=tag_link).first()
-        if t.name not in p.tags:
-            abort(404)
-    if post_date and post_date != '%s/%s' % (p.date.year, p.date.month):
+@blog.route('/post/<path:post_link>')
+@blog.route('/category/<path:post_category_link>')
+@blog.route('/tag/<path:post_tag_link>')
+@blog.route('/archive/<path:post_date_link>')
+def post(post_link=None, post_category_link=None, post_tag_link=None, post_date_link=None):
+    not_found = True
+    if post_link:
+        p = Post.query.filter_by(_link=post_link).first()
+        if p:
+            not_found = False
+    elif post_category_link:
+        *category_link, post_link = post_category_link.split('/')
+        category_link = '/'.join(category_link)
+        p = Post.query.filter_by(_link=post_link).first()
+        if p and category_link == p._category:
+            not_found = False
+    elif post_tag_link:
+        *tag_link, post_link = post_tag_link.split('/')
+        tag_link = '/'.join(tag_link)
+        p = Post.query.filter_by(_link=post_link).first()
+        if p and tag_link in [t.replace(' ', '_') for t in p.tags]:
+            not_found = False
+    elif post_date_link:
+        *date, post_link = post_date_link.split('/')
+        p = Post.query.filter_by(_link=post_link).first()
+        if p and '/'.join(date) == '%s/%s' % (p.date.year, p.date.month):
+            not_found = False
+
+    if not_found:
         abort(404)
 
     cates = Category.query.filter_by(_level=0). \
@@ -60,7 +72,7 @@ def post(post_link, post_category_link=None, tag_link=None, post_date=None):
                            tags=tags)
 
 
-@blog.route('/category')
+@blog.route('/categories')
 def categories():
     display = request.args.get('display')
     if display == 'detail':
@@ -74,7 +86,7 @@ def categories():
                            tags=tags)
 
 
-@blog.route('/category/<path:category_link>')
+@blog.route('/categories/<path:category_link>')
 def category(category_link):
     cate = Category.query.filter_by(_link=category_link).first()
     if not cate:
@@ -101,7 +113,7 @@ def category(category_link):
                            tags=tags)
 
 
-@blog.route('/tag/<path:tag_link>')
+@blog.route('/tags/<path:tag_link>')
 def tag(tag_link):
     t = Tag.query.filter_by(_link=tag_link).first()
     if not t:
@@ -128,7 +140,7 @@ def tag(tag_link):
                            tags=tags)
 
 
-@blog.route('/archive')
+@blog.route('/archives')
 def archive():
     title = '博客存档'
     ps = Post.query.filter_by(_type='article').filter_by(_public=1).order_by(Post._publish_date.desc()).all()

@@ -10,6 +10,7 @@ admin = Blueprint('admin', __name__)
 
 
 @admin.route('/index')
+@admin.route('/')
 @admin_required
 def index():
     posts_count = Post.query.filter_by(_type='article').count()
@@ -114,9 +115,6 @@ def new_post():
         except KeyError:
             category_id = 1
         cate = Category.query.get(category_id)
-        if cate is None:
-            cate = Category(id=1, name="默认分类")
-            db.session.add(cate)
         p.category = cate
         p.tags = form.tags.data.strip()
 
@@ -124,7 +122,7 @@ def new_post():
             return redirect(url_for('admin.edit_post', post_link=p.link, post_version="main"))
         elif form.publish.data:
             p._publish_date = datetime.utcnow(),
-            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category.link))
+            return redirect(url_for('blog.post', post_link=p.link))
     cates = Category.query.filter_by(_level=0).order_by(Category._order.asc()).all()
     return render_template("admin/new_post.html",
                            form=form,
@@ -153,9 +151,6 @@ def edit_post(post_link, post_version):
         except KeyError:
             category_id = 1
         new_cate = Category.query.get(category_id)
-        if new_cate is None:
-            new_cate = Category(id=1, name='默认分类')
-            db.session.add(new_cate)
 
         if form.save.data:
             if post_version == 'main' and p.type == 'article':
@@ -194,7 +189,7 @@ def edit_post(post_link, post_version):
             if not p._publish_date:
                 p._publish_date = p.date
             new_cate.refresh_posts_count()
-            return redirect(url_for('blog.post', post_link=p.link, post_category_link=p.category.link))
+            return redirect(url_for('blog.post', post_link=p.link))
 
     form.title.data = p.title
     form.content.data = p.content
@@ -323,9 +318,6 @@ def edit_category(category_link):
     cate = Category.query.filter_by(_link=category_link).first()
     form.cate_id.data = cate.id
     if form.validate_on_submit():
-        if '/' in form.name.data:
-            flash('分类名中不能包含"/"')
-            return redirect(url_for('admin.new_category'))
         name = form.name.data
         order = form.order.data
         try:

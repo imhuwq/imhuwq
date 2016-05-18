@@ -19,7 +19,7 @@
 
 
     <div class="page-main">
-        {% if category.children.all() %}
+        {% if categories %}
             <div id="children-list">
                 <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseChild"
                    aria-expanded="false"
@@ -29,24 +29,24 @@
 
                 <div class="collapse" id="collapseChild">
                     <ol class="child-category-list">
-                        <div class="row">
-                            {% for category in categories %}
-                                <div class="col-md-4 col-sm-6">
-                                    <li class="child-category">
-                                        <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
-                                        <ol class="grandchild-category-list">
-                                            {% for child in category.children.all() %}
-                                                {% if child.posts_count > 0 %}
-                                                    <li class="grandchild-category">
-                                                        <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ol>
-                                    </li>
-                                </div>
-                            {% endfor %}
+                    <div class="row">
+                        {% for category in categories %}
+                        <div class="col-md-4 col-sm-6">
+                            <li class="child-category">
+                                <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
+                                <ol class="grandchild-category-list">
+                                {% for child in category.children.all() %}
+                                    {% if child.posts_count > 0 %}
+                                        <li class="grandchild-category">
+                                            <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                </ol>
+                            </li>
                         </div>
+                        {% endfor %}
+                    </div>
                     </ol>
                 </div>
             </div>
@@ -67,7 +67,7 @@
 
         {% if pagination %}
             <div class="post-pagination">
-                {{ macros.simple_pagination_widget(pagination=pagination, endpoint="main.index") }}
+                {{ macros.simple_pagination_widget(pagination=pagination, category_link=category.link, endpoint="blog.category") }}
             </div>
         {% endif %}
     </div>

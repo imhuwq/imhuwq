@@ -1,9 +1,10 @@
-from flask import Blueprint, current_app, request, flash
+from flask import Blueprint, current_app, request, make_response
 from flask import render_template, redirect, url_for
 from flask.ext.login import login_user, logout_user, current_user
 from ..models import Settings, User, Post, Category, Tag
 from .. import db
 from ..forms import SetupForm01, SetupForm02, LoginForm
+from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 
@@ -76,12 +77,8 @@ def login():
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            if user is None:
-                flash('用户名或密码不正确')
-                return redirect(url_for('main.login'))
-            if user.verify_password(form.password.data):
-                login_user(user, form.remember_me.data)
-                return redirect(request.args.get('next') or url_for('main.index'))
+            login_user(user, form.remember_me.data)
+            return redirect(request.args.get('next') or url_for('main.index'))
         title = '登陆'
         return render_template('main/gate.html', form=form, title=title)
     else:
@@ -115,8 +112,47 @@ def index():
                            posts=posts,
                            cates=cates,
                            tags=tags,
-                           detailed=False,
                            pagination=pagination)
+
+
+@main.route('/sitemap.xml')
+def sitemap():
+    pages = []
+    ten_days_ago = (datetime.utcnow().replace(microsecond=0) - timedelta(days=10)).isoformat()
+
+    site_index = [url_for('main.index', _external=True), ten_days_ago]
+    pages.append(site_index)
+
+    blog_index = [url_for('blog.index', _external=True), ten_days_ago]
+    pages.append(blog_index)
+
+    blog_categories = [url_for('blog.categories', _external=True), ten_days_ago]
+    pages.append(blog_categories)
+
+    blog_archives = [url_for('blog.archive', _external=True), ten_days_ago]
+    pages.append(blog_archives)
+
+    posts = Post.query.order_by(Post._edit_date).all()
+    for post in posts:
+        url = url_for('blog.post', post_category_link='%s/%s' % (post._category, post.link), _external=True)
+        edit = post.date.isoformat()
+        pages.append([url, edit])
+
+    cates = Category.query.all()
+    for cate in cates:
+        url = url_for('blog.category', category_link=cate.link, _external=True)
+        pages.append([url, ten_days_ago])
+
+    tags = Tag.query.all()
+    for tag in tags:
+        url = url_for('blog.tag', tag_link=tag.link, _external=True)
+        pages.append([url, ten_days_ago])
+
+    sitemap_xml = render_template('main/sitemap.xml', pages=pages)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+
+    return response
 
 
 @main.app_errorhandler(403)

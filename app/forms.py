@@ -2,7 +2,7 @@ from flask.ext.wtf import Form
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField, BooleanField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, Regexp, NumberRange, ValidationError
 from flask import current_app
-from .models import Category, Post
+from .models import Category, Post, User
 
 
 class SetupForm01(Form):
@@ -33,10 +33,17 @@ class SetupForm02(Form):
 
 
 class LoginForm(Form):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
+    email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email(message="请输入正确的邮箱地址")])
     password = PasswordField('密码', validators=[DataRequired()])
     remember_me = BooleanField('记住我')
     submit = SubmitField('登陆')
+
+    def validate_password(self, field):
+        u = User.query.filter_by(email=self.email.data).first()
+        if u is None:
+            raise ValidationError('用户名或密码不正确')
+        if not u.verify_password(field.data):
+            raise ValidationError('用户名或密码不正确')
 
 
 class PostForm(Form):

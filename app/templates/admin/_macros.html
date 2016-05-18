@@ -83,6 +83,7 @@
 
 
 {% macro render_category_select(category, cate=None, parent=None) %}
+    {# 如果cate不为None，则说明是编辑模式，编辑模式下需要限定不能选择cate的子类作为其父类 #}
     {% if cate %}
         {% if not category.is_descendant_of(cate) %}
             <option value="{{ category.id }}"
@@ -101,6 +102,7 @@
             {% endif %}
         {% endif %}
 
+    {# 如果cate为None，说明是新建模式，可以放心自由选择父类 #}
     {% else %}
         <option value="{{ category.id }}"
                 class="category-selectors"
