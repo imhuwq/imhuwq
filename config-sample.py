@@ -29,41 +29,34 @@ class Config:
     # 数据库用户密码
     DATABASE_PASSWORD = ''
 
-    # app默认的运行模式, 一般为 'production’ 生产模式
-    # 如果需要测试环境，设置为'test'
-    # 绝对不要在生产环境中使用'debug'
-    DEFAULT_APP_MODE = 'production'
-
-    # 下列使用随机生产的数据
-    SECRET_KEY = 'NEVERTELLANYBODYEXCEPTIT'
-
     #  ---------------------------------------------  #
     #  编辑　**以上**　区域以配置您的网站　　　　　　　　　  #
     #  --------------------------------------------   #
 
+    # global configurations
     # 通用设置
+    SECRET_KEY = ''
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_RECORD_QUERIES = True
     SITE_INITIATED = False
 
-    def __init__(self, mode=DEFAULT_APP_MODE):
-        # default develop mode
+    def __init__(self, mode):
         # 默认开发模式
-        if mode == 'default' or mode == 'deve':
-            self.DEBUG = True
-            db_name = 'data-deve.sqlite'
-        # test mode
+        if mode == 'prod' or mode == 'default':
+            db_name = 'data.sqlite'
+
         # 测试模式
         elif mode == 'test':
             self.TESTING = True
             db_name = 'data-test.sqlite'
-        # production mode
-        # 生产模式
-        else:
-            db_name = 'data.sqlite'
 
-        if self.DATABASE_NAME == '':
+        # 生产模式
+        elif mode == 'debug':
+            self.DEBUG = True
+            db_name = 'data-debug.sqlite'
+
+        if self.DATABASE_NAME == '' or mode == 'test':
             self.SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, db_name)
         else:
             self.SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%s:%s@%s/%s?charset=utf8' \
@@ -75,4 +68,9 @@ class Config:
         pass
 
 
-config = Config()
+config = {
+    'prod': Config('prod'),
+    'test': Config('test'),
+    'debug': Config('debug'),
+    'default': Config('default')
+}
