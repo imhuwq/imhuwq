@@ -1,3 +1,14 @@
+# -*- coding: utf8 -*-
+"""
+    app.models
+    ~~~~~~~~~~
+
+    整个app的Model设计都在这里.
+    站点基本设置涉及到: Setting 和 User
+    博客涉及到: Post, Category 和 Tag
+
+"""
+
 from . import db, login_manager
 from flask import current_app
 from datetime import datetime
@@ -7,6 +18,8 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 
 
 class Settings(db.Model):
+    """存储基本的站点设置"""
+
     id = db.Column(db.Integer, primary_key=True)
     site_admin_email = db.Column(db.String(64))
     site_initiated = db.Column(db.Boolean, default=False)
@@ -20,6 +33,9 @@ class Settings(db.Model):
     google_analytics_code = db.Column(db.String(32))
 
     def update_site_settings(self):
+        """每次更新设置后,都会触发该函数,对app.config进行更新.
+           触发点是sqlalchemy的event.listens_for
+        """
         current_app.config['SITE_INITIATED'] = self.site_initiated
         current_app.config['SITE_ADMIN_EMAIL'] = self.site_admin_email
         current_app.config['ENABLE_COMMENT'] = self.enable_post_comment
@@ -33,6 +49,11 @@ class Settings(db.Model):
 
 
 class User(db.Model, UserMixin):
+    """用户Model
+       只需要邮箱, 和hash密码
+       密码不可读,但是可以用verify_password(passwd)对passwd进行验证
+       当创建用户时,如果用户邮箱与app.config中的管理员邮箱一致,则赋予用户管理员属性
+    """
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
@@ -53,13 +74,11 @@ class User(db.Model, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def __init__(self):
-        super().__init__()
-        if self.is_administrator is None:
-            if self.email == current_app.config['SITE_ADMIN_EMAIL']:
-                self.is_administrator = True
-            else:
-                self.is_administrator = False
+    def __init__(self, **kwargs):
+        """当创建用户时,如果用户邮箱与app.config中的管理员邮箱一致,则赋予用户管理员属性"""
+        super().__init__(**kwargs)
+        if not self.is_administrator:
+            self.is_administrator = self.email == current_app.config['SITE_ADMIN_EMAIL']
 
 
 @login_manager.user_loader
@@ -78,19 +97,105 @@ login_manager.anonymous_user = AnonymousUser
 
 
 class Post(db.Model):
+    """Post Model
+       所有属性为私有属性, 一律从getter和setter进行数据交流,
+       方便对数据的验证和保护, 进而保护数据的正确性和数据库的完整性
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+       完整的API如下:(小写post指实例, 大写Post指类)
+       post.type,               可读, 返回值为post._type, 'article'和'draft'之一
+                                不可写, 在保存文章时自动设置, 详见Post.save(post) 以及 Post.publish(post)
+
+       post.main,               可读, 返回值为草稿的对应主体文章, Post实例, 或者为None(如果当前文章不是其它文章的修改稿的话)
+                                不可写, 在保存文章时自动设置, 详见Post.save(post) 以及 Post.publish(post)
+
+       post.draft,              可读, 返回值为文章修改中的草稿, Post实例, 或者为None
+                                不可写, 在保存文章时自动设置, 详见详见Post.save(post) 以及 Post.publish(post)
+
+       post.title,              可读, 返回post._title, 字符串或者''
+                                可写, 接受任何120长度以内字符串
+
+       post.link,               可读, 返回post._link, 字符串或者''
+                                不可写, 在_title的setter中而生成, 将_title中的空格转换成下划线
+
+       post.publish_date,       可读, 返回post._publish_date, datetime, 或者None
+                                不可写, 在Post.publish(post)时生成, datetime.datetime.utcnow().replace(milliseconds=0)
+
+       post.date,               可读, 返回post._edit_date, datetime, 或者None
+                                不可写, 在Post.publish(post)时生成, datetime.datetime.utcnow().replace(milliseconds=0)
+
+       post.content,            可读, 返回post._content, 字符串, 或者''
+                                可写, 接受任意长度字符
+
+       post.abstract,           可读, 返回post._abstract, 字符串, 或者''
+                                不可写在content的setter中自动截取, 分隔符为 <!--more-->
+
+       post.commendable,        可读, 返回post._commendable, boolean
+                                可写, 接受boolean
+
+       post.public,             可读, 返回post._public, boolean
+                                可写, 接受boolean
+
+       post.category,           可读,返回对应分类的Category实例, 或者None
+                                可写, 接受一个Category实例, 保存其link到post._category
+
+       post.tags,               可读, 返回一个包含文章标签名称的list: ['tag1', 'tag2', 'tag3'], 或者[]
+                                可写, 接受一个由","分隔的标签名称字符串: 'tag1, tag2, tag3'
+
+       post.add_tag(tag)        增加一个tag, 接受一个Tag实例
+
+       post.del_tag(tag)        删除一个tag, 接受一个Tag实例
+
+       Post.publish(post, **data)发布一篇文章, 自动处理日期, type和main post关系
+                                如果post为新文章或者草稿, 设置post.type = 'article',
+                                                           post.date = post.publish_date = utcnow()
+                                如果post为修改稿, 先找到main post, 更新main post内容, main_post.date = utcnow(),
+                                                再删除post
+       Post.save(post, **data)  保存一篇文章, 自动处理日期, type和main post关系
+                                如果post为新文章, 设置post.type = 'draft', post.date = utcnow()
+                                如果post为已发布, 新建edit_post为修改稿, edit_post内容为当前内容,
+                                                                      edit_post.type = 'draft',
+                                                                      edit_post._main_id = post.id
+                                                                      edit_post.date = utcnow()
+                                如果post为修改稿, post.date = utcnow(), 其余不变
+
+       Post.generate_fake(num)  自动生成num篇文章
+    """
     __tablename__ = 'posts'
     _id = db.Column('id', db.Integer, primary_key=True)
+
+    #: _type和_main_id一起用来区分日志的类型
+    #: if _type == 'article' and not _main_id: 已发布的文章
+    #: if _type == 'draft' and not _main_id: 未发布的文章
+    #: if _type == 'draft' and _main_id: 已发布的文章的修改稿, 已发布的文章的id为_main_id
     _type = db.Column('type', db.String(16))
     _main_id = db.Column('main_id', db.Integer)
-    _title = db.Column('title', db.String(128))
-    _link = db.Column('link', db.String(128), index=True)
+
+    #: _tile即文章的标题, _link是文章的uri, 二者都必须保证唯一性
+    _title = db.Column('title', db.String(128), unique=True)
+    _link = db.Column('link', db.String(128), index=True, unique=True)
+
+    #: _publish_date在文章第一次发表时设置
+    #: _edit_date 在文章草稿发布时设置
+    #: 后者会在文章详情页显示,以体现文章内容的时效性, 前者用于文章按时间排名
     _publish_date = db.Column('publish_date', db.DateTime)
     _edit_date = db.Column('edit_date', db.DateTime)
+
+    #: _content即日志内容, _abstract为摘要
     _content = db.Column('content', db.Text)
     _abstract = db.Column('abstract', db.Text)
+
+    #: _commendable是日志可评论状态, False不可评论,也不会显示以前的评论
+    #: 可评论状态受博客全局可评论设置影响,结果为 settings.enable_post_comment & post.commendable
     _commendable = db.Column('commendable', db.Boolean, default=True)
+
+    #: _public是日志的对外可见状态, False则只有管理员可见
     _public = db.Column('public', db.Boolean, default=True)
+
+    #: _category存储的是文章所属分类的link,包含分类的集成关系信息
     _category = db.Column('category', db.String(128), index=True)
+
+    #: _tags存储的是文章拥有的标签的字符串, 分割符为: ,
     _tags = db.Column('tags', db.String(128), index=True)
 
     @property
@@ -99,64 +204,78 @@ class Post(db.Model):
 
     @property
     def title(self):
-        return self._title
+        return self._title or ''
 
     @title.setter
     def title(self, title):
+        if len(title) > 120:
+            raise AttributeError('标题最多120个字符')
         self._title = title
         self._link = title.replace(' ', '_')
 
     @property
     def link(self):
-        return self._link
+        return self._link or ''
 
     @property
     def date(self):
-        return self._edit_date
+        return self._edit_date or None
 
     @date.setter
     def date(self, date):
         self._edit_date = date
 
     @property
+    def publish_date(self):
+        return self._publish_date or None
+
+    @publish_date.setter
+    def publish_date(self, date):
+        self._publish_date = self._publish_date or date
+
+    @property
     def content(self):
-        return self._content
+        return self._content or ''
 
     @content.setter
     def content(self, content):
         self._content = content
+        # 根据content生成abstract
         self._abstract = content.split('<!--more-->', 1)[0]
 
     @property
     def abstract(self):
-        return self._abstract
+        return self._abstract or ''
 
     @property
     def category(self):
-        name = self._category.split('/')[-1]
-        return Category.query.filter_by(_name=name).first()
+        if self._category:
+            name = self._category.split('/')[-1]
+            return Category.query.filter_by(_name=name).first()
+        return None
 
     @category.setter
     def category(self, cate):
+        if not cate:
+            cate = Category.query.get(1)
+
         old_link = self._category
         new_link = cate.link
         self._category = cate.link
+        db.session.add(self)
 
-        if self._type == 'article':
-            old_ancestors = old_link.split('/') if old_link else ''
-            new_ancestors = new_link.split('/')
-            add_ancestors = [x for x in new_ancestors if x not in old_ancestors]
-            del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
+        old_ancestors = old_link.split('/') if old_link else []
+        new_ancestors = new_link.split('/')
+        del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
+        for name in del_ancestors:
+            ancestor = Category.query.filter_by(_name=name).first()
+            if ancestor:
+                ancestor.refresh_posts_count()
 
-            for name in del_ancestors:
-                ancestor = Category.query.filter_by(_name=name).first()
-                if ancestor:
-                    ancestor.refresh_posts_count()
-
-            for name in add_ancestors:
-                ancestor = Category.query.filter_by(_name=name).first()
-                if ancestor:
-                    ancestor.refresh_posts_count()
+        for name in new_ancestors:
+            ancestor = Category.query.filter_by(_name=name).first()
+            if ancestor:
+                ancestor.refresh_posts_count()
 
     @property
     def tags(self):
@@ -164,15 +283,16 @@ class Post(db.Model):
 
     @tags.setter
     def tags(self, tags):
+        if not tags:
+            tags = ''
         old_tags = self._tags.split(',') if self._tags else []
         new_tags = [tag.strip().lower() for tag in tags.split(',') if tag != '']
-        add_tags = [x for x in new_tags if x not in old_tags]
         del_tags = [x for x in old_tags if x not in new_tags]
 
-        if new_tags:
-            self._tags = ','.join(new_tags)
+        self._tags = ','.join(new_tags)
+        db.session.add(self)
 
-        for tag in add_tags:
+        for tag in new_tags:
             t = Tag.query.filter_by(_name=tag).first()
             if t is None:
                 t = Tag(name=tag)
@@ -184,7 +304,7 @@ class Post(db.Model):
 
     @property
     def draft(self):
-        return Post.query.filter(Post._main_id == self._id).first()
+        return Post.query.filter(Post._main_id == self._id).first() or None
 
     @draft.setter
     def draft(self, draft):
@@ -220,7 +340,7 @@ class Post(db.Model):
 
     @public.setter
     def public(self, value):
-        if value in [1, 'True', 'public', 'open', True]:
+        if value in [1, '1', 'True', 'public', 'open', True]:
             self._public = True
         else:
             self._public = False
@@ -231,7 +351,7 @@ class Post(db.Model):
 
     @commendable.setter
     def commendable(self, value):
-        if value in [1, 'True', 'commendable', 'on', True]:
+        if value in [1, '1', 'True', 'commendable', 'on', True]:
             self._commendable = True
         else:
             self._commendable = False
@@ -251,6 +371,60 @@ class Post(db.Model):
             delete_tag.refresh_posts_count()
 
     @staticmethod
+    def publish(post, **data):
+        """ 如果post为修改稿, 先
+                找到main post,
+                更新main post内容, main_post.date = utcnow(),
+                再删除post
+        """
+        if post.type == 'draft' and post._main_id:
+            main = post.main
+            db.session.delete(post)
+            post = main
+        db.session.add(post)
+        post._type = 'article'
+        post.title = data.get('title')
+        post.content = data.get('content')
+        post.category = data.get('category')
+        post.tags = data.get('tags')
+        post.commendable = data.get('commendable')
+        post.public = data.get('public')
+        post.date = datetime.utcnow().replace(microsecond=0)
+        post.publish_date = post.date
+        db.session.commit()
+
+    @staticmethod
+    def save(post, **data):
+        """ 如果post为新文章, 设置post.type = 'draft', post.date = utcnow()
+            如果post为已发布, 新建edit_post为修改稿, edit_post内容为当前内容,
+                                                  edit_post.type = 'draft',
+                                                  edit_post._main_id = post.id
+                                                  edit_post.date = utcnow()
+            如果post为修改稿, post.date = utcnow(), 其余不变
+        """
+        if not post.type:
+            post._type = 'draft'
+            post.date = datetime.utcnow().replace(microsecond=0)
+        elif post.type == 'article':
+            draft = Post()
+            draft._type = 'draft'
+            draft._main_id = post.id
+            post = draft
+
+        elif post.type == 'draft' and post._main_id:
+            post.date = datetime.utcnow().replace(microsecond=0)
+
+        post.title = data.get('title')
+        post.content = data.get('content')
+        post.category = data.get('category')
+        post.tags = data.get('tags')
+        post.commendable = data.get('commendable')
+        post.public = data.get('public')
+
+        db.session.add(post)
+        db.session.commit()
+
+    @staticmethod
     def generate_fake(count=30):
         from random import randint
         import forgery_py
@@ -265,9 +439,9 @@ class Post(db.Model):
                      date=forgery_py.date.date(True),
                      type='article'
                      )
-            db.session.add(p)
             p.tags = ','.join(set([t1, t2, t3]))
             p.category = c
+            db.session.add(p)
             db.session.commit()
 
 
@@ -367,8 +541,7 @@ class Category(db.Model):
                 child.link = self._link + '/' + child.name.replace(' ', '_')
 
     def refresh_posts_count(self):
-        count = self.all_posts.count()
-        self._posts_count = count
+        self._posts_count = self.all_posts.count()
 
     @property
     def posts(self):
@@ -376,8 +549,9 @@ class Category(db.Model):
 
     @property
     def all_posts(self):
-        return Post.query.filter(or_(Post._category.like(self._link),
-                                     Post._category.like(self._link + '/%'))).filter(Post._type == 'article')
+        posts = Post.query.filter(or_(Post._category.like(self._link),
+                                      Post._category.like(self._link + '/%'))).filter(Post._type == 'article')
+        return posts
 
     @property
     def posts_count(self):
@@ -387,9 +561,12 @@ class Category(db.Model):
     def generate_fake(count=20):
         import forgery_py
         from random import randint
-        for i in range(count):
+        suffix = set([])
+        while len(suffix) < count:
+            suffix.add(randint(1, 100))
+        for i in suffix:
             c = Category(
-                name=forgery_py.lorem_ipsum.word() + str(randint(1, 50))
+                name=forgery_py.lorem_ipsum.word() + str(i)
             )
             db.session.add(c)
             db.session.commit()
@@ -516,10 +693,13 @@ class Tag(db.Model):
     def generate_fake(count=30):
         import forgery_py
         from random import randint
+        suffix = set([])
+        while len(suffix) < count:
+            suffix.add(randint(1, 100))
 
-        for i in range(count):
+        for i in suffix:
             t = Tag(
-                name=forgery_py.lorem_ipsum.word() + str(randint(1, 50))
+                name=forgery_py.lorem_ipsum.word() + str(i)
             )
             db.session.add(t)
             db.session.commit()
