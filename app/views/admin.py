@@ -100,29 +100,32 @@ def new_post():
     form = PostForm()
 
     if form.validate_on_submit():
-        p = Post(
-            title=form.title.data,
-            content=form.content.data,
-            public=form.publicity.data,
-            commendable=form.commendable.data,
-            date=datetime.utcnow()
-        )
-        p.type = 'article' if form.publish.data else 'draft'
-        db.session.add(p)
-
-        try:
-            category_id = request.form['category']
-        except KeyError:
-            category_id = 1
+        p = Post()
+        category_id = request.form.get('category', 1)
         cate = Category.query.get(category_id)
-        p.category = cate
-        p.tags = form.tags.data.strip()
-
-        if form.save.data:
-            return redirect(url_for('admin.edit_post', post_link=p.link, post_version="main"))
-        elif form.publish.data:
-            p._publish_date = datetime.utcnow(),
+        tags = form.tags.data.strip()
+        if form.publish.data:
+            Post.publish(
+                post=p,
+                title=form.title.data,
+                content=form.content.data,
+                public=form.publicity.data,
+                commendable=form.commendable.data,
+                category=cate,
+                tags=tags
+            )
             return redirect(url_for('blog.post', post_link=p.link))
+        elif form.save.data:
+            Post.save(
+                post=p,
+                title=form.title.data,
+                content=form.content.data,
+                public=form.publicity.data,
+                commendable=form.commendable.data,
+                category=cate,
+                tags=tags
+            )
+            return redirect(url_for('admin.edit_post', post_link=p.link, post_version="main"))
     cates = Category.query.filter_by(_level=0).order_by(Category._order.asc()).all()
     return render_template("admin/new_post.html",
                            form=form,
@@ -133,6 +136,10 @@ def new_post():
 @admin.route('/blog/post/<path:post_link>/<post_version>', methods=['GET', 'POST'])
 @admin_required
 def edit_post(post_link, post_version):
+    """post_version用于获取文章的版本
+       'main' 表示获取已发布的文章或者未发布的新文章本身
+       'draft' 表示获取已发布文章的修改稿
+    """
     p = Post.query.filter_by(_link=post_link).first()
     form = PostForm()
     form.post_id.data = p.id
@@ -146,49 +153,28 @@ def edit_post(post_link, post_version):
         return redirect(url_for("admin.edit_post", post_link=p.link, post_version="main"))
 
     if form.validate_on_submit():
-        try:
-            category_id = request.form['category']
-        except KeyError:
-            category_id = 1
+        category_id = request.form.get('category', 1)
         new_cate = Category.query.get(category_id)
+        tags = form.tags.data.strip()
 
         if form.save.data:
-            if post_version == 'main' and p.type == 'article':
-                draft = p.draft
-                if draft is None:
-                    draft = Post(type='draft',
-                                 main=p)
-                    db.session.add(draft)
-                    db.session.flush()
-                post_version = 'draft'
-            else:
-                draft = p
-            draft.category = new_cate
-            draft.tags = form.tags.data.strip()
-            draft.title = form.title.data
-            draft.content = form.content.data
-            draft.commendable = form.commendable.data
-            draft.public = form.publicity.data
-            draft.date = datetime.utcnow()
-            return redirect(url_for('admin.edit_post', post_link=p.link, post_version=post_version))
+            Post.save(post=p,
+                      category=new_cate,
+                      tags=tags,
+                      title=form.title.data,
+                      content=form.content.data,
+                      commendable=form.commendable.data,
+                      public=form.publicity.data)
+            return redirect(url_for('admin.edit_post', post_link=p.link, post_version='draft'))
 
         elif form.publish.data:
-            if p.type == 'draft' and p.main is not None:
-                p_main = p.main
-                db.session.delete(p)
-                p = p_main
-
-            p.type = 'article'
-            p.title = form.title.data
-            p.content = form.content.data
-            p.public = form.publicity.data
-            p.commendable = form.commendable.data
-            p.category = new_cate
-            p.tags = form.tags.data.strip()
-            p.date = datetime.utcnow()
-            if not p._publish_date:
-                p._publish_date = p.date
-            new_cate.refresh_posts_count()
+            Post.publish(post=p,
+                         category=new_cate,
+                         tags=tags,
+                         title=form.title.data,
+                         content=form.content.data,
+                         commendable=form.commendable.data,
+                         public=form.publicity.data)
             return redirect(url_for('blog.post', post_link=p.link))
 
     form.title.data = p.title
@@ -220,12 +206,12 @@ def manage_posts():
     if tag:
         if tag == ',':
             query = query.filter(or_((Post._tags == ''),
-                                     Post._tags is None))
+                                     Post._tags == None))
         else:
-            query = query.filter(or_(Post._tags.like(tag + '、%'),
-                                     Post._tags.like('%、' + tag),
+            query = query.filter(or_(Post._tags.like(tag + ',%'),
+                                     Post._tags.like('%,' + tag),
                                      Post._tags.like(tag),
-                                     Post._tags.like('%、' + tag + '、%')))
+                                     Post._tags.like('%,' + tag + ',%')))
     if publicity:
         if publicity == 'True':
             query = query.filter_by(_public=True)

@@ -25,10 +25,11 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'main.login'
 
 
-def create_app():
+def create_app(mode='default'):
     app = Flask(__name__)
-    app.config.from_object(config)
-    config.init_app(app)
+    con = config[mode]
+    app.config.from_object(con)
+    con.init_app(app)
     db.init_app(app)
     bootstrap.init_app(app)
     login_manager.init_app(app)

@@ -118,7 +118,7 @@ def index():
 @main.route('/sitemap.xml')
 def sitemap():
     pages = []
-    ten_days_ago = (datetime.utcnow().replace(microsecond=0) - timedelta(days=10)).isoformat()
+    ten_days_ago = (datetime.utcnow().replace(microsecond=0) - timedelta(days=10)).isoformat() + '+08:00'
 
     site_index = [url_for('main.index', _external=True), ten_days_ago]
     pages.append(site_index)
@@ -135,7 +135,7 @@ def sitemap():
     posts = Post.query.order_by(Post._edit_date).all()
     for post in posts:
         url = url_for('blog.post', post_category_link='%s/%s' % (post._category, post.link), _external=True)
-        edit = post.date.isoformat()
+        edit = post.date.isoformat() + '+08:00'
         pages.append([url, edit])
 
     cates = Category.query.all()
