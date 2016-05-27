@@ -1,3 +1,11 @@
+# -*- coding: utf8 -*-
+"""
+    app.views.admin
+    ~~~~~~~~~~
+
+    后台管理视图
+"""
+
 from flask import Blueprint, request, redirect, url_for, render_template, jsonify, abort, flash
 from ..helpers import admin_required
 from .. import db

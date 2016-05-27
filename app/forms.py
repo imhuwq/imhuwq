@@ -1,3 +1,11 @@
+# -*- coding: utf8 -*-
+"""
+    app.forms
+    ~~~~~~~~~~
+
+    整个app的Form设计都在这里.
+"""
+
 from flask.ext.wtf import Form
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField, BooleanField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, Regexp, NumberRange, ValidationError

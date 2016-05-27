@@ -1,3 +1,36 @@
+# -*- coding: utf8 -*-
+"""
+    app
+    ~~~~~~~~~~
+
+    app插件初始化以及app格式化
+
+    关于app文档结构:
+    ----app
+        ----__init__.py (本文件)
+        ----forms.py
+        ----models.py
+        ----views
+            ----main.py
+            ----blog.py
+            ----admin.py
+        ----templates
+            ----main
+            ----blog
+            ----admin
+        ----static
+            ----main
+            ----blog
+            ----admin
+        ----ajax
+            ----admin.py
+
+    ----config.py   (配置文件)
+    ----tests       (测试模块)
+    ----manage.py   (调试,测试,shell)
+    ----run.py      (开启应用, 生产环境)
+"""
+
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
@@ -36,9 +69,9 @@ def create_app(mode='default'):
     misaka.init_app(app)
     moment.init_app(app)
 
+    # bootstrap使用cdn.bootcss.com提供cdn加快国内访问速度
     from flask_bootstrap import WebCDN
     cdns = app.extensions['bootstrap']['cdns']
-
     cdns['bootstrap'] = WebCDN('//cdn.bootcss.com/bootstrap/3.3.5/')
     cdns['jquery'] = WebCDN('//cdn.bootcss.com/jquery/1.11.3/')
     cdns['html5shiv'] = WebCDN('//cdn.bootcss.com/html5shiv/3.7.2/')

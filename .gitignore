@@ -1,9 +1,9 @@
-__pycache__
 env
+tmp
 config.py
 migrations
+__pycache__
+.idea
 *.sqlite
 *.log
 *.pyc
-.idea
-tmp

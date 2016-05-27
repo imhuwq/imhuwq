@@ -1,10 +1,19 @@
-import unittest, time
+# -*- coding: utf8 -*-
+"""
+    test.test_basic_post_model
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    测试发布文章和保存文章时文章的状态,以及应分类标签和分类的统计情况
+"""
+
+import unittest
+import time
 from app import create_app, db
 from app.models import Post, Category, Tag
 
 
 class BasicTestCase(unittest.TestCase):
-    """测试文章的发布和保存,以及对应分类标签和分类的统计情况
+    """测试发布文章和保存文章时文章的状态,以及应分类标签和分类的统计情况
        情况大致如下:
        test_publish_new_post                    新建一篇文章, 直接发布
        test_save_new_post                       新建一篇文章, 不发布而保存为草稿
@@ -50,19 +59,9 @@ class BasicTestCase(unittest.TestCase):
         p = Post.query.filter_by(_title='po st').first()
 
         self.assertTrue(p.type == 'article' and
-                        p.date == p._publish_date and
-                        p.category == c and
-                        p.tags == ['tag', 'gat'] and
-                        p.link == 'po_st' and
-                        p.abstract == 'post_abstract' and
+                        p.date == p.publish_date and
                         p.draft is None and
-                        t.posts_count == 1 and
-                        t.posts[0] == p and
-                        a.posts_count == 1 and
-                        a.posts[0] == p and
-                        c.posts_count == 1 and
-                        c.all_posts[0] == p and
-                        c.posts[0] == p)
+                        p.main is None)
 
     def test_02_save_new_post(self):
         """新建一篇文章, 不发布而保存为草稿"""
@@ -82,12 +81,10 @@ class BasicTestCase(unittest.TestCase):
         p = Post.query.filter_by(_title='po st').first()
 
         self.assertTrue(p.type == 'draft' and
-                        p.date is not None and
-                        p._publish_date is None and
+                        p.date and
+                        not p.publish_date and
                         p.category == c and
                         p.tags == ['tag', 'gat'] and
-                        p.link == 'po_st' and
-                        p.abstract == 'post_abstract' and
                         p.draft is None and
                         t.posts_count == 0 and
                         a.posts_count == 0 and
@@ -119,7 +116,7 @@ class BasicTestCase(unittest.TestCase):
                      category=c)
 
         self.assertTrue(p.type == 'article' and
-                        p.date != p._publish_date and
+                        p.date != p.publish_date and
                         p.category == c and
                         p.tags == [] and
                         p.link == 'po_st_2nd' and
@@ -227,7 +224,7 @@ class BasicTestCase(unittest.TestCase):
 
         p = Post.query.filter_by(_title='po st').first()
         Post.save(post=p,
-                  title='po st article',
+                  title='po st',
                   content='post_abstract<!--more-->post_content',
                   public=True,
                   commendable=False,
@@ -238,7 +235,7 @@ class BasicTestCase(unittest.TestCase):
                         p.date != p.publish_date and
                         p.category == c and
                         p.tags == ['tag'] and
-                        p.link == 'po_st_article' and
+                        p.link == 'po_st' and
                         p.public and
                         not p.commendable and
                         p.abstract == 'post_abstract' and
