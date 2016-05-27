@@ -1,3 +1,11 @@
+# -*- coding: utf8 -*-
+"""
+    app.ajax.admin
+    ~~~~~~~~~~~~~
+
+    后台管理的ajax视图
+"""
+
 from flask import Blueprint, request, flash, jsonify
 from ..helpers import admin_required
 from .. import db

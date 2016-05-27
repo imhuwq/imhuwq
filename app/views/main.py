@@ -1,3 +1,13 @@
+# -*- coding: utf8 -*-
+"""
+    app.views.main
+    ~~~~~~~~~~
+
+    app范围视图
+    涉及app范围的操作
+    比如before_first_request, error_handler, sitemap等
+"""
+
 from flask import Blueprint, current_app, request, make_response
 from flask import render_template, redirect, url_for
 from flask.ext.login import login_user, logout_user, current_user

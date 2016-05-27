@@ -1,7 +1,13 @@
+# -*- coding: utf8 -*-
+"""
+    app.views.blog
+    ~~~~~~~~~~
+
+    博客视图
+"""
+
 from flask import Blueprint, request, redirect, url_for, render_template, current_app, abort
-from flask.ext.login import current_user
 from ..models import Post, Category, Tag
-from sqlalchemy import or_
 
 blog = Blueprint('blog', __name__)
 

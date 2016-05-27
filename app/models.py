@@ -15,6 +15,7 @@ from datetime import datetime
 from sqlalchemy import event, or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin, AnonymousUserMixin
+from functools import reduce
 
 
 class Settings(db.Model):
@@ -171,9 +172,9 @@ class Post(db.Model):
     _type = db.Column('type', db.String(16))
     _main_id = db.Column('main_id', db.Integer)
 
-    #: _tile即文章的标题, _link是文章的uri, 二者都必须保证唯一性
-    _title = db.Column('title', db.String(128), unique=True)
-    _link = db.Column('link', db.String(128), index=True, unique=True)
+    #: _tile即文章的标题, _link是文章的uri, 对于已发布的文章来说, 二者都必须保证唯一性
+    _title = db.Column('title', db.String(128))
+    _link = db.Column('link', db.String(128), index=True)
 
     #: _publish_date在文章第一次发表时设置
     #: _edit_date 在文章草稿发布时设置
@@ -210,6 +211,13 @@ class Post(db.Model):
     def title(self, title):
         if len(title) > 120:
             raise AttributeError('标题最多120个字符')
+
+        # 不允许两篇article的标题相同
+        p = Post.query.filter_by(_title=title).first()
+        if p and p.type == 'article' and self.type == 'article':
+            if not self.id or self.id != p.id:
+                raise AttributeError('标题重复')
+
         self._title = title
         self._link = title.replace(' ', '_')
 
@@ -221,17 +229,9 @@ class Post(db.Model):
     def date(self):
         return self._edit_date or None
 
-    @date.setter
-    def date(self, date):
-        self._edit_date = date
-
     @property
     def publish_date(self):
         return self._publish_date or None
-
-    @publish_date.setter
-    def publish_date(self, date):
-        self._publish_date = self._publish_date or date
 
     @property
     def content(self):
@@ -250,30 +250,47 @@ class Post(db.Model):
     @property
     def category(self):
         if self._category:
-            name = self._category.split('/')[-1]
-            return Category.query.filter_by(_name=name).first()
+            cate = Category.query.filter_by(_link=self._category).first()
+            return cate
         return None
 
     @category.setter
     def category(self, cate):
         if not cate:
             cate = Category.query.get(1)
+            if not cate:
+                cate = Category(name='默认分类')
+                db.session.add(cate)
 
         old_link = self._category
         new_link = cate.link
         self._category = cate.link
         db.session.add(self)
 
-        old_ancestors = old_link.split('/') if old_link else []
-        new_ancestors = new_link.split('/')
+        old_names = old_link.split('/') if old_link else []
+        if old_names:
+            old_ancestors = [old_names.pop(0)]
+            for name in old_names:
+                old_ancestors.append('/'.join([old_ancestors[-1], name]))
+        else:
+            old_ancestors = []
+
+        new_names = new_link.split('/') if new_link else []
+        if new_names:
+            new_ancestors = [new_names.pop(0)]
+            for name in new_names:
+                new_ancestors.append('/'.join([new_ancestors[-1], name]))
+        else:
+            new_ancestors = []
+
         del_ancestors = [x for x in old_ancestors if x not in new_ancestors]
-        for name in del_ancestors:
-            ancestor = Category.query.filter_by(_name=name).first()
+        for link in del_ancestors:
+            ancestor = Category.query.filter_by(_link=link).first()
             if ancestor:
                 ancestor.refresh_posts_count()
 
-        for name in new_ancestors:
-            ancestor = Category.query.filter_by(_name=name).first()
+        for link in new_ancestors:
+            ancestor = Category.query.filter_by(_link=link).first()
             if ancestor:
                 ancestor.refresh_posts_count()
 
@@ -306,12 +323,6 @@ class Post(db.Model):
     def draft(self):
         return Post.query.filter(Post._main_id == self._id).first() or None
 
-    @draft.setter
-    def draft(self, draft):
-        if self._type == 'draft' or self._main_id is not None:
-            raise AttributeError('draft can not have draft')
-        draft._main_id = self._id
-
     @property
     def main(self):
         if self._main_id:
@@ -319,20 +330,9 @@ class Post(db.Model):
         else:
             return None
 
-    @main.setter
-    def main(self, main):
-        self._main_id = main.id
-
     @property
     def type(self):
         return self._type
-
-    @type.setter
-    def type(self, t):
-        if t not in ['article', 'draft']:
-            raise AttributeError('only "article" and "draft" are supported')
-
-        self._type = t
 
     @property
     def public(self):
@@ -358,7 +358,7 @@ class Post(db.Model):
 
     def add_tag(self, tag):
         if self._tags:
-            self._tags = self._tags + ',' + tag.name if tag.name not in self._tags else self._tags
+            self._tags = self._tags + ',' + tag.name if tag.name not in self.tags else self._tags
         else:
             self._tags = tag.name
         tag.refresh_posts_count()
@@ -383,43 +383,34 @@ class Post(db.Model):
             post = main
         db.session.add(post)
         post._type = 'article'
-        post.title = data.get('title')
-        post.content = data.get('content')
-        post.category = data.get('category')
-        post.tags = data.get('tags')
-        post.commendable = data.get('commendable')
-        post.public = data.get('public')
-        post.date = datetime.utcnow().replace(microsecond=0)
-        post.publish_date = post.date
+        post.title = data.get('title', '')
+        post.content = data.get('content', '')
+        post.category = data.get('category', None)
+        post.tags = data.get('tags', None)
+        post.commendable = data.get('commendable', True)
+        post.public = data.get('public', True)
+        post._edit_date = datetime.utcnow().replace(microsecond=0)
+        post._publish_date = post._publish_date or post._edit_date
         db.session.commit()
 
     @staticmethod
     def save(post, **data):
-        """ 如果post为新文章, 设置post.type = 'draft', post.date = utcnow()
-            如果post为已发布, 新建edit_post为修改稿, edit_post内容为当前内容,
-                                                  edit_post.type = 'draft',
+        """ 如果post为已发布, 新建edit_post为修改稿, edit_post内容为当前内容,
                                                   edit_post._main_id = post.id
-                                                  edit_post.date = utcnow()
-            如果post为修改稿, post.date = utcnow(), 其余不变
         """
-        if not post.type:
-            post._type = 'draft'
-            post.date = datetime.utcnow().replace(microsecond=0)
-        elif post.type == 'article':
+        if post.type == 'article':
             draft = Post()
-            draft._type = 'draft'
             draft._main_id = post.id
             post = draft
 
-        elif post.type == 'draft' and post._main_id:
-            post.date = datetime.utcnow().replace(microsecond=0)
-
+        post._type = 'draft'
         post.title = data.get('title')
         post.content = data.get('content')
         post.category = data.get('category')
         post.tags = data.get('tags')
         post.commendable = data.get('commendable')
         post.public = data.get('public')
+        post._edit_date = datetime.utcnow().replace(microsecond=0)
 
         db.session.add(post)
         db.session.commit()
@@ -434,15 +425,12 @@ class Post(db.Model):
             t2 = Tag.query.all()[randint(1, 20)].name
             t3 = Tag.query.all()[randint(1, 20)].name
             c = Category.query.all()[randint(1, 10)]
-            p = Post(title=forgery_py.lorem_ipsum.sentence(),
-                     content=forgery_py.lorem_ipsum.sentences(randint(5, 20)),
-                     date=forgery_py.date.date(True),
-                     type='article'
-                     )
-            p.tags = ','.join(set([t1, t2, t3]))
-            p.category = c
-            db.session.add(p)
-            db.session.commit()
+            p = Post()
+            Post.publish(post=p,
+                         title=forgery_py.lorem_ipsum.sentence()[0:110] + str(randint(1, 100)),
+                         content=forgery_py.lorem_ipsum.sentences(randint(5, 20)),
+                         tags=','.join([t1, t2, t3]),
+                         category=c)
 
 
 class Category(db.Model):
@@ -573,6 +561,8 @@ class Category(db.Model):
 
     @staticmethod
     def delete(cate):
+        if cate.id == 1:
+            raise AttributeError('无法删除默认分类')
         parent = cate.parent
         if not parent:
             parent = Category.query.get(1)
@@ -604,6 +594,7 @@ class Category(db.Model):
             for child in c.children.all():
                 child.parent = new_cate
             db.session.delete(c)
+        db.session.commit()
 
     @staticmethod
     def move(target_name, moved_id_list):

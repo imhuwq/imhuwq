@@ -1,3 +1,11 @@
+# -*- coding: utf8 -*-
+"""
+    app.helpers
+    ~~~~~~~~~~
+
+    一些常用的函数和类等
+"""
+
 from functools import wraps
 from flask.ext.login import current_user
 from flask import abort, redirect, url_for
