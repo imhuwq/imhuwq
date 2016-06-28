@@ -1,18 +1,11 @@
 # -*- coding: utf8 -*-
-"""
-    test.test_model_01_site_setting
-    ~~~~~~~~~~~~~~~
-
-    测试站点设置,主要是站点设置自动更新
-"""
-
 import unittest
 from flask import current_app, url_for
 from app import create_app, db
-from app.models import Settings, User
+from app.models import Settings
 
 
-class BasicTestCase(unittest.TestCase):
+class SiteSettingTest(unittest.TestCase):
     """测试基本的测试环境"""
 
     def setUp(self):
