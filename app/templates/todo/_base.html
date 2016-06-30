@@ -1,0 +1,68 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "todo/_macros.html" as macros %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='todo/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+{% endblock %}
+
+{% block title %}
+    {% if title %}{{ title }} - {% endif %}{{ config['SITE_TITLE'] }}
+{% endblock %}
+
+{% block navbar %}
+    {% include "_g_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% include "_g_flash.html" %}
+
+        <div class="row">
+            {% block page_container %}
+
+                <div class="col-md-9">
+                    {% block page_main %}
+
+                    {% endblock %}
+                </div>
+
+                <div class="col-md-3">
+                    {% block page_sidebar %}
+
+                    {% endblock %}
+                </div>
+
+{#                <div class="col-md-12">#}
+{#                    <div class="page-footer">#}
+{#                        <p id="site-description"><i>{{ config['SITE_DESCRIPTION'] }}</i></p>#}
+{#                    </div>#}
+{#                </div>#}
+
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+
+    {% if request.endpoint == 'todo.index' %}
+        <script>
+            var $TODO_INDEX_PATH = {{ url_for('todo.index')|tojson|safe }};
+            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            {% if current_user.is_authenticated %}
+                var $CSRF_TOKEN = "{{ csrf_token() }}";
+            {% endif %}
+        </script>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='todo/script.js') }}"></script>
+
+{% endblock %}

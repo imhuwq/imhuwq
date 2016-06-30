@@ -43,7 +43,8 @@ $(document).ready(function () {
                         $.post($SCRIPT_ROOT + '/ajax-admin/new-category', {
                             // the the name and parent id of the new category
                             name: cate_input.val().trim(),
-                            parent_id: cate_parent.val()
+                            parent_id: cate_parent.val(),
+                            csrf_token: $CSRF_TOKEN
                         }, function (data) {
                             // dealing with the html with the feedback data
                             // prepare for the adding and scrolling and flashing
@@ -231,7 +232,10 @@ $(document).ready(function () {
             $('#delete-all-selected').on('click', function () {
                 if (confirm('您确定删除这些文章吗？') && selectedItem.length > 0) {
                     $.post($SCRIPT_ROOT + '/ajax-admin/delete-all-selected-posts',
-                        {selected_posts: selectedItem.join()},
+                        {
+                            selected_posts: selectedItem.join(),
+                            csrf_token: $CSRF_TOKEN
+                        },
                         function () {
                             afterDeleteItem()
                         })
@@ -251,7 +255,8 @@ $(document).ready(function () {
                         {
                             selected_posts: selectedItem.join(),
                             property: property,
-                            operation: operation
+                            operation: operation,
+                            csrf_token: $CSRF_TOKEN
                         },
                         function () {
                             window.location.reload()
@@ -287,7 +292,8 @@ $(document).ready(function () {
                         {
                             posts: selectedItem.join(),
                             tags: newTag.join(),
-                            operation: operation
+                            operation: operation,
+                            csrf_token: $CSRF_TOKEN
                         },
                         function () {
                             window.location.reload()
@@ -321,7 +327,9 @@ $(document).ready(function () {
                         $.post($SCRIPT_ROOT + '/ajax-admin/update-posts-cate',
                             {
                                 category: newCate,
-                                posts: selectedItem.join()
+                                posts: selectedItem.join(),
+                                csrf_token: $CSRF_TOKEN
+
                             },
                             function () {
                                 location.reload()
@@ -344,18 +352,28 @@ $(document).ready(function () {
                 var postId = postRow.prop('id');
                 if (confirmedDelete == false) {
                     if (confirm('你确定要删除这篇文章吗？')) {
-                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-post', {post_id: postId}, function () {
-                            postRow.remove();
-                            afterDeleteItem(postId);
-                            confirmedDelete = true
-                        })
+                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-post',
+                            {
+                                post_id: postId,
+                                csrf_token: $CSRF_TOKEN
+                            },
+                            function () {
+                                postRow.remove();
+                                afterDeleteItem(postId);
+                                confirmedDelete = true
+                            })
                     }
                 }
                 else {
-                    $.post($SCRIPT_ROOT + '/ajax-admin/delete-post', {post_id: postId}, function () {
-                        postRow.remove();
-                        afterDeleteItem(postId)
-                    })
+                    $.post($SCRIPT_ROOT + '/ajax-admin/delete-post',
+                        {
+                            post_id: postId,
+                            csrf_token: $CSRF_TOKEN
+                        },
+                        function () {
+                            postRow.remove();
+                            afterDeleteItem(postId)
+                        })
                 }
             });
 
@@ -382,7 +400,8 @@ $(document).ready(function () {
                 }
                 $.post($SCRIPT_ROOT + '/ajax-admin/change-post-commendable', {
                     post_id: postId,
-                    commendable: commendable
+                    commendable: commendable,
+                    csrf_token: $CSRF_TOKEN
                 }, function () {
 
                 });
@@ -411,7 +430,8 @@ $(document).ready(function () {
                 }
                 $.post($SCRIPT_ROOT + '/ajax-admin/change-post-publicity', {
                     post_id: postId,
-                    publicity: publicity
+                    publicity: publicity,
+                    csrf_token: $CSRF_TOKEN
                 }, function () {
 
                 });
@@ -492,7 +512,10 @@ $(document).ready(function () {
             $('#delete-all-selected').on('click', function () {
                 if (confirm('您确定删除这些分类吗？\n该分类下的文章和子分类将被并入其父分类') && selectedItem.length > 0) {
                     $.post($SCRIPT_ROOT + '/ajax-admin/delete-all-selected-cates',
-                        {selected_cates: selectedItem.join()},
+                        {
+                            selected_cates: selectedItem.join(),
+                            csrf_token: $CSRF_TOKEN
+                        },
                         function (data) {
                             if (data['warning']) {
                                 alert(data['warning'])
@@ -516,7 +539,8 @@ $(document).ready(function () {
                     $.post($SCRIPT_ROOT + '/ajax-admin/merge-all-selected-cates',
                         {
                             selected_cates: selectedItem.join(),
-                            new_cate_name: newCate
+                            new_cate_name: newCate,
+                            csrf_token: $CSRF_TOKEN
                         },
                         function (data) {
                             if (data['warning']) {
@@ -539,15 +563,21 @@ $(document).ready(function () {
                 else {
                     if (confirmedDelete == false) {
                         if (confirm('你确定要删除这个分类吗？\n分类下的子分类和文章都将划入其父分类')) {
-                            $.post($SCRIPT_ROOT + '/ajax-admin/delete-cate', {cate_id: cateId}, function () {
-                                cateRow.remove();
-                                afterDeleteItem(cateId);
-                                confirmedDelete = true
-                            })
+                            $.post($SCRIPT_ROOT + '/ajax-admin/delete-cate',
+                                {
+                                    cate_id: cateId,
+                                    csrf_token: $CSRF_TOKEN
+                                }, function () {
+                                    cateRow.remove();
+                                    afterDeleteItem(cateId);
+                                    confirmedDelete = true
+                                })
                         }
                     }
                     else {
-                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-cate', {cate_id: cateId}, function () {
+                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-cate', {
+                            cate_id: cateId, csrf_token: $CSRF_TOKEN
+                        }, function () {
                             window.location.reload()
                         })
                     }
@@ -567,7 +597,8 @@ $(document).ready(function () {
                     $.post($SCRIPT_ROOT + '/ajax-admin/move-all-selected-cates',
                         {
                             selected_cates: selectedItem.join(),
-                            target_cate_name: newCate
+                            target_cate_name: newCate,
+                            csrf_token: $CSRF_TOKEN
                         },
                         function (data) {
                             if (data['warning']) {
@@ -586,7 +617,10 @@ $(document).ready(function () {
             $('#delete-all-selected').on('click', function () {
                 if (confirm('您确定删除这些标签吗？') && selectedItem.length > 0) {
                     $.post($SCRIPT_ROOT + '/ajax-admin/delete-all-selected-tags',
-                        {selected_tags: selectedItem.join()},
+                        {
+                            selected_tags: selectedItem.join(),
+                            csrf_token: $CSRF_TOKEN
+                        },
                         function (data) {
                             if (data['warning']) {
                                 alert(data['warning'])
@@ -610,7 +644,8 @@ $(document).ready(function () {
                     $.post($SCRIPT_ROOT + '/ajax-admin/merge-all-selected-tags',
                         {
                             selected_tags: selectedItem.join(),
-                            new_tag_name: newTag
+                            new_tag_name: newTag,
+                            csrf_token: $CSRF_TOKEN
                         },
                         function (data) {
                             if (data['warning']) {
@@ -629,7 +664,10 @@ $(document).ready(function () {
 
                 if (confirmedDelete == false) {
                     if (confirm('你确定要删除这个标签吗？')) {
-                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-tag', {tag_id: tagId}, function () {
+                        $.post($SCRIPT_ROOT + '/ajax-admin/delete-tag', {
+                            tag_id: tagId,
+                            csrf_token: $CSRF_TOKEN
+                        }, function () {
                             tagRow.remove();
                             afterDeleteItem(tagId);
                             confirmedDelete = true
@@ -637,7 +675,10 @@ $(document).ready(function () {
                     }
                 }
                 else {
-                    $.post($SCRIPT_ROOT + '/ajax-admin/delete-tag', {tag_id: tagId}, function () {
+                    $.post($SCRIPT_ROOT + '/ajax-admin/delete-tag', {
+                        tag_id: tagId,
+                        csrf_token: $CSRF_TOKEN
+                    }, function () {
                         window.location.reload()
                     })
                 }
@@ -651,7 +692,8 @@ $(document).ready(function () {
                 newTags = removeItem(newTags, '');
                 if (newTags.length > 0) {
                     $.post($SCRIPT_ROOT + '/ajax-admin/add-tag', {
-                        tags_name: newTags.join()
+                        tags_name: newTags.join(),
+                        csrf_token: $CSRF_TOKEN
                     }, function () {
                         window.location.reload()
                     })
@@ -668,7 +710,8 @@ $(document).ready(function () {
                 if (newName.indexOf(',') < 0 && newName != '') {
                     $.post($SCRIPT_ROOT + '/ajax-admin/rename-tag', {
                         tag_id: $(this).closest('tr').attr('id'),
-                        new_name: newName
+                        new_name: newName,
+                        csrf_token: $CSRF_TOKEN
                     }, function (data) {
                         if (data['merge']) {
                             alert(data['merge'])
@@ -693,7 +736,10 @@ $(document).ready(function () {
             }
             else {
                 $.post($SCRIPT_ROOT + '/ajax-admin/reset-posts-per-page',
-                    {'per_page': per_page},
+                    {
+                        'per_page': per_page,
+                        csrf_token: $CSRF_TOKEN
+                    },
                     function () {
                         location.reload()
                     })

@@ -1,0 +1,8 @@
+<div class="flashed-message" id="flashed-message">
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning fade in" id="flash">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>

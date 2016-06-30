@@ -1,0 +1,66 @@
+{% extends "todo/_base.html" %}
+
+{% block page_main %}
+    <div class="page-main">
+        <input type="text" id="id-task-input" class="form-control" placeholder="{{ config['SITE_DESCRIPTION'] }}"
+               name="task">
+        <ul id="id-task-list" class="noselect">
+
+            <li class="cls-task cls-task-unfinished  cls-task-11" id="id-task-0" style="display: none">
+                <span class="cls-task-order">0</span>:
+            </li>
+            {% for task in tasks_11 %}
+                <li class="cls-task cls-task-unfinished cls-task-11" id="id-task-{{ task.id }}">
+                    <span class="cls-task-order">{{ loop.index }}</span>:
+                    {{ task.text }}
+                </li>
+            {% endfor %}
+
+
+            <li class="cls-task cls-task-unfinished cls-task-10" id="id-task-0" style="display: none">
+                <span class="cls-task-order">0</span>:
+            </li>
+            {% for task in tasks_10 %}
+                <li class="cls-task cls-task-unfinished cls-task-10" id="id-task-{{ task.id }}">
+                    <span class="cls-task-order">{{ loop.index }}</span>:
+                    {{ task.text }}
+                </li>
+            {% endfor %}
+
+            <li class="cls-task cls-task-unfinished cls-task-01" id="id-task-0" style="display: none">
+                <span class="cls-task-order">0</span>:
+            </li>
+            {% for task in tasks_01 %}
+                <li class="cls-task cls-task-unfinished cls-task-01" id="id-task-{{ task.id }}">
+                    <span class="cls-task-order">{{ loop.index }}</span>:
+                    {{ task.text }}
+                </li>
+            {% endfor %}
+
+            <li class="cls-task cls-task-unfinished cls-task-00" id="id-task-0" style="display: none">
+                <span class="cls-task-order">0</span>:
+            </li>
+            {% for task in tasks_00 %}
+                <li class="cls-task cls-task-unfinished cls-task-00" id="id-task-{{ task.id }}">
+                    <span class="cls-task-order">{{ loop.index }}</span>:
+                    {{ task.text }}
+                </li>
+            {% endfor %}
+
+
+        </ul>
+    </div>
+{% endblock %}
+
+{% block page_sidebar %}
+    <div class="page-sidebar">
+        <div id="id-info-panel">
+
+        </div>
+
+        <div id="id-create-project">
+
+        </div>
+    </div>
+{% endblock %}
+
