@@ -127,6 +127,10 @@
             $ADMIN_EDIT_POST_PATH = {{ request.path|tojson|safe }};
         {% endif %}
 
+        {% if current_user.is_authenticated %}
+            var $CSRF_TOKEN = "{{ csrf_token() }}";
+        {% endif %}
+
     </script>
 
     <script src="{{ url_for('static', filename='admin/script.js') }}"></script>

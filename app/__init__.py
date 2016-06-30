@@ -1,43 +1,12 @@
-# -*- coding: utf8 -*-
-"""
-    app
-    ~~~~~~~~~~
-
-    app插件初始化以及app格式化
-
-    关于app文档结构:
-    ----app
-        ----__init__.py (本文件)
-        ----forms.py
-        ----models.py
-        ----views
-            ----main.py
-            ----blog.py
-            ----admin.py
-        ----templates
-            ----main
-            ----blog
-            ----admin
-        ----static
-            ----main
-            ----blog
-            ----admin
-        ----ajax
-            ----admin.py
-
-    ----config.py   (配置文件)
-    ----tests       (测试模块)
-    ----manage.py   (调试,测试,shell)
-    ----run.py      (开启应用, 生产环境)
-"""
+from config import config
 
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager
-from flask.ext.bootstrap import Bootstrap
-from flask.ext.misaka import Misaka
-from flask.ext.moment import Moment
-from config import config
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_bootstrap import Bootstrap
+from flask_misaka import Misaka
+from flask_moment import Moment
+from flask_wtf.csrf import CsrfProtect
 
 db = SQLAlchemy()
 bootstrap = Bootstrap()
@@ -53,6 +22,7 @@ misaka = Misaka(
     tables=True,
     math=True)
 moment = Moment()
+csrf = CsrfProtect()
 
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'main.login'
@@ -68,6 +38,7 @@ def create_app(mode='default'):
     login_manager.init_app(app)
     misaka.init_app(app)
     moment.init_app(app)
+    csrf.init_app(app)
 
     # bootstrap使用cdn.bootcss.com提供cdn加快国内访问速度
     from flask_bootstrap import WebCDN
@@ -83,10 +54,21 @@ def create_app(mode='default'):
     from app.views.blog import blog as blog_blueprint
     app.register_blueprint(blog_blueprint, url_prefix='/blog')
 
+    from app.views.todo import todo as todo_blueprint
+    app.register_blueprint(todo_blueprint, url_prefix='/todo')
+
+    from app.ajaxs.todo import ajax_todo as ajax_todo_blueprint
+    app.register_blueprint(ajax_todo_blueprint, url_prefix='/ajax-todo')
+
     from app.views.admin import admin as admin_blueprint
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
 
-    from app.ajax.admin import ajax_admin as ajax_admin_blueprint
+    from app.ajaxs.admin import ajax_admin as ajax_admin_blueprint
     app.register_blueprint(ajax_admin_blueprint, url_prefix='/ajax-admin')
 
     return app
+
+
+    # TODO: 找回密码
+    # TODO： 导出PDF
+    # TODO: 后台ajax删除bug

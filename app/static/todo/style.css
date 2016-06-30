@@ -1,0 +1,82 @@
+/* 1
+*****************************************************************
+*                   Index 1: global sets                        *
+*****************************************************************/
+body {
+    padding-top: 70px;
+}
+
+body * {
+    border-radius: 0 !important;
+}
+
+a:hover, a:active, a:visited {
+    outline: none !important;
+}
+
+.dropdown-menu {
+    max-height: 30em;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+form #submit {
+    float: right;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none;
+}
+
+/* 2
+*****************************************************************
+*                   Index 2: index sets                        *
+*****************************************************************/
+.cls-task {
+    font-size: 1.5em;
+    line-height: 2em;
+    border-bottom: 1px dashed grey;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.cls-task input {
+    float: right;
+    font-size: 5em;
+
+}
+
+.cls-task-11 {
+    color: #a94442;
+    background-color: #f2dede;
+}
+
+.cls-task-10 {
+    color: #31708f;
+    background-color: #d9edf7;
+}
+
+.cls-task-01 {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+}
+
+/* 9
+*****************************************************************
+*                   Index 9: site footer sets                 *
+*****************************************************************/
+.page-footer {
+    text-align: center;
+}
+
+.page-footer p {
+    margin: 0;
+}

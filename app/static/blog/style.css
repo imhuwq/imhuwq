@@ -60,6 +60,11 @@ form #submit {
     position: relative;
 }
 
+#post-container .post-content pre {
+    word-break: normal;
+    word-wrap: normal;
+}
+
 #post-container .read-more {
     /*font-size: 0.8em;*/
     position: absolute;

@@ -1,0 +1,49 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#site-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ config['SITE_TITLE'] }}</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="site-navbar">
+
+            <ul class="nav navbar-nav">
+                {% if request.endpoint %}
+                    <li {% if request.endpoint.startswith('blog.') %} class="active" {% endif %}>
+                        <a href={{ url_for('blog.index') }}>博客</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li {% if request.endpoint.startswith('todo.') %} class="active" {% endif %}>
+                            <a href={{ url_for('todo.index') }}>ToDo</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            {% if current_user.is_authenticated %}
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-haspopup="true" aria-expanded="false">
+                            管理
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('admin.new_post') }}">发文</a></li>
+                            <li><a href="{{ url_for('admin.index') }}">后台</a></li>
+                            <li><a href="{{ url_for('main.logout') }}">注销</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            {% endif %}
+
+        </div>
+
+    </div>
+</nav>

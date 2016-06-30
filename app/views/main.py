@@ -1,16 +1,6 @@
-# -*- coding: utf8 -*-
-"""
-    app.views.main
-    ~~~~~~~~~~
-
-    app范围视图
-    涉及app范围的操作
-    比如before_first_request, error_handler, sitemap等
-"""
-
-from flask import Blueprint, current_app, request, make_response
+from flask import Blueprint, current_app, request, make_response, abort
 from flask import render_template, redirect, url_for
-from flask.ext.login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user
 from ..models import Settings, User, Post, Category, Tag
 from .. import db
 from ..forms import SetupForm01, SetupForm02, LoginForm
@@ -43,10 +33,21 @@ def before_app_request():
         return redirect(url_for('main.setup'))
 
 
+@main.route('/shutdown')
+def shutdown():
+    if not current_app.testing:
+        abort(404)
+    shutdown = request.environ.get('werkzeug.server.shutdown')
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return 'Shutting down...'
+
+
 @main.route('/setup', methods=['GET', 'POST'])
 def setup():
     if current_app.config['SITE_INITIATED']:
-        return redirect('main.index')
+        return redirect(url_for('main.index'))
     admin = User.query.filter_by(email=current_app.config['SITE_ADMIN_EMAIL']).first()
     if admin is None:
         form = SetupForm01()
