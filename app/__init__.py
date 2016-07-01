@@ -39,6 +39,7 @@ def create_app(mode='default'):
     misaka.init_app(app)
     moment.init_app(app)
     csrf.init_app(app)
+    app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
     # bootstrap使用cdn.bootcss.com提供cdn加快国内访问速度
     from flask_bootstrap import WebCDN
@@ -71,4 +72,3 @@ def create_app(mode='default'):
 
     # TODO: 找回密码
     # TODO： 导出PDF
-    # TODO: 后台ajax删除bug

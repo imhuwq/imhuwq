@@ -1,4 +1,5 @@
 from .. import db
+from datetime import datetime
 
 
 class Task(db.Model):
@@ -8,6 +9,8 @@ class Task(db.Model):
     _text = db.Column('text', db.String(120), index=True)
     _level = db.Column('level', db.String(2))
     _status = db.Column('status', db.Boolean, default=False)
+    _start = db.Column('start', db.DateTime, default=None)
+    _finish = db.Column('finish', db.DateTime, default=None)
 
     @property
     def id(self):
@@ -19,6 +22,9 @@ class Task(db.Model):
 
     @text.setter
     def text(self, t):
+        old = Task.query.filter_by(_text=t).filter_by(_status=False).first()
+        if old:
+            raise AttributeError("Task 已存在")
         self._text = t
 
     @property
@@ -36,3 +42,23 @@ class Task(db.Model):
     @status.setter
     def status(self, s):
         self._status = s
+
+    @property
+    def start(self):
+        return self._start
+
+    @start.setter
+    def start(self, s):
+        if not isinstance(s, datetime):
+            raise AttributeError('开始时间应该是 datetime 对象')
+        self._start = s
+
+    @property
+    def finish(self):
+        return self._finish
+
+    @finish.setter
+    def finish(self, f):
+        if not isinstance(f, datetime):
+            raise AttributeError('完成时间应该是 datetime 对象')
+        self._finish = f
