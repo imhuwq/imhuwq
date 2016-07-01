@@ -40,6 +40,20 @@ ul {
 *****************************************************************
 *                   Index 2: index sets                        *
 *****************************************************************/
+#id-task-input {
+    font-size: 1.5em;
+    line-height: 2em;
+    height: 2.2em;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#id-task-list {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    border-bottom: 1px dotted black;
+}
+
 .cls-task {
     font-size: 1.5em;
     line-height: 2em;
@@ -87,6 +101,10 @@ ul {
     border-bottom: 1px solid grey;
     padding-left: 5px;
     cursor: pointer;
+}
+
+.cls-menu-bottom {
+    border-bottom: none !important;
 }
 
 /* 9

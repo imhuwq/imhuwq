@@ -3,7 +3,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
           type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
@@ -96,7 +96,7 @@
 
 {% block scripts %}
     {{ super() }}
-    {{ moment.include_moment(local_js="/static/moment-with-locales.min.js") }}
+    {{ moment.include_moment(local_js="/static/js/moment-with-locales.min.js") }}
 
     <script>
         (function (i, s, o, g, r, a, m) {
@@ -116,5 +116,5 @@
 
     </script>
 
-    <script src="{{ url_for('static', filename='main/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
