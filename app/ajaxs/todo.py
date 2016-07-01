@@ -67,3 +67,49 @@ def delete_task():
         'status': 400,
         'message': '操作失败'
     })
+
+
+@ajax_todo.route('/arrange-task', methods=['GET', 'POST'])
+@admin_required
+def arrange_task():
+    new_level = request.form.get('level')
+    if new_level not in ['00', '01', '10', '11']:
+        return jsonify({
+            'status': 500,
+            'message': '请输入正确的优先级指标'
+        })
+
+    task_id = request.form.get('id')
+    task = Task.query.get(task_id)
+    if task_id:
+        task.level = new_level
+        db.session.commit()
+        return jsonify({
+            'status': 200,
+        })
+
+    return jsonify({
+        'status': 500,
+        'message': '操作失败'
+    })
+
+
+@ajax_todo.route('/edit-task', methods=['GET', 'POST'])
+@admin_required
+def edit_task():
+    task_id = request.form.get('id')
+    task = Task.query.get(task_id)
+    if task:
+        task_text = request.form.get('text')
+        task_level = request.form.get('level')
+
+        task.text = task_text
+        task.level = task_level
+        db.session.commit()
+        return jsonify({
+            'status': 200
+        })
+    return jsonify({
+        'status': 500,
+        'message': "操作失败"
+    })

@@ -42,10 +42,10 @@ def create_app(mode='default'):
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
     # bootstrap使用本地文件
-    from flask_bootstrap import WebCDN
+    from flask_bootstrap import StaticCDN
     cdns = app.extensions['bootstrap']['cdns']
-    cdns['bootstrap'] = WebCDN('/static/bootstrap/')
-    cdns['jquery'] = WebCDN('/static/jquery/')
+    cdns['bootstrap'] = StaticCDN('static')
+    cdns['jquery'] = StaticCDN('static')
 
     from app.views.main import main as main_blueprint
     app.register_blueprint(main_blueprint)

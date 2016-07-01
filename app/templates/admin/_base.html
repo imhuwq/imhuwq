@@ -4,7 +4,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
           type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
@@ -108,7 +108,7 @@
 
 {% block scripts %}
     {{ super() }}
-    {{ moment.include_moment(local_js="/static/moment-with-locales.min.js") }}
+    {{ moment.include_moment(local_js="/static/js/moment-with-locales.min.js") }}
 
     <script>
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -133,6 +133,6 @@
 
     </script>
 
-    <script src="{{ url_for('static', filename='admin/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 
 {% endblock %}
