@@ -69,6 +69,26 @@ ul {
     background-color: #fcf8e3;
 }
 
+.cls-task-menu {
+    border: 1px solid black;
+    min-width: 6em;
+    background-color: rgb(253, 253, 253);
+    font-size: 1.2em;
+    box-shadow: 0 5px 5px rgb(235, 235, 235);
+}
+
+.cls-task-menu ul {
+    list-style-type: none;
+    margin-bottom: 0;
+}
+
+.cls-task-menu li {
+    line-height: 2em;
+    border-bottom: 1px solid grey;
+    padding-left: 5px;
+    cursor: pointer;
+}
+
 /* 9
 *****************************************************************
 *                   Index 9: site footer sets                 *

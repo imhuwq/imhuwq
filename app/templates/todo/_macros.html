@@ -1,0 +1,27 @@
+{% macro render_task_list(tasks, level) %}
+    <li class="cls-task cls-task-unfinished  cls-task-{{ level }}" id="id-task-0" style="display: none">
+        <span class="cls-task-order">0</span>:
+    </li>
+    {% set index = 0 %}
+    {% for task in tasks %}
+        {% if task.level == level %}
+            {% set index = index + 1 %}
+            {% if task.status %}
+                <del>
+                    <li class="cls-task cls-task-finished cls-task-{{ task.level }}"
+                        id="id-task-{{ task.id }}"
+                        style="color: gray">
+                        <span class="cls-task-order">{{ index }}</span>:
+                        {{ task.text }}
+                    </li>
+                </del>
+            {% else %}
+                <li class="cls-task cls-task-unfinished cls-task-{{ task.level }}" id="id-task-{{ task.id }}">
+                    <span class="cls-task-order">{{ index }}</span>:
+                    {{ task.text }}
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+{% endmacro %}

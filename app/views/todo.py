@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template
 from ..helpers import admin_required
 from ..models.todo import Task
+from datetime import datetime
+from sqlalchemy import or_
 
 todo = Blueprint('todo', __name__)
 
@@ -9,14 +11,13 @@ todo = Blueprint('todo', __name__)
 @admin_required
 def index():
     title = 'ToDo'
-    tasks_11 = Task.query.filter_by(_status=False).filter_by(_level='11').all()
-    tasks_10 = Task.query.filter_by(_status=False).filter_by(_level='10').all()
-    tasks_01 = Task.query.filter_by(_status=False).filter_by(_level='01').all()
-    tasks_00 = Task.query.filter_by(_status=False).filter_by(_level='00').all()
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    tasks = Task.query.filter(or_(Task._finish > today,
+                                  Task._finish == None)) \
+                      .order_by(Task._level.desc())\
+                      .order_by(Task._start.asc()).all()
 
     return render_template('todo/index.html',
                            title=title,
-                           tasks_11=tasks_11,
-                           tasks_10=tasks_10,
-                           tasks_01=tasks_01,
-                           tasks_00=tasks_00)
+                           tasks=tasks)
