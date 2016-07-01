@@ -101,22 +101,22 @@ $(document).ready(function () {
             }).appendTo(menu);
 
             var flow_task = $("<li/>", {
-                class: "flow-task",
+                class: "cls-task-flow",
                 html: "flow&nbsp;&nbsp; &raquo;"
             }).appendTo(menu_items);
 
             var arrange_task = $("<li/>", {
-                class: "arrange-task",
+                class: "cls-task-priority",
                 html: "优先&nbsp; &ReverseUpEquilibrium;"
             }).appendTo(menu_items);
 
             var delete_task = $("<li/>", {
-                class: "cls-delete-task",
+                class: "cls-task-delete",
                 html: "删除&nbsp; &times;"
             }).appendTo(menu_items);
 
             var create_project = $("<li/>", {
-                class: "cls-create-project",
+                class: "cls-task-project",
                 html: "项目&nbsp; &rtriltri;"
             }).appendTo(menu_items);
 
@@ -125,8 +125,11 @@ $(document).ready(function () {
             return false
         }));
 
+        html_body.on("click", ".cls-task-priority", function () {
+            
+        });
 
-        html_body.on("click", ".cls-delete-task", function () {
+        html_body.on("click", ".cls-task-delete", function () {
             var clicking_task_id = clicking_task.prop("id").match(/\d+/);
 
             $.post($SCRIPT_ROOT + '/ajax-todo/delete-task',

@@ -41,13 +41,11 @@ def create_app(mode='default'):
     csrf.init_app(app)
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
-    # bootstrap使用cdn.bootcss.com提供cdn加快国内访问速度
+    # bootstrap使用本地文件
     from flask_bootstrap import WebCDN
     cdns = app.extensions['bootstrap']['cdns']
-    cdns['bootstrap'] = WebCDN('//cdn.bootcss.com/bootstrap/3.3.5/')
-    cdns['jquery'] = WebCDN('//cdn.bootcss.com/jquery/1.11.3/')
-    cdns['html5shiv'] = WebCDN('//cdn.bootcss.com/html5shiv/3.7.2/')
-    cdns['respond.js'] = WebCDN('//cdn.bootcss.com/bootstrap/3.3.5/js/')
+    cdns['bootstrap'] = WebCDN('/static/bootstrap/')
+    cdns['jquery'] = WebCDN('/static/jquery/')
 
     from app.views.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
