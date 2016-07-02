@@ -38,12 +38,6 @@
                     {% endblock %}
                 </div>
 
-{#                <div class="col-md-12">#}
-{#                    <div class="page-footer">#}
-{#                        <p id="site-description"><i>{{ config['SITE_DESCRIPTION'] }}</i></p>#}
-{#                    </div>#}
-{#                </div>#}
-
             {% endblock %}
         </div>
     </div>
@@ -53,15 +47,13 @@
 
     {{ super() }}
 
-    {% if request.endpoint == 'todo.index' %}
-        <script>
-            var $TODO_INDEX_PATH = {{ url_for('todo.index')|tojson|safe }};
-            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-            {% if current_user.is_authenticated %}
-                var $CSRF_TOKEN = "{{ csrf_token() }}";
-            {% endif %}
-        </script>
-    {% endif %}
+    <script>
+        var $TODO_INDEX_PATH = {{ url_for('todo.index')|tojson|safe }};
+        var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        {% if current_user.is_authenticated %}
+            var $CSRF_TOKEN = "{{ csrf_token() }}";
+        {% endif %}
+    </script>
 
     <script src="{{ url_for('static', filename='js/todo.js') }}"></script>
 

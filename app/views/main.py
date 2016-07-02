@@ -1,7 +1,8 @@
 from flask import Blueprint, current_app, request, make_response, abort
 from flask import render_template, redirect, url_for
+from sqlalchemy import or_
 from flask_login import login_user, logout_user, current_user
-from ..models import Settings, User, Post, Category, Tag
+from ..models import Settings, User, Post, Category, Tag, Task
 from .. import db
 from ..forms import SetupForm01, SetupForm02, LoginForm
 from datetime import datetime, timedelta
@@ -37,10 +38,10 @@ def before_app_request():
 def shutdown():
     if not current_app.testing:
         abort(404)
-    shutdown = request.environ.get('werkzeug.server.shutdown')
-    if not shutdown:
+    sd = request.environ.get('werkzeug.server.shutdown')
+    if not sd:
         abort(500)
-    shutdown()
+    sd()
     return 'Shutting down...'
 
 
@@ -105,6 +106,19 @@ def logout():
 @main.route('/index')
 @main.route('/')
 def index():
+    if current_user.is_authenticated:
+        title = 'ToDo'
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+        tasks = Task.query.filter(or_(Task._finish > today,
+                                      Task._finish == None)) \
+            .order_by(Task._level.desc()) \
+            .order_by(Task._start.asc()).all()
+
+        return render_template('todo/index.html',
+                               title=title,
+                               tasks=tasks)
+
     title = 'ImHuWQ'
     query = Post.query.filter_by(_type="article").order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:

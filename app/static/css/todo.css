@@ -36,6 +36,17 @@ ul {
     -ms-user-select: none;
 }
 
+#flashed-message {
+    position: relative;
+    top: 35%;
+    z-index: 10;
+}
+
+#flashed-message .alert {
+    position: absolute;
+    width: 100%;
+}
+
 /* 2
 *****************************************************************
 *                   Index 2: index sets                        *
@@ -105,6 +116,18 @@ ul {
 
 .cls-menu-bottom {
     border-bottom: none !important;
+}
+
+/* 3
+*****************************************************************
+*                   Index 3: flow sets                        *
+*****************************************************************/
+.cls-task-idea {
+    background-color: rgb(235, 235, 235);
+    width: 100%;
+    min-height: 10em;
+    border: 1px solid rgb(235, 235, 235);
+    border-radius: 10px !important;
 }
 
 /* 9

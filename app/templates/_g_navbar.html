@@ -15,14 +15,17 @@
 
             <ul class="nav navbar-nav">
                 {% if request.endpoint %}
-                    <li {% if request.endpoint.startswith('blog.') %} class="active" {% endif %}>
-                        <a href={{ url_for('blog.index') }}>博客</a>
-                    </li>
+
                     {% if current_user.is_authenticated %}
                         <li {% if request.endpoint.startswith('todo.') %} class="active" {% endif %}>
                             <a href={{ url_for('todo.index') }}>ToDo</a>
                         </li>
                     {% endif %}
+
+                    <li {% if request.endpoint.startswith('blog.') %} class="active" {% endif %}>
+                        <a href={{ url_for('blog.index') }}>博客</a>
+                    </li>
+
                 {% endif %}
             </ul>
             {% if current_user.is_authenticated %}
