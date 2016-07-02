@@ -779,4 +779,5 @@ function flash(message) {
         'data-dismiss': 'alert',
         'html': '&times;'
     }).appendTo(msg);
+    msg.delay(2000).fadeOut()
 }

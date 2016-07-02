@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from ..models.todo import Task
+from ..models.todo import Task, DuplicateTaskNameError, CountLimitationError
 from ..helpers import admin_required
 from .. import db
 
@@ -21,14 +21,20 @@ def new_task():
                 'status': 200,
                 'id': new.id
             })
-        except AttributeError:
+        except DuplicateTaskNameError as e:
             db.session.rollback()
             return jsonify({
                 'status': 500,
-                'message': 'Task 已经存在'
+                'message': e.__str__()
+            })
+        except CountLimitationError as e:
+            db.session.rollback()
+            return jsonify({
+                'status': 500,
+                'message': e.__str__()
             })
     return jsonify({
-        'status': 400,
+        'status': 404,
         'message': '创建 Task 失败'
     })
 
@@ -46,7 +52,7 @@ def finish_task():
             'status': 200
         })
     return jsonify({
-        'status': 400,
+        'status': 404,
         'message': '操作失败'
     })
 
@@ -75,21 +81,28 @@ def arrange_task():
     new_level = request.form.get('level')
     if new_level not in ['00', '01', '10', '11']:
         return jsonify({
-            'status': 500,
+            'status': 400,
             'message': '请输入正确的优先级指标'
         })
 
     task_id = request.form.get('id')
     task = Task.query.get(task_id)
     if task_id:
-        task.level = new_level
-        db.session.commit()
-        return jsonify({
-            'status': 200,
-        })
+        try:
+            task.level = new_level
+            db.session.commit()
+            return jsonify({
+                'status': 200,
+            })
+        except CountLimitationError as e:
+            db.session.rollback()
+            return jsonify({
+                'status': 500,
+                'message': e.__str__()
+            })
 
     return jsonify({
-        'status': 500,
+        'status': 404,
         'message': '操作失败'
     })
 
@@ -102,14 +115,26 @@ def edit_task():
     if task:
         task_text = request.form.get('text')
         task_level = request.form.get('level')
-
-        task.text = task_text
-        task.level = task_level
-        db.session.commit()
-        return jsonify({
-            'status': 200
-        })
+        try:
+            task.text = task_text
+            task.level = task_level
+            db.session.commit()
+            return jsonify({
+                'status': 200
+            })
+        except DuplicateTaskNameError as e:
+            db.session.rollback()
+            return jsonify({
+                'status': 500,
+                'message': e.__str__()
+            })
+        except CountLimitationError as e:
+            db.session.rollback()
+            return jsonify({
+                'status': 500,
+                'message': e.__str__()
+            })
     return jsonify({
-        'status': 500,
+        'status': 404,
         'message': "操作失败"
     })

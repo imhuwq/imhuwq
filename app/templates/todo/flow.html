@@ -1,0 +1,32 @@
+{% extends "todo/_base.html" %}
+
+{% block page_main %}
+    <div class="page-main">
+        <div class="cls-task-text">
+            <h4>Task: {{ task.text }}</h4>
+        </div>
+
+        <div class="cls-task-idea">
+            {% if task.idea %}
+                {{ task.idea }}
+            {% else %}
+            {% endif %}
+
+        </div>
+
+        <div class="cls-flow-panel">
+            <ul class="cls-flow-notes">
+                {% for note in notes %}
+                    <li class="cls-note">{{ note.text }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block page_sidebar %}
+    <div class="page-sidebar">
+
+    </div>
+{% endblock %}
