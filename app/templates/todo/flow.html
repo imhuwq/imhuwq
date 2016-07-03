@@ -6,7 +6,7 @@
             <h4>Idea: <i>any clue to the task?</i></h4>
         </div>
 
-        <div class="cls-task-idea">
+        <div id="id-task-idea">
             {% if task.idea %}
                 {{ task.idea | markdown |safe }}
             {% endif %}
@@ -19,7 +19,7 @@
         </div>
         <hr>
         <h4>Notes: <i>feel free to record anything</i></h4>
-        <div class="cls-flow-panel">
+        <div id="id-flow-panel">
             <ul class="cls-flow-notes">
                 {% for note in notes %}
                     <li class="cls-note">{{ note.text }}</li>
