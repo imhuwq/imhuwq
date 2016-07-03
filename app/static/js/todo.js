@@ -219,13 +219,13 @@ $(document).ready(function () {
         var task_idea_origin = $(".cls-task-idea-origin").text().trim();
         var task_idea_html = task_idea.html().trim();
 
-        var idea_wrapper = $("<span/>", {class: "cls-idea-text-wrapper"});
+        var idea_wrapper = $("<div/>", {class: "cls-idea-text-wrapper"});
         var idea_text = $("<textarea/>", {
             class: "cls-task-idea-text",
             type: "text",
             name: "idea",
             text: task_idea_origin,
-            height: task_idea.height()
+            height: task_idea.height() -5
         }).appendTo(idea_wrapper);
 
         // post the task idea text when click outside the text area
@@ -251,7 +251,7 @@ $(document).ready(function () {
                 task_idea.addClass("noselect");
                 task_idea.css({
                     backgroundColor: "white",
-                    border: "none"
+                    border: "1px solid white"
                 });
                 task_idea.text('');
                 idea_text.text(task_idea_origin);
@@ -300,7 +300,7 @@ $(document).ready(function () {
                                 backgroundColor: "rgb(235, 235, 235)",
                                 border: "1px solid rgb(235, 235, 235)"
                             });
-                            idea_text.height(task_idea.height())
+                            idea_text.height(task_idea.height() - 5)
                         }
                         else {
                             flash(data.message);
