@@ -3,7 +3,7 @@
 {% block page_main %}
     <div class="page-main">
         <div class="cls-task-text">
-            <h4>Task: {{ task.text }}</h4>
+            <h4>Idea: <i>any clue to the task?</i></h4>
         </div>
 
         <div class="cls-task-idea">
@@ -13,8 +13,12 @@
 
         </div>
         <div class="cls-task-idea-origin" style="display: none">
-            {{ task.idea }}
+            {% if task.idea %}
+                {{ task.idea }}
+            {% endif %}
         </div>
+        <hr>
+        <h4>Notes: <i>feel free to record anything</i></h4>
         <div class="cls-flow-panel">
             <ul class="cls-flow-notes">
                 {% for note in notes %}
