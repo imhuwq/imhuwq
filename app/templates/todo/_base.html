@@ -54,7 +54,8 @@
             var $CSRF_TOKEN = "{{ csrf_token() }}";
         {% endif %}
     </script>
-
+    <script src="{{ url_for('static', filename='js/jquery/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery-ui-punch.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/todo.js') }}"></script>
 
 {% endblock %}
