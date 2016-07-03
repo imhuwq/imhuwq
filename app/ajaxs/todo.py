@@ -2,12 +2,14 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from ..models.todo import Task, DuplicateTaskNameError, CountLimitationError
 from ..helpers import admin_required
-from .. import db
+from .. import db, misaka
 
 ajax_todo = Blueprint('ajax_todo', __name__)
 
+POST = ['GET', 'POST']
 
-@ajax_todo.route('/new-task', methods=['GET', 'POST'])
+
+@ajax_todo.route('/new-task', methods=POST)
 @admin_required
 def new_task():
     task_text = request.form.get('task_text')
@@ -39,7 +41,7 @@ def new_task():
     })
 
 
-@ajax_todo.route('/finish-task', methods=['GET', 'POST'])
+@ajax_todo.route('/finish-task', methods=POST)
 @admin_required
 def finish_task():
     task_id = request.form.get('task_id')
@@ -57,7 +59,7 @@ def finish_task():
     })
 
 
-@ajax_todo.route('/delete-task', methods=['GET', 'POST'])
+@ajax_todo.route('/delete-task', methods=POST)
 @admin_required
 def delete_task():
     task_id = request.form.get('id')
@@ -75,7 +77,7 @@ def delete_task():
     })
 
 
-@ajax_todo.route('/arrange-task', methods=['GET', 'POST'])
+@ajax_todo.route('/arrange-task', methods=POST)
 @admin_required
 def arrange_task():
     new_level = request.form.get('level')
@@ -107,7 +109,7 @@ def arrange_task():
     })
 
 
-@ajax_todo.route('/edit-task', methods=['GET', 'POST'])
+@ajax_todo.route('/edit-task', methods=POST)
 @admin_required
 def edit_task():
     task_id = request.form.get('id')
@@ -132,6 +134,33 @@ def edit_task():
             db.session.rollback()
             return jsonify({
                 'status': 500,
+                'message': e.__str__()
+            })
+    return jsonify({
+        'status': 404,
+        'message': "操作失败"
+    })
+
+
+@ajax_todo.route('/task-idea', methods=POST)
+@admin_required
+def edit_idea():
+    task_id = request.form.get('id')
+    task = Task.query.get(task_id)
+    if task:
+        task_idea = request.form.get('idea')
+        try:
+            task.idea = task_idea
+            db.session.commit()
+            return jsonify({
+                'status': 200,
+                'idea': task_idea,
+                'html': misaka.render(task_idea)
+            })
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({
+                'status': 400,
                 'message': e.__str__()
             })
     return jsonify({

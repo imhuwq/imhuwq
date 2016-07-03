@@ -130,6 +130,19 @@ ul {
     border-radius: 10px !important;
 }
 
+.cls-task-idea-text {
+    width: 100%;
+    padding-bottom: 0;
+}
+
+.cls-delete-text {
+    position: relative;
+    float: right;
+    bottom: 30px;
+    right: 5px;
+    font-size: 2em;
+}
+
 /* 9
 *****************************************************************
 *                   Index 9: site footer sets                 *

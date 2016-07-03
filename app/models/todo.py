@@ -85,7 +85,7 @@ class Task(db.Model):
 
     @property
     def idea(self):
-        return self._status
+        return self._idea
 
     @idea.setter
     def idea(self, i):

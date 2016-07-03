@@ -216,51 +216,117 @@ $(document).ready(function () {
     if (window.location.pathname.match(flow_path_regex)) {
         var task_id = window.location.pathname.match(/.*\/(\w+)\//)[1];
         var task_idea = $(".cls-task-idea");
-        var idea_wrapper = $("<span/>", {class: "cls-idea-input-wrapper"});
-        var idea_input = $("<input/>", {
-            class: "cls-task-idea-input",
-            type: "text",
-            name: "idea"
-        }).appendTo(idea_wrapper);
-        $("<span/>",
-            {
-                html: "&times;",
-                style: "cursor:pointer",
-                class: "noselect cls-delete-input"
-            }).appendTo(idea_wrapper);
+        var task_idea_origin = $(".cls-task-idea-origin").text().trim();
+        var task_idea_html = task_idea.html().trim();
 
-        task_idea.on("dblclick", function () {
-            idea_wrapper.appendTo(task_idea);
+        var idea_wrapper = $("<span/>", {class: "cls-idea-text-wrapper"});
+        var idea_text = $("<textarea/>", {
+            class: "cls-task-idea-text",
+            type: "text",
+            name: "idea",
+            text: task_idea_origin,
+            height: task_idea.height()
+        }).appendTo(idea_wrapper);
+
+        // post the task idea text when click outside the text area
+        $(document).on("click", function (e) {
+            var tmp_idea_text = $(".cls-task-idea-text");
+            var tmp_text_wrapper = $(".cls-idea-text-wrapper");
+
+            if (tmp_text_wrapper.html() && !$(e.target).is(".cls-task-idea-text")) {
+                post_this_edit(tmp_text_wrapper, tmp_idea_text)
+            }
+            $(".cls-task-menu").remove();
         });
 
-        // remove the task idea input when click other elements and  it is empty
-        html_body.on("click", function (e) {
-            var tem_idea_input = $(".cls-task-idea-input");
-            var tem_input_wrapper = $(".cls-idea-input-wrapper");
-            if (!$(e.target).is(".cls-task-idea-input")) {
-                if (tem_idea_input.val() == '') {
-                    tem_input_wrapper.remove()
+        task_idea.on("dblclick", function () {
+            // double click to cancel the task idea edit when in editing
+            var tmp_text_wrapper = $(".cls-idea-text-wrapper");
+            if (tmp_text_wrapper.html()) {
+                cancel_this_edit()
+            }
+
+            // double click to start edit
+            else {
+                task_idea.addClass("noselect");
+                task_idea.css({
+                    backgroundColor: "white",
+                    border: "none"
+                });
+                task_idea.text('');
+                idea_text.text(task_idea_origin);
+                idea_wrapper.appendTo(task_idea);
+                idea_text.focus()
+            }
+
+        });
+
+        task_idea.on("keydown", function (e) {
+            // cancel the task idea edit when press shift + enter
+            if (e.shiftKey && e.which == 13) {
+                cancel_this_edit()
+            }
+
+            // post the task idea text when press ctrl + enter
+            else if (e.ctrlKey && e.which == 13) {
+                var tmp_idea_text = $(".cls-task-idea-text");
+                var tmp_text_wrapper = $(".cls-idea-text-wrapper");
+                if (tmp_text_wrapper.html()) {
+                    post_this_edit(tmp_text_wrapper, tmp_idea_text)
                 }
             }
         });
 
-        // remove the task idea input when click x
-        html_body.on("click", ".cls-delete-input", function () {
-            var tem_idea_input = $(".cls-idea-input-wrapper");
-            tem_idea_input.remove()
-        });
-
-        idea_input.on("keypress", function (e) {
-            if (e.which == 13 && $(this).val().trim() != '') {
-                $.post($SCRIPT_ROOT + '/ajax-todo/' + task_id + '/idea',
+        function post_this_edit(tmp_text_wrapper, tmp_idea_text) {
+            if (tmp_idea_text.val().trim() == task_idea_origin) {
+                task_idea.html(task_idea_html);
+                task_idea.css({
+                    backgroundColor: "rgb(235, 235, 235)",
+                    border: "1px solid rgb(235, 235, 235)"
+                });
+            }
+            else {
+                $.post($SCRIPT_ROOT + '/ajax-todo/task-idea',
                     {
                         id: task_id,
-                        idea: $(this).val().trim(),
+                        idea: idea_text.val().trim(),
                         csrf_token: $CSRF_TOKEN
-                    })
+                    }, function (data) {
+                        if (data.status == 200) {
+                            task_idea.html(data.html);
+                            task_idea_origin = data.idea;
+                            task_idea_html = data.html;
+                            task_idea.css({
+                                backgroundColor: "rgb(235, 235, 235)",
+                                border: "1px solid rgb(235, 235, 235)"
+                            });
+                            idea_text.height(task_idea.height())
+                        }
+                        else {
+                            flash(data.message);
+                            task_idea.html(task_idea_html);
+                        }
+                    });
             }
+            task_idea.removeClass("noselect");
+            tmp_text_wrapper.remove()
 
-        })
+        }
+
+        function cancel_this_edit() {
+            var tmp_text_wrapper = $(".cls-idea-text-wrapper");
+            if (tmp_text_wrapper.html()) {
+                idea_text.val(task_idea_origin);
+                task_idea.html(task_idea_html);
+                task_idea.css({
+                    backgroundColor: "rgb(235, 235, 235)",
+                    border: "1px solid rgb(235, 235, 235)"
+                });
+                tmp_text_wrapper.remove();
+                task_idea.removeClass("noselect");
+            }
+        }
+
     }
 
 });
