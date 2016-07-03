@@ -8,12 +8,13 @@
 
         <div class="cls-task-idea">
             {% if task.idea %}
-                {{ task.idea }}
-            {% else %}
+                {{ task.idea | markdown |safe }}
             {% endif %}
 
         </div>
-
+        <div class="cls-task-idea-origin" style="display: none">
+            {{ task.idea }}
+        </div>
         <div class="cls-flow-panel">
             <ul class="cls-flow-notes">
                 {% for note in notes %}
