@@ -39,7 +39,7 @@ class LoginForm(Form):
     submit = SubmitField('登陆')
 
     def validate_password(self, field):
-        u = User.query.filter_by(email=self.email.data).first()
+        u = User.query.filter_by(_email=self.email.data).first()
         if u is None:
             raise ValidationError('用户名或密码不正确')
         if not u.verify_password(field.data):

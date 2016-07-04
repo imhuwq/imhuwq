@@ -67,10 +67,15 @@
         {% endif %}
     </script>
 
-    {% if request.endpoint and config['DISQUS_IDENTIFIER'] %}
+    {% if config['DISQUS_IDENTIFIER'] %}
         {% if request.endpoint.startswith('blog.')  or request.endpoint.startswith('main.index') %}
             <script id="dsq-count-scr" src="//{{ config['DISQUS_IDENTIFIER'] }}.disqus.com/count.js" async></script>
         {% endif %}
+    {% endif %}
+
+    {% if (request.endpoint in ["blog.index", "blog.post"]) or
+    (current_user.is_anonymous and request.endpoint == "main.index") %}
+        <script>var $READING_BLOG = true</script>
     {% endif %}
 
     <script>
