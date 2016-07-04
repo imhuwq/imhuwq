@@ -179,7 +179,7 @@ def manage_posts():
                            )
 
 
-@admin.route('/blog/post_display', methods=['GET', 'POST'])
+@admin.route('/blog/post-display', methods=['GET', 'POST'])
 @admin_required
 def manage_display_style():
     sets = Settings.query.get(1)

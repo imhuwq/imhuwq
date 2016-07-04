@@ -1,17 +1,38 @@
 from config import config
 
-from flask import Flask
+from flask import Flask, escape
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
-from flask_misaka import Misaka
 from flask_moment import Moment
 from flask_wtf.csrf import CsrfProtect
+
+from flask_misaka import Misaka, misaka as m
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 
 db = SQLAlchemy()
 bootstrap = Bootstrap()
 login_manager = LoginManager()
+
+
+class HighlighterRenderer(m.HtmlRenderer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def blockcode(self, text, lang):
+        if not lang:
+            return '\n<pre><code>{}</code></pre>\n'.format(
+                escape(text.strip()))
+        lexer = get_lexer_by_name(lang, stripall=True)
+        formatter = HtmlFormatter(linenos=True)
+
+        return highlight(text, lexer, formatter)
+
+
 misaka = Misaka(
+    renderer=HighlighterRenderer(),
     fenced_code=True,
     underline=True,
     highlight=True,
@@ -21,6 +42,7 @@ misaka = Misaka(
     footnotes=True,
     tables=True,
     math=True)
+
 moment = Moment()
 csrf = CsrfProtect()
 

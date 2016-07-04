@@ -103,7 +103,7 @@ def set_posts():
     value = request.form.get('operation')
     if post_list and prop and value:
         for post_id in post_list:
-            post = Post.query.filter_by(id=post_id).first()
+            post = Post.query.filter_by(_id=post_id).first()
             if prop == 'publicity':
                 post.public = int(value)
             elif prop == 'comment':

@@ -5,22 +5,116 @@ from sqlalchemy import event
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 
+TRUE = [1, '1', 'true', 'True', True, 'On', 'on']
+
 
 class Settings(db.Model):
     """存储基本的站点设置"""
     __tablename__ = 'settings'
+    _id = db.Column("id", db.Integer, primary_key=True)
+    _site_admin_email = db.Column("site_admin_email", db.String(64))
+    _site_initiated = db.Column("site_initiated", db.Boolean, default=False)
+    _enable_post_comment = db.Column("enable_post_comment", db.Boolean, default=True)
+    _posts_per_page = db.Column("posts_per_page", db.Integer, default=20)
+    _show_abstract = db.Column("show_abstract", db.Boolean, default=True)
+    _comments_per_page = db.Column("comments_per_page", db.Integer, default=20)
+    _site_title = db.Column("site_title", db.String(64), default="一个崭新的网站")
+    _site_description = db.Column("site_description", db.String(128), default="请到管理面板更改设置")
+    _disqus_identifier = db.Column("disqus_identifier", db.String(32))
+    _google_analytics_code = db.Column("google_analytics_code", db.String(32))
 
-    id = db.Column(db.Integer, primary_key=True)
-    site_admin_email = db.Column(db.String(64))
-    site_initiated = db.Column(db.Boolean, default=False)
-    enable_post_comment = db.Column(db.Integer, default=1)
-    posts_per_page = db.Column(db.Integer, default=20)
-    show_abstract = db.Column(db.Boolean, default=True)
-    comments_per_page = db.Column(db.Integer, default=20)
-    site_title = db.Column(db.String(64), default="一个崭新的网站")
-    site_description = db.Column(db.String(128), default="请到管理面板更改设置")
-    disqus_identifier = db.Column(db.String(32))
-    google_analytics_code = db.Column(db.String(32))
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def site_admin_email(self):
+        return self._site_admin_email
+
+    @site_admin_email.setter
+    def site_admin_email(self, v):
+        self._site_admin_email = v
+
+    @property
+    def site_initiated(self):
+        return self._site_initiated
+
+    @site_initiated.setter
+    def site_initiated(self, v):
+        if v in TRUE:
+            self._site_initiated = True
+        else:
+            self._site_initiated = False
+
+    @property
+    def enable_post_comment(self):
+        return self._enable_post_comment
+
+    @enable_post_comment.setter
+    def enable_post_comment(self, v):
+        if v in TRUE:
+            self._enable_post_comment = True
+        else:
+            self._enable_post_comment = False
+
+    @property
+    def posts_per_page(self):
+        return self._posts_per_page
+
+    @posts_per_page.setter
+    def posts_per_page(self, v):
+        self._posts_per_page = v
+
+    @property
+    def show_abstract(self):
+        return self._show_abstract
+
+    @show_abstract.setter
+    def show_abstract(self, v):
+        if v in TRUE:
+            self._show_abstract = True
+        else:
+            self._show_abstract = False
+
+    @property
+    def comments_per_page(self):
+        return self._comments_per_page
+
+    @comments_per_page.setter
+    def comments_per_page(self, v):
+        self._comments_per_page = v
+
+    @property
+    def site_title(self):
+        return self._site_title
+
+    @site_title.setter
+    def site_title(self, v):
+        self._site_title = v
+
+    @property
+    def site_description(self):
+        return self._site_description
+
+    @site_description.setter
+    def site_description(self, v):
+        self._site_description = v
+
+    @property
+    def disqus_identifier(self):
+        return self._disqus_identifier
+
+    @disqus_identifier.setter
+    def disqus_identifier(self, v):
+        self._disqus_identifier = v
+
+    @property
+    def google_analytics_code(self):
+        return self._google_analytics_code
+
+    @google_analytics_code.setter
+    def google_analytics_code(self, v):
+        self._google_analytics_code = v
 
     def update_site_settings(self):
         """每次更新设置后,都会触发该函数,对app.config进行更新.
@@ -45,12 +139,39 @@ class User(db.Model, UserMixin):
        当创建用户时,如果用户邮箱与app.config中的管理员邮箱一致,则赋予用户管理员属性
     """
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(64), unique=True, index=True)
-    name = db.Column(db.String(12), unique=True, index=True)
-    is_administrator = db.Column(db.Boolean)
-    password_hash = db.Column(db.String(128))
-    password_period = db.Column(db.DateTime, default=datetime.utcnow())
+    _id = db.Column("id", db.Integer, primary_key=True)
+    _email = db.Column("email", db.String(64), unique=True, index=True)
+    _name = db.Column("name", db.String(12), unique=True, index=True)
+    _is_administrator = db.Column("is_administrator", db.Boolean)
+    _password_hash = db.Column("password_hash", db.String(128))
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, v):
+        self._email = v
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, v):
+        self._name = v
+
+    @property
+    def is_administrator(self):
+        return self._is_administrator
+
+    @is_administrator.setter
+    def is_administrator(self, v):
+        self._is_administrator = v
 
     @property
     def password(self):
@@ -58,17 +179,16 @@ class User(db.Model, UserMixin):
 
     @password.setter
     def password(self, password):
-        self.password_hash = generate_password_hash(password)
-        self.password_period = datetime.utcnow()
+        self._password_hash = generate_password_hash(password)
 
     def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self._password_hash, password)
 
     def __init__(self, **kwargs):
         """当创建用户时,如果用户邮箱与app.config中的管理员邮箱一致,则赋予用户管理员属性"""
         super().__init__(**kwargs)
-        if not self.is_administrator:
-            self.is_administrator = self.email == current_app.config['SITE_ADMIN_EMAIL']
+        if not self._is_administrator:
+            self._is_administrator = self.email == current_app.config['SITE_ADMIN_EMAIL']
 
 
 @login_manager.user_loader
@@ -91,7 +211,7 @@ def auto_reload_config(mapper, connection, target):
     target.update_site_settings()
 
 
-@event.listens_for(User.email, 'set')
+@event.listens_for(User._email, 'set')
 def update_admin_email(target, value, oldvalue, initiator):
     if target.is_administrator:
         sets = Settings.query.get(1)
