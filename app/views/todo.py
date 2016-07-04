@@ -27,7 +27,7 @@ def index():
 @admin_required
 def flow(task_id):
     task = Task.query.get_or_404(task_id)
-    notes = task.notes
+    flows = task.flows
     return render_template('todo/flow.html',
                            task=task,
-                           notes=notes)
+                           flows=flows)

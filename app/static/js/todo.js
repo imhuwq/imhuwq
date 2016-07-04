@@ -217,6 +217,153 @@ $(document).ready(function () {
     var flow_path_regex = new RegExp($TODO_INDEX_PATH + "\\w+\/flow");
     if (window.location.pathname.match(flow_path_regex)) {
 
+        // task flow panel
+        {
+            var flow_input = $("#id-flow-input");
+            var flow_list = $(".cls-flow-list");
+
+            // create flow
+            flow_input.on("keypress", function (e) {
+                if (e.which == 13) {
+                    var flow_content = flow_input.val().trim();
+
+                    $.post($SCRIPT_ROOT + '/ajax-todo/new-flow',
+                        {
+                            task: task_id,
+                            flow: flow_content,
+                            csrf_token: $CSRF_TOKEN
+                        },
+                        function (data) {
+                            if (data.status == 200) {
+                                var new_flow = $("<li/>",
+                                    {
+                                        id: "flow-" + data.id,
+                                        class: "cls-flow-item ui-state-default",
+                                        html: flow_content
+                                    }).sortable();
+                                new_flow.appendTo(flow_list)
+                            }
+                            else {
+                                flash(data.message)
+                            }
+                        });
+                    flow_input.val('')
+                }
+            });
+
+            // drag to sort the flow order
+            $("#sortable").sortable();
+            var tmp_order = '';
+            $(".cls-flow-item").each(function (index) {
+                tmp_order += $(this).prop("id")
+            });
+            var cur_flow_order = '';
+            flow_list.on("mouseup", ".cls-flow-item", function (e) {
+                setTimeout(function () {
+                    cur_flow_order = '';
+                    $(".cls-flow-item").each(function (index) {
+                        cur_flow_order += $(this).prop("id")
+                    });
+                    if (cur_flow_order != tmp_order) {
+                        $("#sortable").sortable("disable");
+                        $.post($SCRIPT_ROOT + '/ajax-todo/flow-order',
+                            {
+                                task: task_id,
+                                order: cur_flow_order,
+                                csrf_token: $CSRF_TOKEN
+                            }, function (data) {
+                                if (data.status == 200) {
+                                }
+                                else {
+                                    flash(data.message)
+                                }
+                                $("#sortable").sortable("enable");
+                            })
+                    }
+                }, 100)
+            });
+
+
+            var clicking_flow;
+            var clicking_flow_id;
+            // right click flow to operate on flow
+            flow_list.on("contextmenu", ".cls-flow-item", function (e) {
+                $(".cls-flow-menu").remove();
+
+                var x = e.pageX + 10;
+                var y = e.pageY - 10;
+
+                clicking_flow = $(this);
+                clicking_flow_id = clicking_flow.prop("class").match(/flow-id-(\w+)/)[1];
+
+                var menu = $("<div/>", {
+                    class: "cls-flow-menu",
+                    style: "position:absolute;left:" + x + "px;top:" + y + "px;"
+                });
+                var menu_items = $("<ul/>", {
+                    class: "cls-flow-menu-items"
+                }).appendTo(menu);
+
+
+                var edit_task = $("<li/>", {
+                    class: "cls-flow-edit",
+                    html: "编辑&nbsp; &laquo;"
+                }).appendTo(menu_items);
+
+                var delete_flow = $("<li/>", {
+                    class: "cls-flow-delete cls-menu-bottom",
+                    html: "删除&nbsp; &times;"
+                }).appendTo(menu_items);
+                menu.appendTo(html_body);
+
+                return false
+            });
+
+            html_body.on("click", ".cls-flow-edit", function () {
+
+                var flow_content = prompt("请输入新flow").trim();
+
+                $.post($SCRIPT_ROOT + '/ajax-todo/edit-flow',
+                    {
+                        id: clicking_flow_id,
+                        text: flow_content,
+                        csrf_token: $CSRF_TOKEN
+                    },
+                    function (data) {
+                        if (data.status == 200) {
+                            clicking_flow.html(flow_content)
+                        }
+                        else {
+                            flash(data.message)
+                        }
+                    })
+            });
+
+            html_body.on("click", ".cls-flow-delete", function () {
+                if (confirm("删除这条Flow")) {
+
+                    $.post($SCRIPT_ROOT + '/ajax-todo/delete-flow',
+                        {
+                            id: clicking_flow_id,
+                            csrf_token: $CSRF_TOKEN
+                        },
+                        function (data) {
+                            if (data.status == 200) {
+                                clicking_flow.remove();
+                            }
+                            else {
+                                flash(data.message)
+                            }
+                        })
+                }
+
+
+            });
+
+
+        }
+
+
         // task idea panel
         {
             var task_id = window.location.pathname.match(/.*\/(\w+)\//)[1];
@@ -323,84 +470,17 @@ $(document).ready(function () {
             }
         }
 
-        // task notes panel
-        {
-            var notes_panel = $("#id-flow-panel");
-            var panel_x = notes_panel.offset().left;
-            var panel_w = notes_panel.width();
-            var panel_y = notes_panel.offset().top;
-            var panel_h = notes_panel.height();
-
-            // create note input by double click or right click
-            {
-                notes_panel.on("dblclick", function (e) {
-                    create_note_input(e)
-                });
-                notes_panel.on("contextmenu", function (e) {
-                    var task_note_input = $(".cls-task-note-input");
-                    if (!$(e.target).hasClass("cls-task-note-input")) {
-                        task_note_input.remove()
-                    }
-                    create_note_input(e);
-                    return false
-                });
-
-                function create_note_input(clicking) {
-                    var x = clicking.pageX - 10;
-                    if (x < panel_x) x = panel_x;
-                    if (x > panel_x + panel_w - 180) x = panel_x + panel_w - 180;
-
-                    var y = clicking.pageY - 12;
-                    if (y < panel_y) y = panel_y;
-                    if (y > panel_y + panel_h - 35) y = panel_y + panel_h - 35;
-
-                    var note_input = $("<input/>", {
-                        class: "cls-task-note-input",
-                        type: "text",
-                        name: "note",
-                        style: "position:absolute;left:" + x + "px;top:" + y + "px;",
-                        height: "35px",
-                        width: "180px"
-                    }).appendTo(html_body);
-                    note_input.focus();
-                }
-            }
-
-
-            $(document).on("keypress", ".cls-task-note-input", function (e) {
-                if (e.which == 13) {
-                    var input = $(".cls-task-note-input");
-                    var x = input.offset().left;
-                    var y = input.offset().top;
-                    var note = $("<span/>", {
-                        class: "cls-task-notes",
-                        html: input.val(),
-                        style: "position:absolute;left:" + x + "px;top:" + y + "px;" +
-                        "max-width:180px;word-wrap:break-word;"
-                    }).draggable();
-                    note.appendTo(html_body);
-                    input.remove()
-                }
-            });
-            
-
-        }
-
         $(document).on("click", function (e) {
 
             // post the task idea text when click outside the text area
             var tmp_idea_text = $(".cls-task-idea-text");
             var tmp_text_wrapper = $(".cls-idea-text-wrapper");
-
             if (tmp_text_wrapper.html() && !$(e.target).is(".cls-task-idea-text")) {
                 post_this_edit(tmp_text_wrapper, tmp_idea_text)
             }
 
-            // remove note input when click outside the input element
-            var task_note_input = $(".cls-task-note-input");
-            if (!$(e.target).hasClass("cls-task-note-input")) {
-                task_note_input.remove()
-            }
+            // remove right click menu on click
+            $(".cls-flow-menu").remove();
         });
     }
 

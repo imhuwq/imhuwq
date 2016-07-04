@@ -2,8 +2,23 @@
 
 {% block page_main %}
     <div class="page-main">
+        <div id="id-task-flows">
+            <input type="text" id="id-flow-input" class="form-control" placeholder="what's your next move?"
+                   name="note">
+
+            <ul class="cls-flow-list ui-sortable" id="sortable">
+                {% for flow in flows %}
+                <li class="cls-flow-item ui-state-default flow-id-{{ flow.id }}" id="{{ flow.fake_id }}">
+                    {{ flow.text }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+        <hr>
         <div class="cls-task-text">
-            <h4>Idea: <i>any clue to the task?</i></h4>
+            <h4>Idea: <i>Anything about the task</i></h4>
         </div>
 
         <div id="id-task-idea">
@@ -16,15 +31,6 @@
             {% if task.idea %}
                 {{ task.idea }}
             {% endif %}
-        </div>
-        <hr>
-        <h4>Notes: <i>feel free to record anything</i></h4>
-        <div id="id-flow-panel">
-            <ul class="cls-flow-notes">
-                {% for note in notes %}
-                    <li class="cls-note">{{ note.text }}</li>
-                {% endfor %}
-            </ul>
         </div>
 
     </div>

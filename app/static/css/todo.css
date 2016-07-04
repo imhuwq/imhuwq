@@ -122,7 +122,15 @@ ul {
 *****************************************************************
 *                   Index 3: flow sets                        *
 *****************************************************************/
-#id-task-idea, #id-flow-panel {
+#id-note-input, #id-flow-input{
+    font-size: 1.5em;
+    line-height: 2em;
+    height: 2.2em;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#id-task-idea {
     background-color: rgb(235, 235, 235);
     width: 100%;
     min-height: 10em;
@@ -147,18 +155,40 @@ ul {
     width: 100%;
 }
 
-.cls-delete-text {
-    position: relative;
-    float: right;
-    bottom: 30px;
-    right: 5px;
-    font-size: 2em;
+.cls-flow-list {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    border-bottom: 1px dotted black;
 }
 
-#id-flow-panel {
-    min-height: 40em;
-
+.cls-flow-item {
+    font-size: 1.5em;
+    line-height: 2em;
+    border-bottom: 1px dashed grey;
+    padding-left: 5px;
+    padding-right: 5px;
 }
+
+.cls-flow-menu {
+    border: 1px solid black;
+    min-width: 6em;
+    background-color: rgb(253, 253, 253);
+    font-size: 1.2em;
+    box-shadow: 0 5px 5px rgb(235, 235, 235);
+}
+
+.cls-flow-menu ul {
+    list-style-type: none;
+    margin-bottom: 0;
+}
+
+.cls-flow-menu li {
+    line-height: 2em;
+    border-bottom: 1px solid grey;
+    padding-left: 5px;
+    cursor: pointer;
+}
+
 
 /* 9
 *****************************************************************
