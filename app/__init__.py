@@ -67,7 +67,6 @@ def create_app(mode='default'):
     from flask_bootstrap import StaticCDN
     cdns = app.extensions['bootstrap']['cdns']
     cdns['bootstrap'] = StaticCDN('static')
-    cdns['jquery'] = StaticCDN('static')
 
     from app.views.main import main as main_blueprint
     app.register_blueprint(main_blueprint)

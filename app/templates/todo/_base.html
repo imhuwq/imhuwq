@@ -1,14 +1,11 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "todo/_macros.html" as macros %}
+{% import "_g_macros.html" as g_macros %}
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/todo.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
-          type="image/x-icon">
-    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
-          type="image/x-icon">
+    {{ g_macros.render_header("todo") }}
 {% endblock %}
 
 {% block title %}
@@ -45,7 +42,8 @@
 
 {% block scripts %}
 
-    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
 
     <script>
         var $TODO_INDEX_PATH = {{ url_for('todo.index')|tojson|safe }};
@@ -54,6 +52,7 @@
             var $CSRF_TOKEN = "{{ csrf_token() }}";
         {% endif %}
     </script>
+
     <script src="{{ url_for('static', filename='js/jquery/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery-ui-punch.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/todo.js') }}"></script>

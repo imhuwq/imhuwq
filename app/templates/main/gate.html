@@ -30,3 +30,8 @@
     </div>
 
 {% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
+{% endblock %}

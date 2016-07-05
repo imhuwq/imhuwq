@@ -1,14 +1,11 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "admin/_macros.html" as macros %}
+{% import "_g_macros.html" as g_macros %}
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
-          type="image/x-icon">
-    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
-          type="image/x-icon">
+    {{ g_macros.render_header("admin") }}
 {% endblock %}
 
 {% block title %}
@@ -107,7 +104,8 @@
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
     {{ moment.include_moment(local_js="/static/js/moment-with-locales.min.js") }}
 
     <script>

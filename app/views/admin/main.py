@@ -45,7 +45,7 @@ def site():
 @admin_required
 def profile():
     form = ProfileForm()
-    user = User.query.get(1)
+    user = User.query.first()
     if form.validate_on_submit():
         user.name = form.name.data
         user.email = form.email.data

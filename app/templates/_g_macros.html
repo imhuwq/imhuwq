@@ -1,0 +1,8 @@
+{% macro render_header(endpoint) %}
+    {% set filename = "css/%s.css" % endpoint %}
+    <link rel="stylesheet" href="{{ url_for('static', filename=filename) }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}"
+          type="image/x-icon">
+{% endmacro %}
