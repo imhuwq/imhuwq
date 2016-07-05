@@ -73,7 +73,7 @@
         {% endif %}
     {% endif %}
 
-    {% if (request.endpoint in ["blog.index", "blog.post"]) or
+    {% if (request.endpoint in ["blog.index", "blog.post", "blog.tag", "blog.category"]) or
     (current_user.is_anonymous and request.endpoint == "main.index") %}
         <script>var $READING_BLOG = true</script>
     {% endif %}
