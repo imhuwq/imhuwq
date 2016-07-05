@@ -10,7 +10,7 @@ TRUE = [1, '1', 'true', 'True', True, 'On', 'on']
 
 class Settings(db.Model):
     """存储基本的站点设置"""
-    __tablename__ = 'settings'
+    __tablename__ = 'site_settings'
     _id = db.Column("id", db.Integer, primary_key=True)
     _site_admin_email = db.Column("site_admin_email", db.String(64))
     _site_initiated = db.Column("site_initiated", db.Boolean, default=False)
@@ -138,7 +138,7 @@ class User(db.Model, UserMixin):
        密码不可读,但是可以用verify_password(passwd)对passwd进行验证
        当创建用户时,如果用户邮箱与app.config中的管理员邮箱一致,则赋予用户管理员属性
     """
-    __tablename__ = 'users'
+    __tablename__ = 'site_users'
     _id = db.Column("id", db.Integer, primary_key=True)
     _email = db.Column("email", db.String(64), unique=True, index=True)
     _name = db.Column("name", db.String(12), unique=True, index=True)

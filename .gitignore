@@ -7,3 +7,5 @@ __pycache__
 *.sqlite
 *.log
 *.pyc
+*.json
+te.py

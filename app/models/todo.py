@@ -34,7 +34,7 @@ class FlowCountOutOfRange(BaseException):
 
 
 class Task(db.Model):
-    __tablename__ = 'tasks'
+    __tablename__ = 'todo_tasks'
 
     _id = db.Column('id', db.Integer, primary_key=True)
     _text = db.Column('text', db.String(120), index=True)
@@ -146,7 +146,7 @@ class Task(db.Model):
 
 
 class Flow(db.Model):
-    __tablename__ = "flow"
+    __tablename__ = "todo_flow"
     _id = db.Column('id', db.Integer, primary_key=True)
     _text = db.Column('text', db.String(120), index=True)
     _task = db.Column('task', db.Integer, nullable=False)
