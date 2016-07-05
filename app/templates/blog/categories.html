@@ -2,26 +2,32 @@
 
 {% block page_main %}
 
-    <h2>全部分类</h2>
 
     <div class="page-main">
+        <h2 class="cls-section-identifier">全部分类</h2>
+        <hr>
         <ol class="child-category-list">
             <div class="row">
                 {% for category in categories %}
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-2 col-sm-4 col-xs-6">
                         <li class="child-category">
-                            <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
-                            {% if category.children.all() %}
+                            <div class="child-category-wrapper">
+                                <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
+                                {% if category.children.all() %}
                                 <ol class="grandchild-category-list">
                                     {% for child in category.children.all() %}
                                         {% if child.posts_count > 0 %}
                                             <li class="grandchild-category">
-                                                <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
+                                                <a href="{{ url_for("blog.category", category_link=child.link) }}">
+                                                    {{ loop.index }} {{ child.name }}
+                                                </a>
                                             </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ol>
-                            {% endif %}
+                                {% endif %}
+                            </div>
+
                         </li>
                     </div>
                 {% endfor %}
@@ -29,10 +35,4 @@
         </ol>
     </div>
 
-{% endblock %}
-
-{% block page_sidebar %}
-    <div class="page-sidebar">
-        {% include "blog/_sider_bar.html" %}
-    </div>
 {% endblock %}

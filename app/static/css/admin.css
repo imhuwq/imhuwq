@@ -24,6 +24,16 @@ form #submit {
     float: right;
 }
 
+.navbar-fixed-top {
+    background-color: white;
+    box-shadow: 0 1px 5px rgb(235, 235, 235);
+}
+
+.navbar-default .navbar-nav > .active > a {
+    background-color: rgb(245, 245, 245);
+}
+
+
 /* 2
 *****************************************************************
 *                   Index 2: post editor sets                   *

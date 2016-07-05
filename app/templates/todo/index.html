@@ -17,12 +17,35 @@
 
 {% block page_sidebar %}
     <div class="page-sidebar">
-        <div id="id-info-panel">
+        <div id="id-task-flows">
+            <input type="text" id="id-flow-input" class="form-control" placeholder="what's your next move?"
+                   name="note">
 
+            <ul class="cls-flow-list ui-sortable" id="sortable">
+                {% for flow in flows %}
+                    <li class="cls-flow-item ui-state-default flow-id-{{ flow.id }}" id="{{ flow.fake_id }}">
+                        {{ flow.text }}
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
 
-        <div id="id-create-project">
 
+        <hr>
+        <div class="cls-task-text">
+            <h4>Idea: <i>Anything about the task</i></h4>
+        </div>
+
+        <div id="id-task-idea">
+            {% if task.idea %}
+                {{ task.idea | markdown |safe }}
+            {% endif %}
+
+        </div>
+        <div class="cls-task-idea-origin" style="display: none">
+            {% if task.idea %}
+                {{ task.idea }}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

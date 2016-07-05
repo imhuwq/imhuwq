@@ -24,6 +24,15 @@ form #submit {
     float: right;
 }
 
+.navbar-fixed-top {
+    background-color: white;
+    box-shadow: 0 1px 5px rgb(235, 235, 235);
+}
+
+.navbar-default .navbar-nav > .active > a {
+    background-color: rgb(245, 245, 245);
+}
+
 ul {
     list-style-type: none;
     padding-left: 0;
@@ -122,7 +131,7 @@ ul {
 *****************************************************************
 *                   Index 3: flow sets                        *
 *****************************************************************/
-#id-note-input, #id-flow-input{
+#id-note-input, #id-flow-input {
     font-size: 1.5em;
     line-height: 2em;
     height: 2.2em;
@@ -188,7 +197,6 @@ ul {
     padding-left: 5px;
     cursor: pointer;
 }
-
 
 /* 9
 *****************************************************************

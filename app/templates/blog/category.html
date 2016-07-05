@@ -3,7 +3,7 @@
 {% block page_main %}
     {% if category %}
         {% set tree = request.path.split('/')[3:] %}
-        <h2>分类:
+        <h2 class="cls-section-identifier">分类:
             {% set link = request.path.split('/blog/category/',1)[1] %}
             {% set len = tree|length %}
             {% for i in range(len) %}
@@ -13,6 +13,7 @@
                 {% if i != len-1 %}&raquo;{% endif %}
             {% endfor %}
         </h2>
+        <hr>
     {% else %}
         <h2>分类</h2>
     {% endif %}
@@ -29,24 +30,27 @@
 
                 <div class="collapse" id="collapseChild">
                     <ol class="child-category-list">
-                    <div class="row">
-                        {% for category in categories %}
-                        <div class="col-md-4 col-sm-6">
-                            <li class="child-category">
-                                <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
-                                <ol class="grandchild-category-list">
-                                {% for child in category.children.all() %}
-                                    {% if child.posts_count > 0 %}
-                                        <li class="grandchild-category">
-                                            <a href="{{ url_for("blog.category", category_link=child.link) }}">{{ child.name }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                                </ol>
-                            </li>
+                        <div class="row">
+                            {% for category in categories %}
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <li class="child-category">
+                                        <div class="child-category-wrapper">
+                                            <a href="{{ url_for("blog.category", category_link=category.link) }}">{{ category.name }}</a>
+                                            <ol class="grandchild-category-list">
+                                                {% for child in category.children.all() %}
+                                                    {% if child.posts_count > 0 %}
+                                                        <li class="grandchild-category">
+                                                            <a href="{{ url_for("blog.category", category_link=child.link) }}">
+                                                                {{ loop.index }} {{ child.name }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ol>
+                                        </div>
+                                    </li>
+                                </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
                     </ol>
                 </div>
             </div>
@@ -70,11 +74,5 @@
                 {{ macros.simple_pagination_widget(pagination=pagination, category_link=category.link, endpoint="blog.category") }}
             </div>
         {% endif %}
-    </div>
-{% endblock %}
-
-{% block page_sidebar %}
-    <div class="page-sidebar">
-        {% include "blog/_sider_bar.html" %}
     </div>
 {% endblock %}

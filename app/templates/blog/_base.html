@@ -29,14 +29,8 @@
         <div class="row">
             {% block page_container %}
 
-                <div class="col-md-9">
+                <div class="col-md-12">
                     {% block page_main %}
-
-                    {% endblock %}
-                </div>
-
-                <div class="col-md-3">
-                    {% block page_sidebar %}
 
                     {% endblock %}
                 </div>
@@ -46,6 +40,7 @@
                         <p id="site-description"><i>{{ config['SITE_DESCRIPTION'] }}</i></p>
                     </div>
                 </div>
+
 
             {% endblock %}
         </div>
@@ -63,6 +58,7 @@
         {% if current_user.is_authenticated %}
             var $CSRF_TOKEN = "{{ csrf_token() }}";
         {% endif %}
+        var $READING_BLOG = false
     </script>
 
     {% if config['DISQUS_IDENTIFIER'] %}
@@ -73,7 +69,7 @@
 
     {% if (request.endpoint in ["blog.index", "blog.post", "blog.tag", "blog.category"]) or
     (current_user.is_anonymous and request.endpoint == "main.index") %}
-        <script>var $READING_BLOG = true</script>
+        <script>$READING_BLOG = true</script>
     {% endif %}
 
     <script>

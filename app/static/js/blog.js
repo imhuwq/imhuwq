@@ -3,7 +3,7 @@ $(document).ready(function () {
     if (window.location.pathname.indexOf($BLOG_CATEGORY_PATH) > -1) {
         var childCategory = $('.child-category');
         childCategory.on('click', function () {
-            window.location.replace($SCRIPT_ROOT + $(this).children('a').attr('href'))
+            window.location.replace($SCRIPT_ROOT + $(this).find('a').attr('href'))
         });
 
         childCategory.on('mouseover', function () {

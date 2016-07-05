@@ -3,7 +3,8 @@
 {% block page_main %}
     <div class="page-main">
         <div class="archive-container">
-
+            <h2 class="cls-section-identifier">存档</h2>
+            <hr>
             {% set tmp_year = 0 %}
             {% set start_loop = 0 %}
             {% for post in posts %}
@@ -33,12 +34,5 @@
             {% endfor %}
         </div>
 
-    </div>
-{% endblock %}
-
-
-{% block page_sidebar %}
-    <div class="page-sidebar">
-        {% include "blog/_sider_bar.html" %}
     </div>
 {% endblock %}

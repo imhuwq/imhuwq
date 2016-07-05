@@ -113,13 +113,13 @@
                         {% else %}
                             <div class="abstract">
                                 {{ post.abstract | markdown | safe }}
-                                ......
                             </div>
                             <span class="read-more"><a
                                     href="{{ url_for('blog.post', post_link=post.link) }}">阅读全文</a></span>
                         {% endif %}
                     </div>
                 </li>
+                <hr>
             {% endif %}
         {% endfor %}
     </ul>

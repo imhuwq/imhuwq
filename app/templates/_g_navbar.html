@@ -22,9 +22,37 @@
                         </li>
                     {% endif %}
 
-                    <li {% if request.endpoint.startswith('blog.') %} class="active" {% endif %}>
-                        <a href={{ url_for('blog.index') }}>博客</a>
-                    </li>
+
+                    {% if request.endpoint.startswith('blog.') %}
+                        <li {% if request.endpoint == 'blog.index' %}class="active" {% endif %}>
+                            <a href={{ url_for('blog.index') }}>博客</a>
+                        </li>
+
+                        <li {% if request.endpoint in ['blog.category', 'blog.categories']
+                                    or request.path.startswith('/blog/category/')
+                                    or request.path.startswith('/blog/categories/') %}
+                            class="active"
+                        {% endif %}>
+                            <a href="{{ url_for('blog.categories') }}">&nbsp;&nbsp;分类</a>
+                        </li>
+
+                        <li {% if request.endpoint == 'blog.tags'
+                                    or request.path.startswith('/blog/tag/')
+                                    or request.path.startswith('/blog/tags/') %}
+                            class="active"
+                        {% endif %}>
+                            <a href="{{ url_for('blog.tags') }}">&nbsp;&nbsp;标签</a>
+                        </li>
+
+                        <li {% if request.endpoint == 'blog.archive' %}class="active" {% endif %}>
+                            <a href="{{ url_for('blog.archive') }}">&nbsp;&nbsp;存档</a>
+                        </li>
+
+                    {% else %}
+                        <li>
+                            <a href={{ url_for('blog.index') }}>博客</a>
+                        </li>
+                    {% endif %}
 
                 {% endif %}
             </ul>

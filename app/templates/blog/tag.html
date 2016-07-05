@@ -1,7 +1,7 @@
 {% extends "blog/_base.html" %}
 
 {% block page_main %}
-    <h2>标签: {{ tag.name }}</h2>
+    <h2 class="cls-section-identifier">标签: {{ tag.name }}</h2>
     <hr>
     <div class="page-main">
 
@@ -19,11 +19,5 @@
             </div>
         {% endif %}
 
-    </div>
-{% endblock %}
-
-{% block page_sidebar %}
-    <div class="page-sidebar">
-        {% include "blog/_sider_bar.html" %}
     </div>
 {% endblock %}

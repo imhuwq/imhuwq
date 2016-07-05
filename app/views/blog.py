@@ -18,13 +18,9 @@ def index():
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False
         )
         posts = pagination.items
-    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/index.html',
                            title=title,
                            posts=posts,
-                           cates=cates,
-                           tags=tags,
                            pagination=pagination)
 
 
@@ -59,29 +55,18 @@ def post(post_link=None, post_category_link=None, post_tag_link=None, post_date_
     if not_found:
         abort(404)
 
-    cates = Category.query.filter_by(_level=0). \
-        filter(Category._posts_count != 0). \
-        order_by(Category._order).all()
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/single.html',
                            title=p.title,
-                           posts=[p],
-                           cates=cates,
-                           tags=tags)
+                           posts=[p])
 
 
 @blog.route('/categories')
 def categories():
-    display = request.args.get('display')
-    if display == 'detail':
-        return redirect(url_for('blog.index'))
     cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/categories.html',
                            categories=cates,
                            title='分类',
-                           cates=cates,
-                           tags=tags)
+                           cates=cates)
 
 
 @blog.route('/categories/<path:category_link>')
@@ -100,15 +85,21 @@ def category(category_link):
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
         ps = pagination.items
     cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/category.html',
                            category=cate,
                            categories=children,
                            posts=ps,
                            pagination=pagination,
                            title='分类:' + cate.name,
-                           cates=cates,
-                           tags=tags)
+                           cates=cates)
+
+
+@blog.route('/tags')
+def tags():
+    ts = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
+    return render_template('blog/tags.html',
+                           tags=ts,
+                           title='标签')
 
 
 @blog.route('/tags/<path:tag_link>')
@@ -127,14 +118,12 @@ def tag(tag_link):
         )
         ps = pagination.items
 
-    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
     tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/tag.html',
                            title='标签:' + tag_link,
                            pagination=pagination,
                            posts=ps,
                            tag=t,
-                           cates=cates,
                            tags=tags)
 
 
@@ -142,11 +131,7 @@ def tag(tag_link):
 def archive():
     title = '博客存档'
     ps = Post.query.filter_by(_type='article').order_by(Post._publish_date.desc()).all()
-    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
     return render_template('blog/archive.html',
                            posts=ps,
                            title=title,
-                           cates=cates,
-                           tags=tags
                            )
