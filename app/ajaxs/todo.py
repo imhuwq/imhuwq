@@ -113,7 +113,7 @@ def new_flow():
         flow = Flow(task=task_id, text=flow_text)
         db.session.add(flow)
         db.session.commit()
-        return gen_ok_200(id=flow.id)
+        return gen_ok_200(id=flow.id, fake_id=flow.fake_id)
     except (FlowTextTooLong, TaskNotExist, FlowCountOutOfRange) as e:
         db.session.rollback()
         return gen_err_500(e)

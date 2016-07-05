@@ -237,8 +237,8 @@ $(document).ready(function () {
                             if (data.status == 200) {
                                 var new_flow = $("<li/>",
                                     {
-                                        id: "flow-" + data.id,
-                                        class: "cls-flow-item ui-state-default",
+                                        class: "cls-flow-item ui-state-default flow-id-" + data.id,
+                                        id: data.fake_id,
                                         html: flow_content
                                     }).sortable();
                                 new_flow.appendTo(flow_list)
