@@ -107,9 +107,9 @@ sudo start tornado.your-site.com.conf
  flow 模式聚焦某个 Task， 可以分解子步骤，可以自由添加笔记  
  使用了非常多的 jquery 和 ajax， 操作非常方便
 
- - 博客优化
+ - 博客优化  
  数据库从 mysql 转移到 postgresql  
- 博客的Markdown有代码高亮了，基于Pygments
+ 博客的Markdown有代码高亮了，基于Pygments  
  数据库表一律按功能增加前缀  
  博客的测试更加系统  
 
@@ -144,6 +144,6 @@ sudo start tornado.your-site.com.conf
 # 4.后期的打算
   - 支持图片   
   - 批量导出文章为markdown  
-  - Todo 增加“项目”功能
+  - Todo 增加“项目”功能  
   - News feed： 微博, 知乎, twitter， google+ 等社交媒体信息聚合
-  - 有可能转到 Tornado 框架
+  - 有可能转到 Tornado 框架  
