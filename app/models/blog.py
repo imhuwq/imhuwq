@@ -250,6 +250,10 @@ class Post(db.Model):
             self._public = True
         else:
             self._public = False
+        self.category.refresh_posts_count()
+        for tag in self.tags:
+            t = Tag.query.filter_by(_name=tag).first()
+            t.refresh_posts_count()
 
     @property
     def commendable(self):
@@ -435,7 +439,7 @@ class Category(db.Model):
                 child.link = self._link + '/' + child.name.replace(' ', '_')
 
     def refresh_posts_count(self):
-        self._posts_count = self.all_posts.count()
+        self._posts_count = self.all_posts.filter_by(_public=True).count()
 
     @property
     def posts(self):
@@ -551,7 +555,7 @@ class Tag(db.Model):
         return self._posts_count
 
     def refresh_posts_count(self):
-        self._posts_count = self.posts.count()
+        self._posts_count = self.posts.filter_by(_public=True).count()
 
     @property
     def posts(self):
