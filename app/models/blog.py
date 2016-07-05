@@ -68,7 +68,7 @@ class Post(db.Model):
 
        Post.generate_fake(num)  自动生成num篇文章
     """
-    __tablename__ = 'posts'
+    __tablename__ = 'blog_posts'
     _id = db.Column('id', db.Integer, primary_key=True)
 
     #: _type和_main_id一起用来区分日志的类型
@@ -340,7 +340,7 @@ class Post(db.Model):
 
 
 class Category(db.Model):
-    __tablename__ = 'categories'
+    __tablename__ = 'blog_categories'
     _id = db.Column('id', db.Integer, primary_key=True)
     _name = db.Column('name', db.String(32), unique=True, index=True)
     _link = db.Column('link', db.String(128), unique=True, index=True)
@@ -523,7 +523,7 @@ class Category(db.Model):
 
 
 class Tag(db.Model):
-    __tablename__ = 'tags'
+    __tablename__ = 'blog_tags'
     _id = db.Column('id', db.Integer, primary_key=True)
     _name = db.Column('name', db.String(32), unique=True, index=True)
     _link = db.Column('link', db.String(32), unique=True, index=True)
