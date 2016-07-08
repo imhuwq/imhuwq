@@ -120,7 +120,7 @@ def index():
                                tasks=tasks)
 
     title = 'ImHuWQ'
-    query = Post.query.filter_by(_type="article").order_by(Post._publish_date.desc())
+    query = Post.query.filter_by(_type="article").filter_by(_public=True).order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         posts = query.all()
         pagination = None

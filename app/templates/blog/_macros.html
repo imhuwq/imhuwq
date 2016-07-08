@@ -34,7 +34,7 @@
 {% endmacro %}
 
 {% macro simple_pagination_widget(pagination, endpoint) %}
-    <nv>
+    <nav>
         <ul class="pager">
             {% if pagination.has_prev %}
                 <li class="previous"><a href="{{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}">
@@ -47,7 +47,7 @@
                 </a></li>
             {% endif %}
         </ul>
-    </nv>
+    </nav>
 {% endmacro %}
 
 
@@ -114,9 +114,10 @@
                             <div class="abstract">
                                 {{ post.abstract | markdown | safe }}
                             </div>
-                            <span class="read-more"><a
-                                    href="{{ url_for('blog.post', post_link=post.link) }}">阅读全文</a></span>
                         {% endif %}
+                        <span class="read-more">
+                                <a href="{{ url_for('blog.post', post_link=post.link) }}">阅读全文</a>
+                            </span>
                     </div>
                 </li>
                 <hr>
