@@ -155,10 +155,10 @@ class PubAndSavePostTest(unittest.TestCase):
                         d.main == p and
                         d.link == 'po_st_dr_af_t' and
                         d.category == c and
-                        t.posts_count == 1 and
-                        a.posts_count == 1 and
                         d.tags == ['tag'] and
-                        c.posts_count == 1)
+                        t.posts_count == 0 and
+                        a.posts_count == 0 and
+                        c.posts_count == 0)
 
     def test_05_edit_publish_draft(self):
         """修改一篇草稿, 直接发布"""
@@ -332,12 +332,12 @@ class PubAndSavePostTest(unittest.TestCase):
                         not p.public and
                         not p.commendable and
                         p.category == c and
-                        t.posts_count == 1 and
-                        a.posts_count == 1 and
+                        t.posts_count == 0 and
+                        a.posts_count == 0 and
                         t.posts[0] == p and
                         a.posts[0] == p and
                         p.tags == ['tag', 'gat'] and
-                        c.posts_count == 1 and
+                        c.posts_count == 0 and
                         c.posts[0] == p and
                         d.main == p and
                         d.title == 'po st ed it' and

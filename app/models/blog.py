@@ -4,70 +4,6 @@ from sqlalchemy import event, or_
 
 
 class Post(db.Model):
-    """Post Model
-       所有属性为私有属性, 一律从getter和setter进行数据交流,
-       方便对数据的验证和保护, 进而保护数据的正确性和数据库的完整性
-       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-       完整的API如下:(小写post指实例, 大写Post指类)
-       post.type,               可读, 返回值为post._type, 'article'和'draft'之一
-                                不可写, 在保存文章时自动设置, 详见Post.save(post) 以及 Post.publish(post)
-
-       post.main,               可读, 返回值为草稿的对应主体文章, Post实例, 或者为None(如果当前文章不是其它文章的修改稿的话)
-                                不可写, 在保存文章时自动设置, 详见Post.save(post) 以及 Post.publish(post)
-
-       post.draft,              可读, 返回值为文章修改中的草稿, Post实例, 或者为None
-                                不可写, 在保存文章时自动设置, 详见详见Post.save(post) 以及 Post.publish(post)
-
-       post.title,              可读, 返回post._title, 字符串或者''
-                                可写, 接受任何120长度以内字符串
-
-       post.link,               可读, 返回post._link, 字符串或者''
-                                不可写, 在_title的setter中而生成, 将_title中的空格转换成下划线
-
-       post.publish_date,       可读, 返回post._publish_date, datetime, 或者None
-                                不可写, 在Post.publish(post)时生成, datetime.datetime.utcnow().replace(milliseconds=0)
-
-       post.date,               可读, 返回post._edit_date, datetime, 或者None
-                                不可写, 在Post.publish(post)时生成, datetime.datetime.utcnow().replace(milliseconds=0)
-
-       post.content,            可读, 返回post._content, 字符串, 或者''
-                                可写, 接受任意长度字符
-
-       post.abstract,           可读, 返回post._abstract, 字符串, 或者''
-                                不可写在content的setter中自动截取, 分隔符为 <!--more-->
-
-       post.commendable,        可读, 返回post._commendable, boolean
-                                可写, 接受boolean
-
-       post.public,             可读, 返回post._public, boolean
-                                可写, 接受boolean
-
-       post.category,           可读,返回对应分类的Category实例, 或者None
-                                可写, 接受一个Category实例, 保存其link到post._category
-
-       post.tags,               可读, 返回一个包含文章标签名称的list: ['tag1', 'tag2', 'tag3'], 或者[]
-                                可写, 接受一个由","分隔的标签名称字符串: 'tag1, tag2, tag3'
-
-       post.add_tag(tag)        增加一个tag, 接受一个Tag实例
-
-       post.del_tag(tag)        删除一个tag, 接受一个Tag实例
-
-       Post.publish(post, **data)发布一篇文章, 自动处理日期, type和main post关系
-                                如果post为新文章或者草稿, 设置post.type = 'article',
-                                                           post.date = post.publish_date = utcnow()
-                                如果post为修改稿, 先找到main post, 更新main post内容, main_post.date = utcnow(),
-                                                再删除post
-       Post.save(post, **data)  保存一篇文章, 自动处理日期, type和main post关系
-                                如果post为新文章, 设置post.type = 'draft', post.date = utcnow()
-                                如果post为已发布, 新建edit_post为修改稿, edit_post内容为当前内容,
-                                                                      edit_post.type = 'draft',
-                                                                      edit_post._main_id = post.id
-                                                                      edit_post.date = utcnow()
-                                如果post为修改稿, post.date = utcnow(), 其余不变
-
-       Post.generate_fake(num)  自动生成num篇文章
-    """
     __tablename__ = 'blog_posts'
     _id = db.Column('id', db.Integer, primary_key=True)
 
@@ -309,6 +245,9 @@ class Post(db.Model):
                                                   edit_post._main_id = post.id
         """
         if post.type == 'article':
+            old_draft = post.draft
+            if old_draft:
+                db.session.delete(old_draft)
             draft = Post()
             draft._main_id = post.id
             post = draft
