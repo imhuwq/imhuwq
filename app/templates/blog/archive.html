@@ -9,24 +9,24 @@
             {% set start_loop = 0 %}
             {% for post in posts %}
                 {% if post.public or current_user.is_authenticated %}
-                    {% if post.date.year != tmp_year %}
-                        {% set tmp_year = post.date.year %}
+                    {% if post.publish_date.year != tmp_year %}
+                        {% set tmp_year = post.publish_date.year %}
                         {% if start_loop == 1 %} </ul>
                         {% else %} {% set start_loop = 1 %}
                         {% endif %}
-                        <ul class="{{ post.date.year }}" id="post-archive-list">
+                        <ul class="{{ post.publish_date.year }}" id="post-archive-list">
                         <h3>{{ tmp_year }}年</h3>
-                        <li>{{ post.date.month }}月
-                            {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
+                        <li>{{ post.publish_date.month }}月
+                            {% if post.publish_date.day < 10 %}0{% endif %}{{ post.publish_date.day }}日 &raquo; <a
                                     href="{{ url_for("blog.post",
-                                                 post_date_link = '%s/%s/%s' % (post.date.year, post.date.month, post.link)) }}">
+                                                 post_date_link = '%s/%s/%s' % (post.publish_date.year, post.publish_date.month, post.link)) }}">
                                 {{ post.title }}</a>
                         </li>
                     {% else %}
-                        <li>{{ post.date.month }}月
-                            {% if post.date.day < 10 %}0{% endif %}{{ post.date.day }}日 &raquo; <a
+                        <li>{{ post.publish_date.month }}月
+                            {% if post.publish_date.day < 10 %}0{% endif %}{{ post.publish_date.day }}日 &raquo; <a
                                     href="{{ url_for("blog.post",
-                                                 post_date_link = '%s/%s/%s' % (post.date.year, post.date.month, post.link)) }}">
+                                                 post_date_link = '%s/%s/%s' % (post.publish_date.year, post.publish_date.month, post.link)) }}">
                                 {{ post.title }}</a>
                         </li>
                     {% endif %}
