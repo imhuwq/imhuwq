@@ -69,7 +69,7 @@ def edit_post(post_link, post_version):
        'main' 表示获取已发布的文章或者未发布的新文章本身
        'draft' 表示获取已发布文章的修改稿
     """
-    p = Post.query.filter_by(_link=post_link).filter_by(_type='article').first()
+    p = Post.query.filter_by(_link=post_link).order_by(Post._publish_date.asc()).first()
     form = PostForm()
     form.post_id.data = p.id
 

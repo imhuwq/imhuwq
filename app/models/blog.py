@@ -281,6 +281,13 @@ class Post(db.Model):
                          tags=','.join([t1, t2, t3]),
                          category=c)
 
+    def __repr__(self):
+        if self._main_id:
+            return "[修改稿]: %s" % self._title
+        elif self._type == 'draft':
+            return "[起草中]: %s" % self._title
+        return "[发布稿]: %s" % self._title
+
 
 class Category(db.Model):
     __tablename__ = 'blog_categories'
