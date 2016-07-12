@@ -116,7 +116,9 @@
                             </div>
                         {% endif %}
                         <span class="read-more">
+                            {% if not single %}
                                 <a href="{{ url_for('blog.post', post_link=post.link) }}">阅读全文</a>
+                            {% endif %}
                             </span>
                     </div>
                 </li>
