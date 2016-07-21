@@ -212,7 +212,7 @@ class User(db.Model, UserMixin):
         if not target_dir:
             target_dir = BASE_DIR
         columns = User.__table__.columns
-        users = Settings.query.all()
+        users = User.query.all()
         users_data = [{
                           column.key: getattr(user, '_' + column.key) for column in columns
                           }
