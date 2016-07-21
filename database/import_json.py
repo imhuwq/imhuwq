@@ -30,8 +30,7 @@ def run():
     with app.app_context():
         target_dir = os.path.abspath(os.path.join(BASE_DIR, 'database/backup'))
         database = read_json(target_dir)
-        print(database)
-        settings_data = database.get('Setting')
+        settings_data = database.get('Settings')
         users_data = database.get('User')
         posts_data = database.get('Post')
         tags_data = database.get('Tag')
@@ -62,7 +61,7 @@ def run():
                     _is_administrator=user.get("is_administrator"),
                     _password_hash=user.get("password_hash")
                 )
-                db.session.add(user)
+                db.session.add(u)
 
         if posts_data:
             for post in posts_data:
@@ -80,7 +79,7 @@ def run():
                           _tags=post.get('tags'),
                           )
 
-            db.session.add(po)
+                db.session.add(po)
 
         if users_data:
             for tag in tags_data:
@@ -100,7 +99,7 @@ def run():
                     _order=category.get('order'),
                     _posts_count=category.get('posts_count', 0),
                 )
-            db.session.add(c)
+                db.session.add(c)
 
         if tasks_data:
             for task in tasks_data:
@@ -108,8 +107,8 @@ def run():
                     _text=task.get('text'),
                     _level=task.get('level'),
                     _status=task.get('status'),
-                    _start=datetime.strptime(task.get('publish_date'), "%Y-%m-%d %H:%M:%S"),
-                    _finish=datetime.strptime(task.get('finish'), "%Y-%m-%d %H:%M:%S"),
+                    _start=datetime.strptime(task.get('start'), "%Y-%m-%d %H:%M:%S"),
+                    _finish=datetime.strptime(task.get('finish'), "%Y-%m-%d %H:%M:%S") if task.get('finish') else None,
                     _idea=task.get('idea', db.Text),
                     _flow_index=task.get('flow_index'),
                     _flow_order=task.get('flow_order'),
