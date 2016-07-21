@@ -1,4 +1,7 @@
 from .. import db
+from config import BASE_DIR
+
+import json
 from datetime import datetime
 from sqlalchemy import event, or_
 
@@ -281,6 +284,23 @@ class Post(db.Model):
                          tags=','.join([t1, t2, t3]),
                          category=c)
 
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = BASE_DIR
+        columns = Post.__table__.columns
+        posts = Post.query.all()
+        posts_data = [{
+                          column.key: getattr(post, '_' + column.key) \
+                              if not isinstance(getattr(post, '_' + column.key), datetime) \
+                              else str(getattr(post, '_' + column.key).replace(microsecond=0)) for column in columns
+                          }
+                      for post in posts]
+        if export_directly:
+            with open('%s/posts.json' % target_dir, 'w') as j:
+                json.dump(posts_data, j)
+        return posts_data
+
     def __repr__(self):
         if self._main_id:
             return "[修改稿]: %s" % self._title
@@ -471,6 +491,21 @@ class Category(db.Model):
             c.parent = target_cate
         return {'success': 'done'}
 
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = BASE_DIR
+        columns = Category.__table__.columns
+        cates = Category.query.all()
+        cates_data = [{
+                          column.key: getattr(cate, '_' + column.key) for column in columns
+                          }
+                      for cate in cates]
+        if export_directly:
+            with open('%s/cates.json' % target_dir, 'w') as j:
+                json.dump(cates_data, j)
+        return cates_data
+
 
 class Tag(db.Model):
     __tablename__ = 'blog_tags'
@@ -550,6 +585,21 @@ class Tag(db.Model):
             )
             db.session.add(t)
             db.session.commit()
+
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = BASE_DIR
+        columns = Tag.__table__.columns
+        tags = Tag.query.all()
+        tags_data = [{
+                         column.key: getattr(tag, '_' + column.key) for column in columns
+                         }
+                     for tag in tags]
+        if export_directly:
+            with open('%s/tags.json' % target_dir, 'w') as j:
+                json.dump(tags_data, j)
+        return tags_data
 
 
 # recount tag and category posts count after deleting the post

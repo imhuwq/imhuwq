@@ -1,4 +1,6 @@
 from .. import db
+from config import BASE_DIR
+import json
 from ..helpers import base36, chunk_string
 from datetime import datetime
 
@@ -144,6 +146,23 @@ class Task(db.Model):
             flow.delete(False)
         db.session.delete(self)
 
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = BASE_DIR
+        columns = Task.__table__.columns
+        tasks = Task.query.all()
+        tasks_data = [{
+                          column.key: getattr(task, '_' + column.key) \
+                              if not isinstance(getattr(task, '_' + column.key), datetime) \
+                              else str(getattr(task, '_' + column.key).replace(microsecond=0)) for column in columns
+                          }
+                      for task in tasks]
+        if export_directly:
+            with open('%s/tasks.json' % target_dir, 'w') as j:
+                json.dump(tasks_data, j)
+        return tasks_data
+
 
 class Flow(db.Model):
     __tablename__ = "todo_flow"
@@ -194,3 +213,20 @@ class Flow(db.Model):
             task = self.task
             task.flow_order = task.flow_order.replace(self._fake_id, '')
         db.session.delete(self)
+
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = None
+        columns = Flow.__table__.columns
+        flows = Flow.query.all()
+        flows_data = [{
+                          column.key: getattr(flow, '_' + column.key) \
+                              if not isinstance(getattr(flow, '_' + column.key), datetime) \
+                              else str(getattr(flow, '_' + column.key).replace(microsecond=0)) for column in columns
+                          }
+                      for flow in flows]
+        if export_directly:
+            with open('%s/flows.json' % target_dir, 'w') as j:
+                json.dump(flows_data, j)
+        return flows_data

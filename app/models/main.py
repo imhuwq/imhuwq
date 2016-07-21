@@ -1,4 +1,6 @@
 from .. import db, login_manager
+from config import BASE_DIR
+import json
 from flask import current_app
 from datetime import datetime
 from sqlalchemy import event
@@ -131,6 +133,21 @@ class Settings(db.Model):
         current_app.config['GOOGLE_ANALYTICS_CODE'] = self.google_analytics_code
         current_app.config['DISQUS_IDENTIFIER'] = self.disqus_identifier
 
+    @staticmethod
+    def export_json(target_url=None, export_directly=True):
+        if not target_url:
+            target_url = BASE_DIR
+        columns = Settings.__table__.columns
+        sets = Settings.query.all()
+        sets_data = [{
+                         column.key: getattr(set, '_' + column.key) for column in columns
+                         }
+                     for set in sets]
+        if export_directly:
+            with open('%s/settings.json' % target_url, 'w') as j:
+                json.dump(sets_data, j)
+        return sets_data
+
 
 class User(db.Model, UserMixin):
     """用户Model
@@ -189,6 +206,21 @@ class User(db.Model, UserMixin):
         super().__init__(**kwargs)
         if not self._is_administrator:
             self._is_administrator = self.email == current_app.config['SITE_ADMIN_EMAIL']
+
+    @staticmethod
+    def export_json(target_dir=None, export_directly=True):
+        if not target_dir:
+            target_dir = BASE_DIR
+        columns = User.__table__.columns
+        users = Settings.query.all()
+        users_data = [{
+                          column.key: getattr(user, '_' + column.key) for column in columns
+                          }
+                      for user in users]
+        if export_directly:
+            with open('%s/users.json' % target_dir, 'w') as j:
+                json.dump(users_data, j)
+        return users_data
 
 
 @login_manager.user_loader

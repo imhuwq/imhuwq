@@ -39,6 +39,18 @@ def test(cov=False, which=None):
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
+@manager.command
+def export_json():
+    from database import export_json
+    export_json.run()
+
+
+@manager.command
+def import_json():
+    from database import import_json
+    import_json.run()
+
+
 if COV:
     COV.stop()
     COV.save()

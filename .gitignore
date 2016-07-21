@@ -1,4 +1,5 @@
 env
+backup
 tmp
 config.py
 migrations
