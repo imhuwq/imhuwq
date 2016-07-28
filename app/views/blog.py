@@ -1,5 +1,6 @@
-from flask import Blueprint, request, redirect, url_for, render_template, current_app, abort
+from flask import Blueprint, request, render_template, current_app, abort
 from flask_login import current_user
+from sqlalchemy import or_
 from ..models import Post, Category, Tag
 
 blog = Blueprint('blog', __name__)
@@ -79,7 +80,8 @@ def category(category_link):
     if not cate:
         abort(404)
     children = cate.children.all()
-    base_query = Post.query.filter_by(_type="article")
+    base_query = Post.query.filter_by(_type="article").filter(or_(Post._category.like(category_link),
+                                                                  Post._category.like(category_link + '/%')))
     base_query = base_query.filter_by(_public=True) if not current_user.is_administrator else base_query
     query = base_query.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
@@ -113,7 +115,10 @@ def tag(tag_link):
     t = Tag.query.filter_by(_link=tag_link).first()
     if not t:
         abort(404)
-    base_query = Post.query.filter_by(_type="article")
+    base_query = Post.query.filter_by(_type="article").filter(or_(Post._tags.like(tag_link + ',%'),
+                                                                  Post._tags.like('%,' + tag_link),
+                                                                  Post._tags.like(tag_link),
+                                                                  Post._tags.like('%,' + tag_link + ',%')))
     base_query = base_query.filter_by(_public=True) if not current_user.is_administrator else base_query
     query = base_query.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
