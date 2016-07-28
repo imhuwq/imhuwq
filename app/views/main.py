@@ -18,7 +18,7 @@ def before_app_first_request():
         sets = Settings(site_initiated=False,
                         site_admin_email=current_app.config['SITE_ADMIN_EMAIL'])
         db.session.add(sets)
-    cate = Category.query.get(1)
+    cate = Category.query.first()
     if cate is None:
         cate = Category(name='默认分类')
         db.session.add(cate)
