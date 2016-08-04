@@ -69,7 +69,8 @@ def run():
                           _main_id=post.get('main_id'),
                           _title=post.get('title'),
                           _link=post.get('link'),
-                          _publish_date=datetime.strptime(post.get('publish_date'), "%Y-%m-%d %H:%M:%S"),
+                          _publish_date=datetime.strptime(post.get('publish_date'), "%Y-%m-%d %H:%M:%S")
+                                        if post.get('publish_date') else None,
                           _edit_date=datetime.strptime(post.get('edit_date'), "%Y-%m-%d %H:%M:%S"),
                           _content=post.get('content'),
                           _abstract=post.get('abstract'),
