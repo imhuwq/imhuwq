@@ -60,6 +60,9 @@ def post(post_link=None, post_category_link=None, post_tag_link=None, post_date_
     if not_found:
         abort(404)
 
+    if not p.public and not current_user.is_authenticated:
+        abort(404)
+
     return render_template('blog/single.html',
                            title=p.title,
                            posts=[p])
