@@ -54,7 +54,7 @@ def post(post_link=None, post_category_link=None, post_tag_link=None, post_date_
     elif post_date_link:
         *date, post_link = post_date_link.split('/')
         p = Post.query.filter_by(_link=post_link).first()
-        if p and '/'.join(date) == '%s/%s' % (p.date.year, p.date.month):
+        if p and '/'.join(date) == '%s/%s' % (p.publish_date.year, p.publish_date.month):
             not_found = False
 
     if not_found:
