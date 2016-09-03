@@ -6,10 +6,8 @@ from flask import abort, redirect, url_for, jsonify
 def admin_required(func):
     @wraps(func)
     def decorator(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for('main.login'))
         if not current_user.is_administrator:
-            abort(403)
+            abort(404)
         return func(*args, **kwargs)
 
     return decorator
