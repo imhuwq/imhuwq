@@ -92,7 +92,7 @@
                         {% endif %}
                         <span class="post-comment">
                         <span class="glyphicon glyphicon-comment" title="评论"></span>&nbsp;
-                        {% if config['PREFERED_URL_SCHEME'] == 'https' %}
+                        {% if config['PREFERRED_URL_SCHEME'] == 'https' %}
                         <a href="{{ url_for('blog.post', post_link=post.link, _external=True, _scheme='https') }}#disqus_thread"
                            data-disqus-identifier="post-{{ post.title }}">
 
