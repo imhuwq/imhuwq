@@ -92,10 +92,16 @@
                         {% endif %}
                         <span class="post-comment">
                         <span class="glyphicon glyphicon-comment" title="评论"></span>&nbsp;
-                        <a href="{{ url_for('blog.post', post_link=post.link, _external=True) }}#disqus_thread"
+                        {% if app.config['PREFERED_URL_SCHEME'] == 'https' %}
+                        <a href="{{ url_for('blog.post', post_link=post.link, _external=True, _scheme='https') }}#disqus_thread"
                            data-disqus-identifier="post-{{ post.title }}">
 
                         </a>
+                        {% else %}
+                        <a href="{{ url_for('blog.post', post_link=post.link, _external=True) }}#disqus_thread"
+                           data-disqus-identifier="post-{{ post.title }}">
+
+                        {% endif %}
                     </span>&nbsp;
 
                         {% if current_user.is_administrator %}
