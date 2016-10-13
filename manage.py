@@ -66,7 +66,8 @@ if COV:
 @manager.command
 def profile(length=30, profile_dir=None):
     from werkzeug.contrib.profiler import ProfilerMiddleware
-    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length], profile_dir=profile_dir)
+    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[
+                                      length], profile_dir=profile_dir)
     app.run()
 
 

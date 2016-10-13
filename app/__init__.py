@@ -18,6 +18,7 @@ login_manager = LoginManager()
 
 
 class HighlighterRenderer(m.HtmlRenderer):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -87,7 +88,6 @@ def create_app(mode='default'):
     app.register_blueprint(ajax_admin_blueprint, url_prefix='/ajax-admin')
 
     return app
-
 
     # TODO: 找回密码
     # TODO： 导出PDF

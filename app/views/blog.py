@@ -11,7 +11,8 @@ blog = Blueprint('blog', __name__)
 def index():
     title = '博客'
     base_query = Post.query.filter_by(_type="article")
-    base_query = base_query.filter_by(_public=True) if not current_user.is_administrator else base_query
+    base_query = base_query.filter_by(
+        _public=True) if not current_user.is_administrator else base_query
     query = base_query.order_by(Post._publish_date.desc())
 
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
@@ -20,7 +21,8 @@ def index():
     else:
         page = request.args.get('page', 1, type=int)
         pagination = query.paginate(
-            page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False
+            page=page, per_page=current_app.config[
+                'POSTS_PER_PAGE'], error_out=False
         )
         posts = pagination.items
     return render_template('blog/index.html',
@@ -70,7 +72,8 @@ def post(post_link=None, post_category_link=None, post_tag_link=None, post_date_
 
 @blog.route('/categories')
 def categories():
-    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    cates = Category.query.filter_by(_level=0).filter(
+        Category._posts_count != 0).order_by(Category._order).all()
     return render_template('blog/categories.html',
                            categories=cates,
                            title='分类',
@@ -85,7 +88,8 @@ def category(category_link):
     children = cate.children.all()
     base_query = Post.query.filter_by(_type="article").filter(or_(Post._category.like(category_link),
                                                                   Post._category.like(category_link + '/%')))
-    base_query = base_query.filter_by(_public=True) if not current_user.is_administrator else base_query
+    base_query = base_query.filter_by(
+        _public=True) if not current_user.is_administrator else base_query
     query = base_query.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()
@@ -95,7 +99,8 @@ def category(category_link):
         pagination = query.paginate(
             page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
         ps = pagination.items
-    cates = Category.query.filter_by(_level=0).filter(Category._posts_count != 0).order_by(Category._order).all()
+    cates = Category.query.filter_by(_level=0).filter(
+        Category._posts_count != 0).order_by(Category._order).all()
     return render_template('blog/category.html',
                            category=cate,
                            categories=children,
@@ -107,7 +112,8 @@ def category(category_link):
 
 @blog.route('/tags')
 def tags():
-    ts = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
+    ts = Tag.query.filter(Tag._posts_count != 0).order_by(
+        Tag._posts_count.desc()).all()
     return render_template('blog/tags.html',
                            tags=ts,
                            title='标签')
@@ -119,10 +125,13 @@ def tag(tag_link):
     if not t:
         abort(404)
     base_query = Post.query.filter_by(_type="article").filter(or_(Post._tags.like(tag_link + ',%'),
-                                                                  Post._tags.like('%,' + tag_link),
-                                                                  Post._tags.like(tag_link),
+                                                                  Post._tags.like(
+                                                                      '%,' + tag_link),
+                                                                  Post._tags.like(
+                                                                      tag_link),
                                                                   Post._tags.like('%,' + tag_link + ',%')))
-    base_query = base_query.filter_by(_public=True) if not current_user.is_administrator else base_query
+    base_query = base_query.filter_by(
+        _public=True) if not current_user.is_administrator else base_query
     query = base_query.order_by(Post._publish_date.desc())
     if query.count() <= current_app.config['POSTS_PER_PAGE']:
         ps = query.all()
@@ -130,11 +139,13 @@ def tag(tag_link):
     else:
         page = request.args.get('page', 1, type=int)
         pagination = query.paginate(
-            page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False
+            page=page, per_page=current_app.config[
+                'POSTS_PER_PAGE'], error_out=False
         )
         ps = pagination.items
 
-    tags = Tag.query.filter(Tag._posts_count != 0).order_by(Tag._posts_count.desc()).all()
+    tags = Tag.query.filter(Tag._posts_count != 0).order_by(
+        Tag._posts_count.desc()).all()
     return render_template('blog/tag.html',
                            title='标签:' + tag_link,
                            pagination=pagination,
@@ -146,7 +157,8 @@ def tag(tag_link):
 @blog.route('/archives')
 def archive():
     title = '博客存档'
-    ps = Post.query.filter_by(_type='article').order_by(Post._publish_date.desc()).all()
+    ps = Post.query.filter_by(_type='article').order_by(
+        Post._publish_date.desc()).all()
     return render_template('blog/archive.html',
                            posts=ps,
                            title=title,

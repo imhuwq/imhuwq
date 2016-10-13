@@ -41,6 +41,8 @@ class Config:
     # 通用设置
     SECRET_KEY = gen_secret_key()
 
+    PREFERRED_URL_SCHEME = 'https'
+
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_RECORD_QUERIES = True
@@ -63,7 +65,8 @@ class Config:
 
         # 不提供数据库名则使用 sqlite
         if self.DATABASE_NAME == '' or mode == 'test':
-            self.SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, db_name)
+            self.SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
+                os.path.join(BASE_DIR, db_name)
 
         # 否则使用 postgresql
         else:
