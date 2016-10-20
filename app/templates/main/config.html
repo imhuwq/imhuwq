@@ -1,0 +1,19 @@
+<h1>ImHuWQ</h1>
+
+{% if config['DEBUG'] or config['TESTING'] %}
+<h2>Config Table</h2>
+<table>
+    <tbody>
+    {% for key, value in config.items() %}
+    <tr>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+<h2>You can only access app config in develop mode or testing mode</h2>
+
+{% endif %}
