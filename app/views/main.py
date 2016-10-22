@@ -1,15 +1,14 @@
-from flask import Blueprint, render_template, redirect, url_for, current_app
+from flask import Blueprint, render_template, jsonify
 
-app = Blueprint('app', __name__)
+main = Blueprint('app', __name__)
 
 
-@app.route('/')
+@main.route('/')
 def index():
-    if current_app.config['DEBUG'] or current_app.config['TESTING']:
-        return redirect(url_for('main.config'))
-    return render_template('main/index.html')
+    return jsonify(status='ok',
+                   page='home page to load static files')
 
 
-@app.route('/config')
+@main.route('/config')
 def config():
     return render_template('main/config.html')

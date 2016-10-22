@@ -53,7 +53,7 @@ class Config:
         self.DEBUG = None
         self.TESTING = None
         self.SQLALCHEMY_DATABASE_URI = None
-
+        self.SERVER_NAME = None
         if app:
             self.init_app(app)
 
@@ -67,11 +67,14 @@ class Config:
         elif mode == 'testing':
             self.TESTING = True
             db_name = 'testing.sqlite'
+            self.SERVER_NAME = 'imhuwq.local'
 
         # 开发模式
         elif mode == 'develop':
             self.DEBUG = True
             db_name = 'develop.sqlite'
+            self.SERVER_NAME = 'imhuwq.local'
+
         else:
             raise AttributeError('an app should be run in production, develop or testing mode')
 
